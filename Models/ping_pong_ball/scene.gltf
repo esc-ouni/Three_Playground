@@ -1,0 +1,286 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 910,
+      "max": [
+        0.3195255994796753,
+        0.3193948566913605,
+        0.3199999928474426
+      ],
+      "min": [
+        -0.3195255994796753,
+        -0.3193948566913605,
+        -0.3199999928474426
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 10920,
+      "componentType": 5126,
+      "count": 910,
+      "max": [
+        0.9985426664352417,
+        0.9981005191802979,
+        1.0
+      ],
+      "min": [
+        -0.9985426068305969,
+        -0.9981005191802979,
+        -1.0
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5126,
+      "count": 910,
+      "max": [
+        0.9989277124404907,
+        0.7070633172988892,
+        0.9017642736434937,
+        1.0
+      ],
+      "min": [
+        -0.9994792938232422,
+        -0.7630024552345276,
+        -0.9495614171028137,
+        1.0
+      ],
+      "type": "VEC4"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 910,
+      "max": [
+        0.9992432594299316,
+        0.7790310382843018
+      ],
+      "min": [
+        0.0008545998716726899,
+        0.23213887214660645
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 4860,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "Alexandre_Gomes (https://sketchfab.com/Alexandre_Gomes)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/ping-pong-ball-966c74cfad20469f8beb3afac62bb9ea",
+      "title": "Ping pong Ball"
+    },
+    "generator": "Sketchfab-12.66.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 19440,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 7280,
+      "byteOffset": 19440,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 21840,
+      "byteOffset": 26720,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 14560,
+      "byteOffset": 48560,
+      "byteStride": 16,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 63120,
+      "uri": "scene.bin"
+    }
+  ],
+  "images": [
+    {
+      "uri": "textures/Material_40_baseColor.png"
+    },
+    {
+      "uri": "textures/Material_40_metallicRoughness.png"
+    },
+    {
+      "uri": "textures/Material_40_normal.png"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "Material_40",
+      "normalTexture": {
+        "index": 2,
+        "scale": 0.2
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0.0,
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "GeoSphere001_Material #40_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TANGENT": 2,
+            "TEXCOORD_0": 3
+          },
+          "indices": 4,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        0.3014495604459313,
+        0.040819505881785303,
+        -0.055302939646240994,
+        0.0,
+        0.056110524770423,
+        -0.0024504365498693847,
+        0.30404290358251984,
+        0.0,
+        0.03970209751532572,
+        -0.30647064399154544,
+        -0.009796947756322517,
+        0.0,
+        -0.020902138203382492,
+        -2.409695148468017,
+        -1.9706519842147832,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "3c6b7247356c49e997b64e218b22d48d.fbx"
+    },
+    {
+      "children": [
+        3
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4
+      ],
+      "matrix": [
+        0.9659258257467465,
+        -1.3877787807814457e-17,
+        0.2588190471264935,
+        0.0,
+        -0.22414387613034759,
+        0.4999999576018558,
+        0.8365163269126348,
+        0.0,
+        -0.1294095125897995,
+        -0.8660254282630173,
+        0.4829628719199107,
+        0.0,
+        0.3065110445022583,
+        -1.0021554231643677,
+        1.1938259601593018,
+        1.0
+      ],
+      "name": "GeoSphere001"
+    },
+    {
+      "mesh": 0,
+      "name": "GeoSphere001_Material #40_0"
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+
+body{
+    background-color: rgb(11, 45, 73);
+}
+
+#Renderer {
+    top:0;
+    left:0;
+    position: fixed;
+}
