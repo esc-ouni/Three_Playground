@@ -10,5 +10,12 @@
   },
   "scripts": {
     "deploy": "vite build && gh-pages -d dist"
-  }
+  },
+  "name": "three_playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

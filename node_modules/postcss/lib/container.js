@@ -1,11 +1,11 @@
 'use strict'
 
-let { isClean, my } = require('./symbols')
-let Declaration = require('./declaration')
 let Comment = require('./comment')
+let Declaration = require('./declaration')
 let Node = require('./node')
+let { isClean, my } = require('./symbols')
 
-let parse, Rule, AtRule, Root
+let AtRule, parse, Root, Rule
 
 function cleanSource(nodes) {
   return nodes.map(i => {
@@ -214,6 +214,8 @@ class Container extends Node {
       i = i.proxyOf
       if (i.parent) i.parent.removeChild(i)
       if (i[isClean]) markTreeDirty(i)
+
+      if (!i.raws) i.raws = {}
       if (typeof i.raws.before === 'undefined') {
         if (sample && typeof sample.raws.before !== 'undefined') {
           i.raws.before = sample.raws.before.replace(/\S/g, '')
