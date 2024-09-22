@@ -1,7 +1,12 @@
 import * as THREE from 'three';
 
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
 import * as gui from 'lil-gui';
+
+
+const TextureLoader = new THREE.TextureLoader();
+
 
 const ligui = new gui.GUI(); 
 
@@ -39,7 +44,39 @@ ligui.add(material, 'roughness', 0, 1)
 ligui.add(material, 'metalness', 0, 1)
 
 
+// star_04.png
+
 // scene.add(ground, sphere, donut, plane);
+
+//particles
+
+const star_texture = TextureLoader.load("./Materials/static/textures/Stars/star_06.png");
+
+console.log(star_texture);
+
+const Paricle_Geometry = new THREE.BufferGeometry();
+const count = 5000;
+
+const positions = new Float32Array(count * 3);
+
+for (let i = 0; i < count*3 ; i++)
+    positions[i] = (Math.random() - 0.5) * 30;
+
+Paricle_Geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+const Paricle_Material = new THREE.PointsMaterial();
+Paricle_Material.size = 0.14;
+Paricle_Material.sizeAttenuation = true;
+Paricle_Material.color = new THREE.Color('#ff43ff');
+Paricle_Material.map = star_texture;
+
+const particles = new THREE.Points(Paricle_Geometry, Paricle_Material);
+
+scene.add(particles)
+
+
+//particles
+
 
 
 
@@ -54,12 +91,6 @@ function Animate() {
     sphere.rotation.y -= 0.15 * c;
     plane.rotation.y  -= 0.15 * c;
     donut.rotation.y  -= 0.15 * c;
-
-    // const elapsed = clock.getElapsedTime()
-    // sphere.position.x = 1.5 * Math.cos(elapsed);
-    // sphere.position.z = 1.5 * Math.sin(elapsed);
-    // sphere.position.y = Math.abs(3 * Math.sin(elapsed));
-
 
     controls.update();
 
