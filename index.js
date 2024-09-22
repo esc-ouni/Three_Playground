@@ -67,11 +67,16 @@ Paricle_Geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3
 Paricle_Geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
 const Paricle_Material = new THREE.PointsMaterial();
-Paricle_Material.size = 0.2;
+Paricle_Material.size = 0.5;
 Paricle_Material.sizeAttenuation = true;
-Paricle_Material.color = new THREE.Color('#ff43ff');
+Paricle_Material.color = new THREE.Color('#ffffff');
 Paricle_Material.map = star_texture;
 Paricle_Material.vertexColors = true;
+//remove back
+Paricle_Material.transparent = true;
+Paricle_Material.alphaMap = star_texture;
+Paricle_Material.alphaTest = 0.001;
+//remove back
 
 
 const particles = new THREE.Points(Paricle_Geometry, Paricle_Material);
