@@ -88,6 +88,8 @@ function Animate() {
     plane.rotation.y  -= 0.15 * c;
     donut.rotation.y  -= 0.15 * c;
 
+    particles.rotation.y += 0.1 * c;
+
     controls.update();
 
     camera.aspect = window.innerWidth/ window.innerHeight;
