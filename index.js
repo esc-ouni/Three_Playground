@@ -44,8 +44,6 @@ ligui.add(material, 'roughness', 0, 1)
 ligui.add(material, 'metalness', 0, 1)
 
 
-// star_04.png
-
 // scene.add(ground, sphere, donut, plane);
 
 //particles
@@ -76,8 +74,6 @@ scene.add(particles)
 
 
 //particles
-
-
 
 
 const clock = new THREE.Clock();
