@@ -56,17 +56,23 @@ const Paricle_Geometry = new THREE.BufferGeometry();
 const count = 5000;
 
 const positions = new Float32Array(count * 3);
+const colors    = new Float32Array(count * 3);
 
-for (let i = 0; i < count*3 ; i++)
+for (let i = 0; i < count*3 ; i++){
     positions[i] = (Math.random() - 0.5) * 30;
+    colors[i] = Math.random();
+}
 
 Paricle_Geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+Paricle_Geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
 const Paricle_Material = new THREE.PointsMaterial();
-Paricle_Material.size = 0.14;
+Paricle_Material.size = 0.2;
 Paricle_Material.sizeAttenuation = true;
 Paricle_Material.color = new THREE.Color('#ff43ff');
 Paricle_Material.map = star_texture;
+Paricle_Material.vertexColors = true;
+
 
 const particles = new THREE.Points(Paricle_Geometry, Paricle_Material);
 
