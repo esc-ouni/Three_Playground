@@ -46,13 +46,12 @@ ligui.add(material, 'metalness', 0, 1)
 // scene.add(ground, sphere, donut, plane);
 
 const parameters = {}
-parameters.count = 5000;
-parameters.size  = 0.5;
-parameters.radius     = 5;
-parameters.branches   = 3;
-parameters.spin       = 1;
-parameters.randomness = 0.2;
-parameters.randomnessP= 3;
+parameters.count       = 5000;
+parameters.size        = 0.5;
+parameters.radius      = 5;
+parameters.branches    = 3;
+parameters.spin        = 1;
+parameters.randomness  = 0.2;
 
 //particles
 
