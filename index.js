@@ -33,7 +33,7 @@ ground.position.y -= 2.2;
 donut.position.x += 5;
 plane.position.x -= 5;
 
-camera.position.set(12, 8, 21);
+camera.position.set(12, 12, 21);
 
 const controls = new OrbitControls(camera, canvas);
 controls.update()
@@ -46,10 +46,10 @@ ligui.add(material, 'metalness', 0, 1)
 // scene.add(ground, sphere, donut, plane);
 
 const parameters = {}
-parameters.count       = 5000;
+parameters.count       = 50000;
 parameters.size        = 0.5;
-parameters.radius      = 5;
-parameters.branches    = 3;
+parameters.radius      = 13;
+parameters.branches    = 5;
 parameters.spin        = 1;
 parameters.randomness  = 0.2;
 
@@ -84,7 +84,7 @@ const GenerateGalaxy = () => {
         const RandomY = (Math.random() - 0.5) * parameters.randomness * radius;
         const RandomZ = (Math.random() - 0.5) * parameters.randomness * radius;
 
-        const i3 = i*3;
+        const i3 = i * 3;
 
         positions[i3 + 0] = Math.cos(AngleBranche + SpinAngle) * radius + RandomX;
         positions[i3 + 1] = RandomY;
