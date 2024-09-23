@@ -8,7 +8,7 @@ import * as gui from 'lil-gui';
 const TextureLoader = new THREE.TextureLoader();
 
 
-const ligui = new gui.GUI(); 
+const ligui = new gui.GUI({width:400}); 
 
 const scene = new THREE.Scene();
 
@@ -46,42 +46,63 @@ ligui.add(material, 'metalness', 0, 1)
 
 // scene.add(ground, sphere, donut, plane);
 
+const parameters = {}
+parameters.count = 5000;
+parameters.size  = 0.5;
+
 //particles
 
 const star_texture = TextureLoader.load("./Materials/static/textures/Stars/star_06.png");
 
-console.log(star_texture);
+let particles = null;
+let Paricle_Material = null;
+let Paricle_Geometry = null;
 
-const Paricle_Geometry = new THREE.BufferGeometry();
-const count = 5000;
+const GenerateGalaxy = () => {
 
-const positions = new Float32Array(count * 3);
-const colors    = new Float32Array(count * 3);
+    if (particles !== null){
+        Paricle_Geometry.dispose();
+        Paricle_Material.dispose();
+        scene.remove(particles);
+    }
 
-for (let i = 0; i < count*3 ; i++){
-    positions[i] = (Math.random() - 0.5) * 30;
-    colors[i] = Math.random();
-}
+    Paricle_Geometry = new THREE.BufferGeometry();
+    
+    const positions = new Float32Array(parameters.count * 3);
+    const colors    = new Float32Array(parameters.count * 3);
+    
+    for (let i = 0; i < parameters.count*3 ; i++){
+        positions[i] = (Math.random() - 0.5) * 30;
+        colors[i] = Math.random();
+    }
+    
+    Paricle_Geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    Paricle_Geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    Paricle_Material = new THREE.PointsMaterial();
+    Paricle_Material.size = parameters.size;
+    Paricle_Material.sizeAttenuation = true;
+    Paricle_Material.color = new THREE.Color('#ffffff');
+    Paricle_Material.map = star_texture;
+    Paricle_Material.vertexColors = true;
+    
+    //remove back-ground
+    Paricle_Material.transparent = true;
+    Paricle_Material.alphaMap = star_texture;
+    Paricle_Material.alphaTest = 0.001;
+    Paricle_Material.blending = THREE.AdditiveBlending;
+    Paricle_Material.depthWrite = false;
+    //remove back-ground
+    
+    particles = new THREE.Points(Paricle_Geometry, Paricle_Material);
+    
+    scene.add(particles)
+} 
 
-Paricle_Geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-Paricle_Geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+GenerateGalaxy();
 
-const Paricle_Material = new THREE.PointsMaterial();
-Paricle_Material.size = 0.5;
-Paricle_Material.sizeAttenuation = true;
-Paricle_Material.color = new THREE.Color('#ffffff');
-Paricle_Material.map = star_texture;
-Paricle_Material.vertexColors = true;
-//remove back
-Paricle_Material.transparent = true;
-Paricle_Material.alphaMap = star_texture;
-Paricle_Material.alphaTest = 0.001;
-//remove back
-
-
-const particles = new THREE.Points(Paricle_Geometry, Paricle_Material);
-
-scene.add(particles)
+ligui.add(parameters, 'count', 500, 5000).onChange(GenerateGalaxy);
+ligui.add(parameters, 'size', 0.09, 1).onChange(GenerateGalaxy);
 
 
 //particles
