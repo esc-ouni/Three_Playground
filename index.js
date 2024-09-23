@@ -43,12 +43,16 @@ material.roughness = 0;
 ligui.add(material, 'roughness', 0, 1)
 ligui.add(material, 'metalness', 0, 1)
 
-
 // scene.add(ground, sphere, donut, plane);
 
 const parameters = {}
 parameters.count = 5000;
 parameters.size  = 0.5;
+parameters.radius     = 5;
+parameters.branches   = 3;
+parameters.spin       = 1;
+parameters.randomness = 0.2;
+parameters.randomnessP= 3;
 
 //particles
 
@@ -72,8 +76,23 @@ const GenerateGalaxy = () => {
     const colors    = new Float32Array(parameters.count * 3);
     
     for (let i = 0; i < parameters.count*3 ; i++){
-        positions[i] = (Math.random() - 0.5) * 30;
+
+        const radius     = parameters.radius * Math.random();
+        let AngleBranche = 2 * Math.PI * ((i % parameters.branches) / parameters.branches);
+        let SpinAngle    = parameters.spin * radius;
+
+        const RandomX = (Math.random() - 0.5) * parameters.randomness * radius;
+        const RandomY = (Math.random() - 0.5) * parameters.randomness * radius;
+        const RandomZ = (Math.random() - 0.5) * parameters.randomness * radius;
+
+        const i3 = i*3;
+
+        positions[i3 + 0] = Math.cos(AngleBranche + SpinAngle) * radius + RandomX;
+        positions[i3 + 1] = RandomY;
+        positions[i3 + 2] = Math.sin(AngleBranche + SpinAngle) * radius + RandomZ;
+
         colors[i] = Math.random();
+    
     }
     
     Paricle_Geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -103,6 +122,9 @@ GenerateGalaxy();
 
 ligui.add(parameters, 'count', 500, 5000).onChange(GenerateGalaxy);
 ligui.add(parameters, 'size', 0.09, 1).onChange(GenerateGalaxy);
+ligui.add(parameters, 'radius', 3, 15).onChange(GenerateGalaxy);
+ligui.add(parameters, 'branches', 3, 10).step(1).onChange(GenerateGalaxy);
+ligui.add(parameters, 'spin', 1, 5).onChange(GenerateGalaxy);
 
 
 //particles
