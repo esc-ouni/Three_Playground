@@ -104,6 +104,23 @@ const Distance = 5;
 obj2.position.y = - Distance; 
 obj3.position.y = - (Distance * 2); 
 
+
+//add Particles
+
+// const count = 5000; 
+
+// const positions = Float32Array(count * 3);
+
+// for (let i = 0; i < count * 3; i++){
+//     positions[i] = 
+// }
+
+// const Points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({color:'white'}))
+
+
+//add Particles
+
+
 let Yo, Y = 0
 const tick = () =>
 {
