@@ -101,7 +101,7 @@ const GenerateGalaxy = () => {
     Paricle_Material = new THREE.PointsMaterial();
     Paricle_Material.size = parameters.size;
     Paricle_Material.sizeAttenuation = true;
-    Paricle_Material.color = new THREE.Color('#ffffff');
+    Paricle_Material.color = new THREE.Color('#4168E1');
     Paricle_Material.map = star_texture;
     Paricle_Material.vertexColors = true;
     
