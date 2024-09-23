@@ -1,6 +1,10 @@
 import * as THREE from 'three'
 import GUI from 'lil-gui'
 
+// S2 ADD STatndard Light/ Metalness
+
+
+
 /**
  * Debug
  */
@@ -26,11 +30,17 @@ const scene = new THREE.Scene()
  * Test cube
  */
 
-const obj1 = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 1), new THREE.MeshNormalMaterial({color:'Blue'}));
-const obj2 = new THREE.Mesh(new THREE.TorusKnotGeometry(1, 5), new THREE.MeshNormalMaterial({color:'Blue'}));
-const obj3 = new THREE.Mesh(new THREE.RingGeometry(1, 5), new THREE.MeshNormalMaterial({color:'Blue'}));
+const Material = new THREE.MeshNormalMaterial();
+
+const obj1 = new THREE.Mesh(new THREE.DodecahedronGeometry(0.8, 0), Material);
+const obj2 = new THREE.Mesh(new THREE.TorusKnotGeometry(0.4, 0.15, 136, 19, 2, 5), Material);
+const obj3 = new THREE.Mesh(new THREE.OctahedronGeometry(0.6, 0), Material);
 
 scene.add(obj1, obj2, obj3)
+
+obj1.position.x += 1.3;
+obj2.position.x -= 1.3;
+obj3.position.x += 1.3;
 
 /**
  * Sizes
@@ -77,9 +87,28 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
  */
 const clock = new THREE.Clock()
 
+const sectionMeshes = [obj1, obj2, obj3];
+
+
+const Distance = 4;
+
+obj2.position.y = - Distance; 
+obj3.position.y = - (Distance * 2); 
+
+let Y = 0
 const tick = () =>
 {
+    Y = window.scrollY
+    
+    camera.position.y = - ((Y/2658) * 8)
+
     const elapsedTime = clock.getElapsedTime()
+
+    // Animating
+    for (const mesh of sectionMeshes){
+        mesh.rotation.x = - elapsedTime * 0.12;
+        mesh.rotation.y = (0.17 * elapsedTime);
+    }
 
     // Render
     renderer.render(scene, camera)
