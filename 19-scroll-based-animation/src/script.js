@@ -89,18 +89,32 @@ const clock = new THREE.Clock()
 
 const sectionMeshes = [obj1, obj2, obj3];
 
+const cursor = {};
+cursor.x = 0;
+cursor.y = 0;
 
-const Distance = 4;
+window.addEventListener('mousemove', (event) => {
+    cursor.x = (event.clientX / sizes.width) - 0.5;
+    cursor.y = (event.clientY / sizes.height) - 0.5;
+    console.log(cursor.x, cursor.y);    
+})
+
+const Distance = 5;
 
 obj2.position.y = - Distance; 
 obj3.position.y = - (Distance * 2); 
 
-let Y = 0
+let Yo, Y = 0
 const tick = () =>
 {
     Y = window.scrollY
+    let offset= - ((Y/2658) * 10);
     
-    camera.position.y = - ((Y/2658) * 8)
+    // camera.position.x = -cursor.x;
+    // camera.position.y = offset + cursor.y;
+    
+    camera.position.x += (cursor.x - camera.position.x) * 0.02;
+    camera.position.y += ( offset + cursor.y - camera.position.y) * 0.02;
 
     const elapsedTime = clock.getElapsedTime()
 
@@ -108,6 +122,8 @@ const tick = () =>
     for (const mesh of sectionMeshes){
         mesh.rotation.x = - elapsedTime * 0.12;
         mesh.rotation.y = (0.17 * elapsedTime);
+
+        // mesh.position.y = Math.sin(elapsedTime);
     }
 
     // Render
