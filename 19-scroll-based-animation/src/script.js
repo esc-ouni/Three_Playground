@@ -144,7 +144,7 @@ const tick = () =>
         mesh.rotation.x = - elapsedTime * 0.12;
         mesh.rotation.y = (0.17 * elapsedTime);
 
-        mesh.position.y = mesh.position.y + (Math.sin(elapsedTime) / 200);
+        mesh.position.y += (Math.sin(elapsedTime) / 200);
     }
 
     // Render
