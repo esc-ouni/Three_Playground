@@ -4,7 +4,6 @@ import GUI from 'lil-gui'
 // S2 ADD STatndard Light/ Metalness
 
 
-
 /**
  * Debug
  */
@@ -96,7 +95,6 @@ cursor.y = 0;
 window.addEventListener('mousemove', (event) => {
     cursor.x = (event.clientX / sizes.width) - 0.5;
     cursor.y = (event.clientY / sizes.height) - 0.5;
-    console.log(cursor.x, cursor.y);    
 })
 
 const Distance = 5;
@@ -107,29 +105,35 @@ obj3.position.y = - (Distance * 2);
 
 //add Particles
 
-// const count = 5000; 
+const count = 7000; 
 
-// const positions = Float32Array(count * 3);
+const positions = new Float32Array(count * 3);
+const colors    = new Float32Array(count * 3);
 
-// for (let i = 0; i < count * 3; i++){
-//     positions[i] = 
-// }
+for (let i = 0; i < count * 3; i++){
+    positions[i] = (Math.random() - 0.5) * 10;
+}
 
-// const Points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({color:'white'}))
+const Geo = new THREE.BufferGeometry();
+Geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+Geo.scale(2, 3, 2)
 
+const Mat = new THREE.PointsMaterial({color:'white'});
+Mat.size            = 0.007;
+Mat.sizeAttenuation = true;
+
+const Points = new THREE.Points(Geo, Mat)
+
+scene.add(Points);
 
 //add Particles
-
 
 let Yo, Y = 0
 const tick = () =>
 {
     Y = window.scrollY
     let offset= - ((Y/2658) * 10);
-    
-    // camera.position.x = -cursor.x;
-    // camera.position.y = offset + cursor.y;
-    
+
     camera.position.x += (cursor.x - camera.position.x) * 0.02;
     camera.position.y += ( offset + cursor.y - camera.position.y) * 0.02;
 
@@ -140,7 +144,7 @@ const tick = () =>
         mesh.rotation.x = - elapsedTime * 0.12;
         mesh.rotation.y = (0.17 * elapsedTime);
 
-        // mesh.position.y = Math.sin(elapsedTime);
+        mesh.position.y = mesh.position.y + (Math.sin(elapsedTime) / 200);
     }
 
     // Render
