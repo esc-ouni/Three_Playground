@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import GUI from 'lil-gui'
+import gsap from 'gsap'
 
 // S2 ADD STatndard Light/ Metalness
 
@@ -128,23 +129,55 @@ scene.add(Points);
 
 //add Particles
 
-let Yo, Y = 0
+let S, CurrentSection, Y = 0;
+let oSec = 0.001;
+
+
+document.addEventListener('scroll', (event) => {
+    S = window.scrollY / sizes.height;
+
+    if (S < (0.33*2)){
+        CurrentSection = 0;
+    }
+    else if (S >= (0.33*2) && S <= (0.66*2)){
+        CurrentSection = 1;
+    }
+    else if (S > (0.66*2)){
+        CurrentSection = 2;
+    }
+
+    if (CurrentSection !== oSec){
+        console.log(CurrentSection);
+        oSec = CurrentSection;
+        gsap.to(sectionMeshes[CurrentSection].rotation, {
+            duration: 2.5,
+            ease: 'power3.out',
+            x: '-=6',
+            y: '+=8.5'
+        })
+    }
+
+})
+
+
 const tick = () =>
 {
     Y = window.scrollY
+
     let offset= - ((Y/2658) * 10);
 
     camera.position.x += (cursor.x - camera.position.x) * 0.02;
     camera.position.y += ( offset + cursor.y - camera.position.y) * 0.02;
+    // camera.position.y = offset;
 
-    const elapsedTime = clock.getElapsedTime()
+    const elapsedTime = clock.getDelta()
 
     // Animating
     for (const mesh of sectionMeshes){
-        mesh.rotation.x = - elapsedTime * 0.12;
-        mesh.rotation.y = (0.17 * elapsedTime);
+        mesh.rotation.x += - elapsedTime * 0.12;
+        mesh.rotation.y += (0.17 * elapsedTime);
 
-        mesh.position.y += (Math.sin(elapsedTime) / 200);
+        mesh.position.y += (Math.sin(clock.elapsedTime) / 200);
     }
 
     // Render
