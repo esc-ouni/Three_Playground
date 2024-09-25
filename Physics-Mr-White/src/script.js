@@ -168,6 +168,8 @@ const sphereBody  = new cannon.Body({
     material: plasticMaterial
 });
 
+sphereBody.quaternion.setFromAxisAngle(new cannon.Vec3(-1, 0,0), Math.PI * 1.61);
+
 PhysicWorld.addBody(sphereBody);
 
 //plane
@@ -184,10 +186,7 @@ planeBody.quaternion.setFromAxisAngle(
 )
 PhysicWorld.addBody(planeBody);
 
-
 //
-
-
 
 /**
  * Animate
@@ -207,6 +206,7 @@ const tick = () =>
 
     // console.log(sphereBody.position);
     sphere.position.copy(sphereBody.position);
+    sphere.quaternion.copy(sphereBody.quaternion);
     floor.position.copy(planeBody.position);
 
     // Update controls
