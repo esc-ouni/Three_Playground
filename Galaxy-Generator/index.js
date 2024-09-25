@@ -119,7 +119,7 @@ const GenerateGalaxy = () => {
 
 GenerateGalaxy();
 
-ligui.add(parameters, 'count', 500, 5000).onChange(GenerateGalaxy);
+ligui.add(parameters, 'count', 500, 50000).onChange(GenerateGalaxy);
 ligui.add(parameters, 'size', 0.09, 1).onChange(GenerateGalaxy);
 ligui.add(parameters, 'radius', 3, 15).onChange(GenerateGalaxy);
 ligui.add(parameters, 'branches', 3, 10).step(1).onChange(GenerateGalaxy);
