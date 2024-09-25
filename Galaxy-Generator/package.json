@@ -2,7 +2,8 @@
   "dependencies": {
     "dat.gui": "^0.7.9",
     "lil-gui": "^0.19.2",
-    "three": "^0.167.1"
+    "three": "^0.167.1",
+    "vite-plugin-restart": "^0.4.1"
   },
   "devDependencies": {
     "gh-pages": "^6.1.1",
