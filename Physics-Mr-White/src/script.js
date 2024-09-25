@@ -144,6 +144,10 @@ sphere.material.map = Texture;
 // console.log(cannon);
 const PhysicWorld = new cannon.World();
 
+// const AxesHelper = new THREE.AxesHelper(5);
+
+// scene.add(AxesHelper);
+
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
 const concreteMaterial = new cannon.Material('concrete');
@@ -168,7 +172,8 @@ const sphereBody  = new cannon.Body({
     material: plasticMaterial
 });
 
-sphereBody.quaternion.setFromAxisAngle(new cannon.Vec3(-1, 0,0), Math.PI * 1.61);
+sphereBody.applyForce(new cannon.Vec3(15, 0, 0), new cannon.Vec3(0, 0, 0)) // force + torque
+// sphereBody.applyLocalForce(new cannon.Vec3(15, 0, 0), new cannon.Vec3(0, 0, 0)) // only force
 
 PhysicWorld.addBody(sphereBody);
 
@@ -200,6 +205,9 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     Dx = elapsedTime - oelapsedTime
     oelapsedTime = elapsedTime
+
+    // wind effect
+    sphereBody.applyLocalForce(new cannon.Vec3(7, 0, 0), sphereBody.position)
 
     // update physic world
     PhysicWorld.step(1/60, Dx, 3)
