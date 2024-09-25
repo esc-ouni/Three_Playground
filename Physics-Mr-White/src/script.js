@@ -144,9 +144,21 @@ sphere.material.map = Texture;
 // console.log(cannon);
 const PhysicWorld = new cannon.World();
 
-// const AxesHelper = new THREE.AxesHelper(5);
 
-// scene.add(AxesHelper);
+//Line of Force
+const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+const points = [];
+points.push( new THREE.Vector3( 0, 0, 0 ) );
+points.push( new THREE.Vector3( 15, 0, 0 ) );
+
+const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+const ForceLine = new THREE.Line(geometry, material);
+
+scene.add(ForceLine);
+//Line of Force
+
+
 
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
@@ -172,8 +184,8 @@ const sphereBody  = new cannon.Body({
     material: plasticMaterial
 });
 
-sphereBody.applyForce(new cannon.Vec3(15, 0, 0), new cannon.Vec3(0, 0, 0)) // force + torque
-// sphereBody.applyLocalForce(new cannon.Vec3(15, 0, 0), new cannon.Vec3(0, 0, 0)) // only force
+// sphereBody.applyForce(new cannon.Vec3(10, 0, 0), sphereBody.position) // force + torque
+sphereBody.applyLocalForce(new cannon.Vec3(10, 0, 0), sphereBody.position) // only force
 
 PhysicWorld.addBody(sphereBody);
 
@@ -207,7 +219,7 @@ const tick = () =>
     oelapsedTime = elapsedTime
 
     // wind effect
-    sphereBody.applyLocalForce(new cannon.Vec3(7, 0, 0), sphereBody.position)
+    // sphereBody.applyLocalForce(new cannon.Vec3(7, 0, 0), sphereBody.position)
 
     // update physic world
     PhysicWorld.step(1/60, Dx, 3)
