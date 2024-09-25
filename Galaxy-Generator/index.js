@@ -55,7 +55,7 @@ parameters.randomness  = 0.2;
 
 //particles
 
-const star_texture = TextureLoader.load("./Stars/star_06.png");
+const star_texture = TextureLoader.load("./static/Stars/star_06.png");
 
 let particles = null;
 let Paricle_Material = null;
