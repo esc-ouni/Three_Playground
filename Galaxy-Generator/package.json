@@ -1,0 +1,24 @@
+{
+  "name": "galaxy-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create-vite": "vite create",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^5.4.8"
+  },
+  "dependencies": {
+    "lil-gui": "^0.19.2",
+    "three": "^0.168.0",
+    "vite-plugin-restart": "^0.4.1"
+  }
+}
