@@ -45,7 +45,7 @@ const sphere = new THREE.Mesh(
     })
 )
 sphere.castShadow = true
-sphere.position.y = 80
+sphere.position.y = 10
 scene.add(sphere)
 
 gui.add(sphere.material, 'metalness', 0, 1);
@@ -135,16 +135,33 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 
 //Cannon.js
+
+//Materials
 // console.log(cannon);
 const PhysicWorld = new cannon.World();
 
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
+const concreteMaterial = new cannon.Material('concrete');
+const plasticMaterial  = new cannon.Material('plastic');
+
+const ContactMaterial  = new cannon.ContactMaterial(
+    concreteMaterial,
+    plasticMaterial,
+    {
+        friction:0.2,
+        restitution:0.85,
+    }
+);
+PhysicWorld.addContactMaterial(ContactMaterial)
+
+
 const sphereShape = new cannon.Sphere(0.5);
 const sphereBody  = new cannon.Body({
     mass: 1,
     position: new cannon.Vec3().copy(sphere.position),
-    shape: sphereShape
+    shape: sphereShape,
+    material: plasticMaterial
 });
 
 PhysicWorld.addBody(sphereBody);
@@ -154,7 +171,8 @@ const planeShape = new cannon.Plane();
 const planeBody  = new cannon.Body({
     mass: 0,
     position: new cannon.Vec3().copy(floor.position),
-    shape: planeShape
+    shape: planeShape,
+    material:concreteMaterial
 })
 planeBody.quaternion.setFromAxisAngle(
     new cannon.Vec3(-1, 0, 0),
@@ -185,6 +203,7 @@ const tick = () =>
 
     // console.log(sphereBody.position);
     sphere.position.copy(sphereBody.position);
+    floor.position.copy(planeBody.position);
 
     // Update controls
     controls.update()
