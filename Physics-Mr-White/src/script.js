@@ -38,8 +38,8 @@ const environmentMapTexture = cubeTextureLoader.load([
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 32, 32),
     new THREE.MeshStandardMaterial({
-        metalness: 0.3,
-        roughness: 0.4,
+        metalness: 0.1,
+        roughness: 0.1,
         envMap: environmentMapTexture,
         envMapIntensity: 0.5
     })
@@ -132,7 +132,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-
+//Textures
+const TextureLoader = new THREE.TextureLoader();
+const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
+sphere.material.map = Texture;
+//Textures
 
 //Cannon.js
 
