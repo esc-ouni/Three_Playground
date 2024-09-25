@@ -45,7 +45,7 @@ const sphere = new THREE.Mesh(
     })
 )
 sphere.castShadow = true
-sphere.position.y = 10
+sphere.position.y = 0.5
 scene.add(sphere)
 
 gui.add(sphere.material, 'metalness', 0, 1);
@@ -170,7 +170,7 @@ const ContactMaterial  = new cannon.ContactMaterial(
     plasticMaterial,
     {
         friction:0.2,
-        restitution:0.85,
+        restitution:0,
     }
 );
 PhysicWorld.addContactMaterial(ContactMaterial)
@@ -184,8 +184,8 @@ const sphereBody  = new cannon.Body({
     material: plasticMaterial
 });
 
-// sphereBody.applyForce(new cannon.Vec3(10, 0, 0), sphereBody.position) // force + torque
-sphereBody.applyLocalForce(new cannon.Vec3(10, 0, 0), sphereBody.position) // only force
+sphereBody.applyForce(new cannon.Vec3(20, 0, 0), sphereBody.position) // force + torque
+// sphereBody.applyLocalForce(new cannon.Vec3(20, 0, 0), sphereBody.position) // only force
 
 PhysicWorld.addBody(sphereBody);
 
