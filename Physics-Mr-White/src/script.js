@@ -88,7 +88,7 @@ const createBox = (position) => {
     scene.add(Box)
         
     const BoxBody  = new cannon.Body({
-        mass: 10,
+        mass: 150,
         shape: BoxShape,
         material: metalMaterial
     });
@@ -195,48 +195,48 @@ const concreteMaterial = new cannon.Material('concrete');
 const plasticMaterial  = new cannon.Material('plastic');
 const metalMaterial  = new cannon.Material('metal');
 
-const ContactMaterial  = new cannon.ContactMaterial(
+const ContactMaterial = new cannon.ContactMaterial(
     concreteMaterial,
     plasticMaterial,
     {
-        friction:0.2,
-        restitution:0.7,
+        friction: 0.4,    // Increased for more realistic grip
+        restitution: 0.5, // Decreased for less bounce
     }
 );
 
-const BallContactMaterial  = new cannon.ContactMaterial(
+const BallContactMaterial = new cannon.ContactMaterial(
     plasticMaterial,
     plasticMaterial,
     {
-        friction:0.2,
-        restitution:0.9,
+        friction: 0.2,    // Low friction for smooth surfaces
+        restitution: 0.9, // High restitution for bounciness
     }
 );
 
-const MetalContactMaterial  = new cannon.ContactMaterial(
+const MetalContactMaterial = new cannon.ContactMaterial(
     plasticMaterial,
     metalMaterial,
     {
-        friction:0.9,
-        restitution:0.01,
+        friction: 0.4,    // Moderate friction
+        restitution: 0.3, // Moderate restitution
     }
 );
 
-const MetalContactMaterial2  = new cannon.ContactMaterial(
+const MetalContactMaterial2 = new cannon.ContactMaterial(
     concreteMaterial,
     metalMaterial,
     {
-        friction:0.9,
-        restitution:0.01,
+        friction: 0.6,    // Moderate to high friction
+        restitution: 0.2, // Low restitution
     }
 );
 
-const MetalContactMaterial3  = new cannon.ContactMaterial(
+const MetalContactMaterial3 = new cannon.ContactMaterial(
     metalMaterial,
     metalMaterial,
     {
-        friction:0.9,
-        restitution:0.01,
+        friction: 0.5,    // Moderate friction
+        restitution: 0.1, // Low restitution
     }
 );
 
