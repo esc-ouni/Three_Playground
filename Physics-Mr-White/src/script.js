@@ -42,6 +42,7 @@ const environmentMapTexture = cubeTextureLoader.load([
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
 const Pong_Ball_colide = () => {
+    hit_sound.currentTime = 0;
     hit_sound.play();
 }
 //
