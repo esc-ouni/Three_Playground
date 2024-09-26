@@ -43,14 +43,15 @@ const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
 let Objects  = []
 
+const STDMaterial = new THREE.MeshStandardMaterial;
+STDMaterial.metalness = 0.1;
+STDMaterial.roughness = 0.1;
+STDMaterial.map       = Texture;
+
 const createSphere = (radius, position) => {
     const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(radius, 32, 32),
-    new THREE.MeshStandardMaterial({
-        metalness: 0.1,
-        roughness: 0.1,
-        map: Texture,
-    }))
+    STDMaterial)
     sphere.castShadow = true
     sphere.position.copy(position);
     scene.add(sphere)
