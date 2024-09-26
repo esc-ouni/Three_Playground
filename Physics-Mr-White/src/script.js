@@ -39,9 +39,7 @@ const environmentMapTexture = cubeTextureLoader.load([
 const TextureLoader = new THREE.TextureLoader();
 const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
-
-let WorldObjs  = []
-let PhysicObjs = []
+let Objects  = []
 
 const createSphere = (radius, position) => {
     const sphere = new THREE.Mesh(
@@ -54,7 +52,6 @@ const createSphere = (radius, position) => {
     sphere.castShadow = true
     sphere.position.copy(position);
     scene.add(sphere)
-    WorldObjs.push(sphere)
     
     const sphereShape = new cannon.Sphere(radius);
     const sphereBody  = new cannon.Body({
@@ -64,7 +61,7 @@ const createSphere = (radius, position) => {
         material: plasticMaterial
     });
     PhysicWorld.addBody(sphereBody);
-    PhysicObjs.push(sphereBody)
+    Objects.push({sphere, sphereBody})
 }
 
 
@@ -238,9 +235,9 @@ const tick = () =>
 
     // console.log(sphereBody.position);
 
-    for (let i = 0;i < WorldObjs.length; i++){
-        WorldObjs[i].position.copy(PhysicObjs[i].position);
-        WorldObjs[i].quaternion.copy(PhysicObjs[i].quaternion);
+    for (let i = 0;i < Objects.length; i++){
+        Objects[i].sphere.position.copy(Objects[i].sphereBody.position);
+        Objects[i].sphere.quaternion.copy(Objects[i].sphereBody.quaternion);
     }
 
     floor.position.copy(planeBody.position);
