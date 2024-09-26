@@ -40,6 +40,7 @@ const environmentMapTexture = cubeTextureLoader.load([
 
 const TextureLoader = new THREE.TextureLoader();
 const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
+const Texture2 = TextureLoader.load("/textures/Models/kk.jpeg");
 
 let Objects  = []
 
@@ -74,7 +75,7 @@ let Boxes  = []
 
 const STDBGeometry = new THREE.BoxGeometry(1, 1);
 const STDBMaterial = new THREE.MeshStandardMaterial;
-STDBMaterial.map   = Texture;
+STDBMaterial.map   = Texture2;
 
 const BoxShape = new cannon.Box(new cannon.Vec3(0.5, 0.5, 0.5));
 
@@ -192,7 +193,6 @@ PhysicWorld.gravity.set(0, - 8.92, 0);
 
 const concreteMaterial = new cannon.Material('concrete');
 const plasticMaterial  = new cannon.Material('plastic');
-
 const metalMaterial  = new cannon.Material('metal');
 
 const ContactMaterial  = new cannon.ContactMaterial(
@@ -231,11 +231,20 @@ const MetalContactMaterial2  = new cannon.ContactMaterial(
     }
 );
 
+const MetalContactMaterial3  = new cannon.ContactMaterial(
+    metalMaterial,
+    metalMaterial,
+    {
+        friction:0.9,
+        restitution:0.01,
+    }
+);
 
 PhysicWorld.addContactMaterial(ContactMaterial)
 PhysicWorld.addContactMaterial(BallContactMaterial)
 PhysicWorld.addContactMaterial(MetalContactMaterial)
 PhysicWorld.addContactMaterial(MetalContactMaterial2)
+PhysicWorld.addContactMaterial(MetalContactMaterial3)
 
 // sphereBody.applyForce(new cannon.Vec3(200,0, 0), sphereBody.position) // world outside force (wind, gravity, ...) 
 // sphereBody.applyLocalForce(new cannon.Vec3(200, 0, 0), sphereBody.position) // like engine mounted on the body
