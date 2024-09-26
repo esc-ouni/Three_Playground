@@ -35,22 +35,43 @@ const environmentMapTexture = cubeTextureLoader.load([
 /**
  * Test sphere
  */
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 32, 32),
+
+const TextureLoader = new THREE.TextureLoader();
+const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
+
+
+let WorldObjs  = []
+let PhysicObjs = []
+
+const createSphere = (radius, position) => {
+    const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(radius, 32, 32),
     new THREE.MeshStandardMaterial({
         metalness: 0.1,
         roughness: 0.1,
-        envMap: environmentMapTexture,
-        envMapIntensity: 0.5
-    })
-)
-sphere.castShadow = true
-sphere.position.y = 0.5
-scene.add(sphere)
+        map: Texture,
+    }))
+    sphere.castShadow = true
+    sphere.position.copy(position);
+    scene.add(sphere)
+    WorldObjs.push(sphere)
+    
+    const sphereShape = new cannon.Sphere(radius);
+    const sphereBody  = new cannon.Body({
+        mass: 1,
+        position: new cannon.Vec3().copy(sphere.position),
+        shape: sphereShape,
+        material: plasticMaterial
+    });
+    PhysicWorld.addBody(sphereBody);
+    PhysicObjs.push(sphereBody)
+}
 
-gui.add(sphere.material, 'metalness', 0, 1);
-gui.add(sphere.material, 'roughness', 0, 1);
-gui.add(sphere.position, 'y', 0, 5000);
+
+
+// gui.add(sphere.material, 'metalness', 0, 1);
+// gui.add(sphere.material, 'roughness', 0, 1);
+// gui.add(sphere.position, 'y', 0, 5000);
 
 /**
  * Floor
@@ -78,10 +99,11 @@ scene.add(ambientLight)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far = 15
-directionalLight.shadow.camera.left = - 7
-directionalLight.shadow.camera.top = 7
-directionalLight.shadow.camera.right = 7
+directionalLight.shadow.camera.far    = 100000
+directionalLight.shadow.camera.near   = 0.01
+directionalLight.shadow.camera.left   = - 7
+directionalLight.shadow.camera.top    = 7
+directionalLight.shadow.camera.right  = 7
 directionalLight.shadow.camera.bottom = - 7
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
@@ -114,7 +136,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(- 30, 30, 30)
+camera.position.set(-14, 12, 5)
 scene.add(camera)
 
 // Controls
@@ -132,33 +154,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-//Textures
-const TextureLoader = new THREE.TextureLoader();
-const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
-sphere.material.map = Texture;
-//Textures
-
 //Cannon.js
 
 //Materials
 // console.log(cannon);
 const PhysicWorld = new cannon.World();
-
-
-//Line of Force
-const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-const points = [];
-points.push( new THREE.Vector3( 0, 0, 0 ) );
-points.push( new THREE.Vector3( 15, 0, 0 ) );
-
-const geometry = new THREE.BufferGeometry().setFromPoints( points );
-
-const ForceLine = new THREE.Line(geometry, material);
-
-scene.add(ForceLine);
-//Line of Force
-
-
 
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
@@ -170,24 +170,24 @@ const ContactMaterial  = new cannon.ContactMaterial(
     plasticMaterial,
     {
         friction:0.2,
-        restitution:0,
+        restitution:0.7,
+    }
+);
+
+const BallContactMaterial  = new cannon.ContactMaterial(
+    plasticMaterial,
+    plasticMaterial,
+    {
+        friction:0.2,
+        restitution:0.9,
     }
 );
 PhysicWorld.addContactMaterial(ContactMaterial)
+PhysicWorld.addContactMaterial(BallContactMaterial)
 
+// sphereBody.applyForce(new cannon.Vec3(200,0, 0), sphereBody.position) // world outside force (wind, gravity, ...) 
+// sphereBody.applyLocalForce(new cannon.Vec3(200, 0, 0), sphereBody.position) // like engine mounted on the body
 
-const sphereShape = new cannon.Sphere(0.5);
-const sphereBody  = new cannon.Body({
-    mass: 1,
-    position: new cannon.Vec3().copy(sphere.position),
-    shape: sphereShape,
-    material: plasticMaterial
-});
-
-sphereBody.applyForce(new cannon.Vec3(20, 0, 0), sphereBody.position) // force + torque
-// sphereBody.applyLocalForce(new cannon.Vec3(20, 0, 0), sphereBody.position) // only force
-
-PhysicWorld.addBody(sphereBody);
 
 //plane
 const planeShape = new cannon.Plane();
@@ -205,6 +205,18 @@ PhysicWorld.addBody(planeBody);
 
 //
 
+createSphere(0.5, new THREE.Vector3())
+createSphere(0.5, new THREE.Vector3())
+createSphere(0.5, new THREE.Vector3())
+
+for (let i = 0; i < 50; i++){
+    let x = (Math.random() - 0.5) * 10
+    let y = (Math.random() + 0.05) * 10
+    let z = (Math.random() - 0.5) * 10
+    createSphere(Math.random(), new THREE.Vector3(x, y, z))
+}
+
+
 /**
  * Animate
  */
@@ -219,14 +231,18 @@ const tick = () =>
     oelapsedTime = elapsedTime
 
     // wind effect
-    // sphereBody.applyLocalForce(new cannon.Vec3(7, 0, 0), sphereBody.position)
+    // sphereBody.applyForce(new cannon.Vec3(0.95, 0, 0), sphereBody.position)
 
     // update physic world
     PhysicWorld.step(1/60, Dx, 3)
 
     // console.log(sphereBody.position);
-    sphere.position.copy(sphereBody.position);
-    sphere.quaternion.copy(sphereBody.quaternion);
+
+    for (let i = 0;i < WorldObjs.length; i++){
+        WorldObjs[i].position.copy(PhysicObjs[i].position);
+        WorldObjs[i].quaternion.copy(PhysicObjs[i].quaternion);
+    }
+
     floor.position.copy(planeBody.position);
 
     // Update controls
