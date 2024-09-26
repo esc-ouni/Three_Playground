@@ -38,6 +38,14 @@ const environmentMapTexture = cubeTextureLoader.load([
  * Test sphere
  */
 
+// Add Sound
+const hit_sound = new Audio("/sounds/ping_pong.mp3");
+
+const Pong_Ball_colide = () => {
+    hit_sound.play();
+}
+//
+
 const TextureLoader = new THREE.TextureLoader();
 const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 const Texture2 = TextureLoader.load("/textures/Models/kk.jpeg");
@@ -65,6 +73,7 @@ const createSphere = (position) => {
             shape: sphereShape,
             material: plasticMaterial
         });
+    sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
     PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
@@ -95,6 +104,7 @@ const createBox = (width , height, depth, position) => {
         material: metalMaterial
     });
     
+    // BoxBody.addEventListener('collide', Pong_Ball_colide);
     BoxBody.position.copy(Box.position);
     PhysicWorld.addBody(BoxBody);
     Boxes.push({Box, BoxBody})
@@ -192,8 +202,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 // console.log(cannon);
 const PhysicWorld = new cannon.World();
 
+//Allow objects sleep => icrease performance
+PhysicWorld.allowSleep = true; 
 //Collision detction better than Naive
-// PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
+PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
 
 
 PhysicWorld.gravity.set(0, - 8.92, 0);
@@ -291,19 +303,20 @@ BoxCreator.createBox = () => {
     createBox(Math.random()*2, Math.random()*2, Math.random()*2, new THREE.Vector3(x, y, z))
 }
 
-for (let i = 0; i < 25; i++){
-    BallCreator.createBall();
-}
+// for (let i = 0; i < 25; i++){
+//     BallCreator.createBall();
+// }
 
 
-for (let i = 0; i < 25; i++){
-    BoxCreator.createBox();
-}
+// for (let i = 0; i < 25; i++){
+//     BoxCreator.createBox();
+// }
 
 gui.add(BallCreator, 'createBall')
 gui.add(BoxCreator, 'createBox')
 
 //
+
 
 /**
  * Animate
@@ -325,6 +338,8 @@ const tick = () =>
     for (const object of Objects){
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
+
+        // if (object.sphereBody.col)
     }
 
     for (const object of Boxes){
@@ -340,8 +355,9 @@ const tick = () =>
     // Render
     renderer.render(scene, camera)
     // Call tick again on the next frame
-    if (!k)
-        console.timeEnd('label');k=42
+    if (!k){
+        console.timeEnd('label');k=42;
+    }
     window.requestAnimationFrame(tick)
 }
 
