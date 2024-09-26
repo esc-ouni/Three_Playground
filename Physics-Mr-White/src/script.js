@@ -49,7 +49,7 @@ STDMaterial.metalness = 0.1;
 STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
-const sphereShape = new cannon.Sphere(1);
+const sphereShape = new cannon.Sphere(0.5);
 
 const createSphere = (position) => {
     const sphere = new THREE.Mesh(
@@ -76,7 +76,7 @@ const STDBGeometry = new THREE.BoxGeometry(1, 1);
 const STDBMaterial = new THREE.MeshStandardMaterial;
 STDBMaterial.map   = Texture;
 
-const BoxShape = new cannon.Box(new cannon.Vec3(1, 1, 1));
+const BoxShape = new cannon.Box(new cannon.Vec3(0.5, 0.5, 0.5));
 
 const createBox = (position) => {
     const Box = new THREE.Mesh(
