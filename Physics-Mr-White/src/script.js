@@ -77,7 +77,7 @@ const createSphere = (radius, position) => {
  * Floor
  */
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
+    new THREE.PlaneGeometry(15, 15),
     new THREE.MeshStandardMaterial({
         color: '#777777',
         metalness: 0.3,
