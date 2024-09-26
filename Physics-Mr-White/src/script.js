@@ -204,10 +204,6 @@ PhysicWorld.addBody(planeBody);
 
 //
 
-createSphere(0.5, new THREE.Vector3())
-createSphere(0.5, new THREE.Vector3())
-createSphere(0.5, new THREE.Vector3())
-
 for (let i = 0; i < 50; i++){
     let x = (Math.random() - 0.5) * 10
     let y = (Math.random() + 0.05) * 10
@@ -215,6 +211,18 @@ for (let i = 0; i < 50; i++){
     createSphere(0.5, new THREE.Vector3(x, y, z))
 }
 
+//To Add it To Dat Gui It has to be inside of an Object
+const BallCreator = {}
+BallCreator.create = () => {
+    let x = (Math.random() - 0.5) * 10
+    let y = (Math.random() + 0.05) * 10
+    let z = (Math.random() - 0.5) * 10
+    createSphere(0.5, new THREE.Vector3(x, y, z))
+}
+
+gui.add(BallCreator, 'create')
+
+//
 
 /**
  * Animate
