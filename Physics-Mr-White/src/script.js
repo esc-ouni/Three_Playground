@@ -75,23 +75,26 @@ let Boxes  = []
 
 const STDBGeometry = new THREE.BoxGeometry(1, 1);
 const STDBMaterial = new THREE.MeshStandardMaterial;
-STDBMaterial.map   = Texture2;
+STDBMaterial.metalness   = 0.5;
+STDBMaterial.roughness   = 0.7;
 
-const BoxShape = new cannon.Box(new cannon.Vec3(0.5, 0.5, 0.5));
 
-const createBox = (position) => {
+const createBox = (width , height, depth, position) => {
     const Box = new THREE.Mesh(
         STDBGeometry,
         STDBMaterial)
-    Box.castShadow = true
-    Box.position.copy(position);
-    scene.add(Box)
+        Box.castShadow = true
+        Box.position.copy(position);
+        Box.scale.set(width, height, depth);
+        scene.add(Box)
         
+    let BoxShape = new cannon.Box(new cannon.Vec3(width * 0.5, height * 0.5, depth * 0.5));
     const BoxBody  = new cannon.Body({
-        mass: 150,
+        mass: 15,
         shape: BoxShape,
         material: metalMaterial
     });
+    
     BoxBody.position.copy(Box.position);
     PhysicWorld.addBody(BoxBody);
     Boxes.push({Box, BoxBody})
@@ -270,20 +273,6 @@ PhysicWorld.addBody(planeBody);
 
 //
 
-for (let i = 0; i < 25; i++){
-    let x = (Math.random() - 0.5) * 10
-    let y = (Math.random() + 0.05) * 10
-    let z = (Math.random() - 0.5) * 10
-    createSphere(new THREE.Vector3(x, y, z))
-}
-
-
-for (let i = 0; i < 25; i++){
-    let x = (Math.random() - 0.5) * 10
-    let y = (Math.random() + 0.05) * 10
-    let z = (Math.random() - 0.5) * 10
-    createBox(new THREE.Vector3(x, y, z))
-}
 
 //To Add it To Dat Gui It has to be inside of an Object
 const BallCreator = {}
@@ -299,7 +288,16 @@ BoxCreator.createBox = () => {
     let x = (Math.random() - 0.5) * 10
     let y = (Math.random() + 0.05) * 10
     let z = (Math.random() - 0.5) * 10
-    createBox(new THREE.Vector3(x, y, z))
+    createBox(Math.random()*2, Math.random()*2, Math.random()*2, new THREE.Vector3(x, y, z))
+}
+
+for (let i = 0; i < 25; i++){
+    BallCreator.createBall();
+}
+
+
+for (let i = 0; i < 25; i++){
+    BoxCreator.createBox();
 }
 
 gui.add(BallCreator, 'createBall')
