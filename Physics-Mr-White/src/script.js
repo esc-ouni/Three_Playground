@@ -49,24 +49,51 @@ STDMaterial.metalness = 0.1;
 STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
-const sphereShape = new cannon.Sphere(0.5);
+const sphereShape = new cannon.Sphere(1);
 
 const createSphere = (position) => {
     const sphere = new THREE.Mesh(
         STDGeometry,
         STDMaterial)
-    sphere.castShadow = true
-    sphere.position.copy(position);
-    scene.add(sphere)
+        sphere.castShadow = true
+        sphere.position.copy(position);
+        scene.add(sphere)
         
-    const sphereBody  = new cannon.Body({
-        mass: 1,
-        shape: sphereShape,
-        material: plasticMaterial
-    });
+        const sphereBody  = new cannon.Body({
+            mass: 1,
+            shape: sphereShape,
+            material: plasticMaterial
+        });
     sphereBody.position.copy(sphere.position);
     PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
+}
+
+
+let Boxes  = []
+
+const STDBGeometry = new THREE.BoxGeometry(1, 1);
+const STDBMaterial = new THREE.MeshStandardMaterial;
+STDBMaterial.map   = Texture;
+
+const BoxShape = new cannon.Box(new cannon.Vec3(1, 1, 1));
+
+const createBox = (position) => {
+    const Box = new THREE.Mesh(
+        STDBGeometry,
+        STDBMaterial)
+    Box.castShadow = true
+    Box.position.copy(position);
+    scene.add(Box)
+        
+    const BoxBody  = new cannon.Body({
+        mass: 10,
+        shape: BoxShape,
+        material: metalMaterial
+    });
+    BoxBody.position.copy(Box.position);
+    PhysicWorld.addBody(BoxBody);
+    Boxes.push({Box, BoxBody})
 }
 
 // gui.add(sphere.material, 'metalness', 0, 1);
@@ -166,6 +193,8 @@ PhysicWorld.gravity.set(0, - 8.92, 0);
 const concreteMaterial = new cannon.Material('concrete');
 const plasticMaterial  = new cannon.Material('plastic');
 
+const metalMaterial  = new cannon.Material('metal');
+
 const ContactMaterial  = new cannon.ContactMaterial(
     concreteMaterial,
     plasticMaterial,
@@ -183,8 +212,30 @@ const BallContactMaterial  = new cannon.ContactMaterial(
         restitution:0.9,
     }
 );
+
+const MetalContactMaterial  = new cannon.ContactMaterial(
+    plasticMaterial,
+    metalMaterial,
+    {
+        friction:0.9,
+        restitution:0.01,
+    }
+);
+
+const MetalContactMaterial2  = new cannon.ContactMaterial(
+    concreteMaterial,
+    metalMaterial,
+    {
+        friction:0.9,
+        restitution:0.01,
+    }
+);
+
+
 PhysicWorld.addContactMaterial(ContactMaterial)
 PhysicWorld.addContactMaterial(BallContactMaterial)
+PhysicWorld.addContactMaterial(MetalContactMaterial)
+PhysicWorld.addContactMaterial(MetalContactMaterial2)
 
 // sphereBody.applyForce(new cannon.Vec3(200,0, 0), sphereBody.position) // world outside force (wind, gravity, ...) 
 // sphereBody.applyLocalForce(new cannon.Vec3(200, 0, 0), sphereBody.position) // like engine mounted on the body
@@ -206,23 +257,40 @@ PhysicWorld.addBody(planeBody);
 
 //
 
-for (let i = 0; i < 50; i++){
+for (let i = 0; i < 25; i++){
     let x = (Math.random() - 0.5) * 10
     let y = (Math.random() + 0.05) * 10
     let z = (Math.random() - 0.5) * 10
     createSphere(new THREE.Vector3(x, y, z))
+}
+
+
+for (let i = 0; i < 25; i++){
+    let x = (Math.random() - 0.5) * 10
+    let y = (Math.random() + 0.05) * 10
+    let z = (Math.random() - 0.5) * 10
+    createBox(new THREE.Vector3(x, y, z))
 }
 
 //To Add it To Dat Gui It has to be inside of an Object
 const BallCreator = {}
-BallCreator.create = () => {
+BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 10
     let y = (Math.random() + 0.05) * 10
     let z = (Math.random() - 0.5) * 10
     createSphere(new THREE.Vector3(x, y, z))
 }
 
-gui.add(BallCreator, 'create')
+const BoxCreator = {}
+BoxCreator.createBox = () => {
+    let x = (Math.random() - 0.5) * 10
+    let y = (Math.random() + 0.05) * 10
+    let z = (Math.random() - 0.5) * 10
+    createBox(new THREE.Vector3(x, y, z))
+}
+
+gui.add(BallCreator, 'createBall')
+gui.add(BoxCreator, 'createBox')
 
 //
 
@@ -246,10 +314,13 @@ const tick = () =>
     for (const object of Objects){
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
-        // wind effect
-        // object.sphereBody.applyForce(new cannon.Vec3(0.95, 0, 0), object.sphereBody.position)
     }
-    
+
+    for (const object of Boxes){
+        object.Box.position.copy(object.BoxBody.position);
+        object.Box.quaternion.copy(object.BoxBody.quaternion);
+    }
+
     floor.position.copy(planeBody.position);
     
     // Update controls
