@@ -189,6 +189,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 // console.log(cannon);
 const PhysicWorld = new cannon.World();
 
+//Collision detction better than Naive
+// PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
+
+
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
 const concreteMaterial = new cannon.Material('concrete');
