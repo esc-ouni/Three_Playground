@@ -45,6 +45,12 @@ const Pong_Ball_colide = () => {
     hit_sound.currentTime = 0;
     hit_sound.play();
 }
+
+const hit__sound = new Audio("/sounds/hit.mp3");
+const Hit__ = () => {
+    hit__sound.currentTime = 0;
+    hit__sound.play();
+}
 //
 
 const TextureLoader = new THREE.TextureLoader();
@@ -105,7 +111,7 @@ const createBox = (width , height, depth, position) => {
         material: metalMaterial
     });
     
-    // BoxBody.addEventListener('collide', Pong_Ball_colide);
+    BoxBody.addEventListener('collide', Hit__);
     BoxBody.position.copy(Box.position);
     PhysicWorld.addBody(BoxBody);
     Boxes.push({Box, BoxBody})
