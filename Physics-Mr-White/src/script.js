@@ -3,6 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import cannon, { World } from 'cannon'
 
+console.time('label');
+let k = 0;
 /**
  * Debug
  */
@@ -235,20 +237,21 @@ const tick = () =>
 
     // console.log(sphereBody.position);
 
-    for (let i = 0;i < Objects.length; i++){
-        Objects[i].sphere.position.copy(Objects[i].sphereBody.position);
-        Objects[i].sphere.quaternion.copy(Objects[i].sphereBody.quaternion);
+    for (const object of Objects){
+        object.sphere.position.copy(object.sphereBody.position);
+        object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
-
+    
     floor.position.copy(planeBody.position);
-
+    
     // Update controls
     controls.update()
-
+    
     // Render
     renderer.render(scene, camera)
-
     // Call tick again on the next frame
+    if (!k)
+        console.timeEnd('label');k=42
     window.requestAnimationFrame(tick)
 }
 
