@@ -213,7 +213,7 @@ for (let i = 0; i < 50; i++){
     let x = (Math.random() - 0.5) * 10
     let y = (Math.random() + 0.05) * 10
     let z = (Math.random() - 0.5) * 10
-    createSphere(Math.random(), new THREE.Vector3(x, y, z))
+    createSphere(0.5, new THREE.Vector3(x, y, z))
 }
 
 
