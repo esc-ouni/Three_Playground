@@ -43,31 +43,31 @@ const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
 let Objects  = []
 
+const STDGeometry = new THREE.SphereGeometry(0.5, 32, 32);
 const STDMaterial = new THREE.MeshStandardMaterial;
 STDMaterial.metalness = 0.1;
 STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
-const createSphere = (radius, position) => {
+const sphereShape = new cannon.Sphere(0.5);
+
+const createSphere = (position) => {
     const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(radius, 32, 32),
-    STDMaterial)
+        STDGeometry,
+        STDMaterial)
     sphere.castShadow = true
     sphere.position.copy(position);
     scene.add(sphere)
-    
-    const sphereShape = new cannon.Sphere(radius);
+        
     const sphereBody  = new cannon.Body({
         mass: 1,
-        position: new cannon.Vec3().copy(sphere.position),
         shape: sphereShape,
         material: plasticMaterial
     });
+    sphereBody.position.copy(sphere.position);
     PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
 }
-
-
 
 // gui.add(sphere.material, 'metalness', 0, 1);
 // gui.add(sphere.material, 'roughness', 0, 1);
@@ -209,7 +209,7 @@ for (let i = 0; i < 50; i++){
     let x = (Math.random() - 0.5) * 10
     let y = (Math.random() + 0.05) * 10
     let z = (Math.random() - 0.5) * 10
-    createSphere(0.5, new THREE.Vector3(x, y, z))
+    createSphere(new THREE.Vector3(x, y, z))
 }
 
 //To Add it To Dat Gui It has to be inside of an Object
@@ -218,7 +218,7 @@ BallCreator.create = () => {
     let x = (Math.random() - 0.5) * 10
     let y = (Math.random() + 0.05) * 10
     let z = (Math.random() - 0.5) * 10
-    createSphere(0.5, new THREE.Vector3(x, y, z))
+    createSphere(new THREE.Vector3(x, y, z))
 }
 
 gui.add(BallCreator, 'create')
