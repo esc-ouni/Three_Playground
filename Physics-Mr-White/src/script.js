@@ -136,7 +136,8 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-14, 12, 5)
+camera.position.set(-12.22, 10.86, -9.86)
+
 scene.add(camera)
 
 // Controls
@@ -238,17 +239,15 @@ const tick = () =>
     Dx = elapsedTime - oelapsedTime
     oelapsedTime = elapsedTime
 
-    // wind effect
-    // sphereBody.applyForce(new cannon.Vec3(0.95, 0, 0), sphereBody.position)
-
+    
     // update physic world
     PhysicWorld.step(1/60, Dx, 3)
-
-    // console.log(sphereBody.position);
-
+    
     for (const object of Objects){
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
+        // wind effect
+        // object.sphereBody.applyForce(new cannon.Vec3(0.95, 0, 0), object.sphereBody.position)
     }
     
     floor.position.copy(planeBody.position);
