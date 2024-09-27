@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import cannon, { World } from 'cannon'
+import * as cannon from 'cannon-es'
 
 console.time('label');
 let k = 0;
@@ -42,21 +42,20 @@ const environmentMapTexture = cubeTextureLoader.load([
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
 const Pong_Ball_colide = (Collision) => {
-    // let strength = Collision.contact.getImpactVelocityAlongNormal() / 8;
-    let strength = Math.random();
-    console.log((strength/ 8));
-    // hit_sound.volume = strength;
+    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
+
+    hit_sound.volume = Math.min(strength, 1);
     hit_sound.currentTime = 0;
     hit_sound.play();
 }
 
 const hit__sound = new Audio("/sounds/hit.mp3");
 const Hit__ = (Collision) => {
-    let strength = Collision.contact.getImpactVelocityAlongNormal() / 8;
-    console.log(strength/ 8);
-    // hit__sound.volume = strength;
-    // hit__sound.currentTime = 0;
-    // hit__sound.play();
+    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
+
+    hit__sound.volume = Math.min(strength, 1);
+    hit__sound.currentTime = 0;
+    hit__sound.play();
 }
 //
 
