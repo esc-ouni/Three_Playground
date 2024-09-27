@@ -103,7 +103,7 @@ const group = new THREE.Group();
 GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
-        let x = 0;
+        let x = -0.4;
         let Board;
         const z = gltf.scene.children[0].position.z;
         
@@ -124,7 +124,7 @@ GLTFLoaderr.load(
                 // gltf.scene.children[22].position.y = 1;
                 // scene.add( gltf.scene.children[22] );
                 item.position.y = 1.004;
-                item.position.x = (x - 0.5);
+                item.position.x = x;
                 item.position.z = z;
             }
             scene.add(item)
