@@ -1,0 +1,155 @@
+{
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.6.16",
+    "version": "2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "mesh": 0,
+      "name": "WetFloorSign_01"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "WetFloorSign_01",
+      "normalTexture": {
+        "index": 0
+      },
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 1
+        },
+        "metallicRoughnessTexture": {
+          "index": 2
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Mesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "sampler": 0,
+      "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "name": "WetFloorSign_01_nor_gl",
+      "uri": "textures/WetFloorSign_01_nor_gl_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "WetFloorSign_01_diff",
+      "uri": "textures/WetFloorSign_01_diff_4k.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "name": "WetFloorSign_01_metallic-WetFloorSign_01_roughness",
+      "uri": "textures/WetFloorSign_01_arm_4k.jpg"
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 254,
+      "max": [
+        0.15002740919589996,
+        0.6317126154899597,
+        0.16525021195411682
+      ],
+      "min": [
+        -0.15002743899822235,
+        0.002168611390516162,
+        -0.1932590901851654
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 254,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 254,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 684,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 3048,
+      "byteOffset": 0
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3048,
+      "byteOffset": 3048
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2032,
+      "byteOffset": 6096
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1368,
+      "byteOffset": 8128
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 9496,
+      "uri": "WetFloorSign_01.bin"
+    }
+  ]
+}
