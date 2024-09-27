@@ -326,13 +326,15 @@ BoxCreator.reset = () => {
         
         scene.remove(object.sphere);
     }
-    
+    Objects.splice(0, Objects.length)
+
     for (const object of Boxes){
         object.BoxBody.removeEventListener('collide', Hit__)
         PhysicWorld.removeBody(object.BoxBody);
-
+        
         scene.remove(object.Box);
     }
+    Boxes.splice(0, Boxes.length)
 }
 
 
