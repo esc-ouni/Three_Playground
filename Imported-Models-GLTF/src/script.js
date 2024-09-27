@@ -103,33 +103,61 @@ const group = new THREE.Group();
 GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
-        let x = -0.4;
+        let x = 0;
         let Board;
-        const z = gltf.scene.children[0].position.z;
+        let z = -0.2;
+        // console.log(z)
         
         // gui.add(gltf.scene.position, 'y', 0, 10).step(1)
-		for (const item of gltf.scene.children){
+		// for (const item of gltf.scene.children){
+        //     if (item.name === "board"){
+        //         Board = item;
+        //         item.position.y = 1.004;
+        //         item.position.x = 0;
+        //         item.position.z = 0.179;
+        //         // console.log(item.position);
+        //         // gui.add(item.position, 'x', 0, 10).step(0.1)
+        //         // gui.add(item.position, 'y', 0, 10).step(0.1)
+        //         // gui.add(item.position, 'z', 0, 10).step(0.1)
+        //         x -= 0.05;                    
+        //     }
+        //     else{
+        //         // gltf.scene.children[22].position.y = 1;
+        //         // scene.add( gltf.scene.children[22] );
+        //         item.position.y = 1.004;
+        //         item.position.x = x;
+        //         item.position.z = z;
+        //     }
+        //     scene.add(item)
+        //     x += 0.05;
+        // }
+
+        //Testing right apraoch
+        let item;
+        let posx = -0.36;
+		while (gltf.scene.children.length){
+            item = gltf.scene.children[0];
+            if (x >= 16){
+                z = -0.25;
+                posx = -1.15;
+            }
             if (item.name === "board"){
                 Board = item;
                 item.position.y = 1.004;
                 item.position.x = 0;
                 item.position.z = 0.179;
-                // console.log(item.position);
-                // gui.add(item.position, 'x', 0, 10).step(0.1)
-                // gui.add(item.position, 'y', 0, 10).step(0.1)
-                // gui.add(item.position, 'z', 0, 10).step(0.1)
-                x -= 0.05;                    
+                x -= 1;                    
             }
             else{
-                // gltf.scene.children[22].position.y = 1;
-                // scene.add( gltf.scene.children[22] );
                 item.position.y = 1.004;
-                item.position.x = x;
+                item.position.x = posx + (0.05 * x);
                 item.position.z = z;
             }
             scene.add(item)
-            x += 0.05;
+            x += 1;
         }
+        console.log('x: ', x);
+
     }
 );
 
