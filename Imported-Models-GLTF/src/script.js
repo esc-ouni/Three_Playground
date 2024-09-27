@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
+
 const gui = new GUI()
 
 const canvas = document.querySelector('canvas.webgl')
@@ -13,11 +15,12 @@ const floor = new THREE.Mesh(
     new THREE.MeshStandardMaterial({
         color: '#444444',
         metalness: 0,
-        roughness: 0.5
+        roughness: 0.5,
     })
 )
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
+floor.material.side = THREE.DoubleSide;
 scene.add(floor)
 
 // Lights
@@ -74,6 +77,33 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+
+
+//GLTF Loading
+const GLTFLoaderr = new GLTFLoader();
+
+GLTFLoaderr.load(
+	'/models/chess_set_4k.gltf/chess_set_4k.gltf',
+	function ( gltf ) {
+		scene.add( gltf.scene );
+		// gltf.animations; // Array<THREE.AnimationClip>
+		// gltf.scene; // THREE.Group
+		// gltf.scenes; // Array<THREE.Group>
+		// gltf.cameras; // Array<THREE.Camera>
+		// gltf.asset; // Object
+
+    },
+    function ( xhr ){
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+	function ( error ){
+		console.log( 'An error happened' );
+    }
+);
+//
+
+
 
 //  Animate
 const clock = new THREE.Clock()
