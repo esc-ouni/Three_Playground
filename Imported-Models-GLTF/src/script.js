@@ -61,7 +61,7 @@ window.addEventListener('resize', () =>
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-0.71, 0.29, -0.96)
+camera.position.set(-0.71, 1.41, -0.96)
 scene.add(camera)
 
 // Controls
@@ -84,23 +84,34 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 const GLTFLoaderr = new GLTFLoader();
 
 GLTFLoaderr.load(
-	'/models/chess_set_4k.gltf/chess_set_4k.gltf',
+    '/models/round_wooden_table_01_4k.gltf/round_wooden_table_01_4k.gltf',
+    function ( gltf ) {
+        scene.add( gltf.scene );
+        // gltf.animations; // Array<THREE.AnimationClip>
+        // gltf.scene; // THREE.Group
+        // gltf.scenes; // Array<THREE.Group>
+        // gltf.cameras; // Array<THREE.Camera>
+        // gltf.asset; // Object
+        
+    }
+);
+
+GLTFLoaderr.load(
+    '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
-		scene.add( gltf.scene );
+        // gui.add(gltf.scene.position, 'y', 0, 10).step(1)
+		gltf.scene.position.y = 1;
+        scene.add( gltf.scene );
 		// gltf.animations; // Array<THREE.AnimationClip>
 		// gltf.scene; // THREE.Group
 		// gltf.scenes; // Array<THREE.Group>
 		// gltf.cameras; // Array<THREE.Camera>
 		// gltf.asset; // Object
 
-    },
-    function ( xhr ){
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    },
-	function ( error ){
-		console.log( 'An error happened' );
     }
 );
+
+
 //
 
 
