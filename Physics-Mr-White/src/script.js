@@ -317,6 +317,25 @@ BoxCreator.createBox = () => {
     createBox(Math.random()*2, Math.random()*2, Math.random()*2, new THREE.Vector3(x, y, z))
 }
 
+
+BoxCreator.reset = () => {
+    console.log('Triggered');
+    for (const object of Objects){
+        object.sphereBody.removeEventListener('collide', Pong_Ball_colide);
+        PhysicWorld.removeBody(object.sphereBody);
+        
+        scene.remove(object.sphere);
+    }
+    
+    for (const object of Boxes){
+        object.BoxBody.removeEventListener('collide', Hit__)
+        PhysicWorld.removeBody(object.BoxBody);
+
+        scene.remove(object.Box);
+    }
+}
+
+
 // for (let i = 0; i < 25; i++){
 //     BallCreator.createBall();
 // }
@@ -328,6 +347,7 @@ BoxCreator.createBox = () => {
 
 gui.add(BallCreator, 'createBall')
 gui.add(BoxCreator, 'createBox')
+gui.add(BoxCreator, 'reset')
 
 //
 
