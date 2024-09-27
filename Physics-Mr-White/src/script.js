@@ -318,7 +318,6 @@ BoxCreator.createBox = () => {
 
 
 BoxCreator.reset = () => {
-    console.log('Triggered');
     for (const object of Objects){
         object.sphereBody.removeEventListener('collide', Pong_Ball_colide);
         PhysicWorld.removeBody(object.sphereBody);
