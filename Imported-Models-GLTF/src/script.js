@@ -104,36 +104,34 @@ GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
         let x = 0;
-        let itemD;
+        let Board;
         const z = gltf.scene.children[0].position.z;
         
         // gui.add(gltf.scene.position, 'y', 0, 10).step(1)
 		for (const item of gltf.scene.children){
-            if (x === 0.3){
-                itemD = item;
+            if (item.name === "board"){
+                Board = item;
+                item.position.y = 1.004;
+                item.position.x = 0;
+                item.position.z = 0.179;
+                // console.log(item.position);
+                // gui.add(item.position, 'x', 0, 10).step(0.1)
+                // gui.add(item.position, 'y', 0, 10).step(0.1)
+                // gui.add(item.position, 'z', 0, 10).step(0.1)
+                x -= 0.05;                    
             }
-            // gltf.scene.children[22].position.y = 1;
-            // scene.add( gltf.scene.children[22] );
-            item.position.y = 1;
-            item.position.x = x;
-            item.position.z = z;
+            else{
+                // gltf.scene.children[22].position.y = 1;
+                // scene.add( gltf.scene.children[22] );
+                item.position.y = 1.004;
+                item.position.x = (x - 0.5);
+                item.position.z = z;
+            }
             scene.add(item)
-            console.log(item);
-            x += 0.1;
+            x += 0.05;
         }
-        // itemD.clear()
-        console.log('Item Selected: ', itemD);
-        
-        // scene.remove(itemD)
-		// gltf.animations; // Array<THREE.AnimationClip>
-		// gltf.scene; // THREE.Group
-		// gltf.scenes; // Array<THREE.Group>
-		// gltf.cameras; // Array<THREE.Camera>
-		// gltf.asset; // Object
-
     }
 );
-
 
 //
 
