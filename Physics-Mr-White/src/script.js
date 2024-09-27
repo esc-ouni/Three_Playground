@@ -348,7 +348,6 @@ BoxCreator.reset = () => {
 gui.add(BallCreator, 'createBall')
 gui.add(BoxCreator, 'createBox')
 gui.add(BoxCreator, 'reset')
-
 //
 
 
