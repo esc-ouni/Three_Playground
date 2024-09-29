@@ -4,6 +4,8 @@ import GUI from 'lil-gui'
 
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 
+import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
+
 const gui = new GUI()
 
 const canvas = document.querySelector('canvas.webgl')
@@ -21,7 +23,7 @@ const floor = new THREE.Mesh(
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
-scene.add(floor)
+// scene.add(floor)
 
 // Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 2.4)
@@ -86,7 +88,9 @@ const GLTFLoaderr = new GLTFLoader();
 GLTFLoaderr.load(
     '/models/round_wooden_table_01_4k.gltf/round_wooden_table_01_4k.gltf',
     function ( gltf ) {
+        gui.add(gltf.scene.children[0].position, 'y', -50, 1).step(1);
         scene.add( gltf.scene.children[0] );
+
 
         // gltf.animations; // Array<THREE.AnimationClip>
         // gltf.scene; // THREE.Group
@@ -103,9 +107,9 @@ const group = new THREE.Group();
 GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
-        let x = 0;
-        let Board;
-        let z = -0.2;
+        // let x = 0;
+        // let Board;
+        // let z = -0.2;
         // console.log(z)
         
         // gui.add(gltf.scene.position, 'y', 0, 10).step(1)
@@ -133,37 +137,55 @@ GLTFLoaderr.load(
         // }
 
         //Testing right apraoch
-        let item;
-        let posx = -0.36;
-		while (gltf.scene.children.length){
-            item = gltf.scene.children[0];
-            if (x >= 16){
-                z = -0.25;
-                posx = -1.15;
-            }
-            if (item.name === "board"){
-                Board = item;
-                item.position.y = 1.004;
-                item.position.x = 0;
-                item.position.z = 0.179;
-                x -= 1;                    
-            }
-            else{
-                item.position.y = 1.004;
-                item.position.x = posx + (0.05 * x);
-                item.position.z = z;
-            }
-            scene.add(item)
-            x += 1;
-        }
-        console.log('x: ', x);
-
+        // let item;
+        // let posx = -0.36;
+		// while (gltf.scene.children.length){
+        //     item = gltf.scene.children[0];
+        //     if (x >= 16){
+        //         z = -0.25;
+        //         posx = -1.15;
+        //     }
+        //     if (item.name === "board"){
+        //         Board = item;
+        //         item.position.y = 1.004;
+        //         item.position.x = 0;
+        //         item.position.z = 0.179;
+        //         x -= 1;                    
+        //     }
+        //     else{
+        //         item.position.y = 1.004;
+        //         item.position.x = posx + (0.05 * x);
+        //         item.position.z = z;
+        //     }
+        //     scene.add(item)
+        //     x += 1;
+        // }
+        // console.log('x: ', x);
+        
+        // item.position.y = 1.004;
+        // item.position.x = 0;
+        // item.position.z = 0.179;
+		// while (gltf.scene.children.length){
+        //     item = gltf.scene.children[0];
+        //     scene.add(item);
+        // }
+        gltf.scene.position.y = 1.004;
+        gui.add(gltf.scene.position, 'y', -50, 1).step(1);
+        scene.add(gltf.scene)
     }
 );
 
 //
 
+const rgbeLoader = new RGBELoader();
 
+rgbeLoader.load('/models/envmap/photo_studio_loft_hall_8k.pic', (enviroment_map) => {
+
+    enviroment_map.mapping = THREE.EquirectangularReflectionMapping
+
+    scene.background  = enviroment_map;
+    scene.environment = enviroment_map;
+})
 
 //  Animate
 const clock = new THREE.Clock()
