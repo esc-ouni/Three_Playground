@@ -107,71 +107,46 @@ const group = new THREE.Group();
 GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
-        // let x = 0;
-        // let Board;
-        // let z = -0.2;
+        let x = 0;
+        let Board;
+        let z = -0.2;
         // console.log(z)
-        
-        // gui.add(gltf.scene.position, 'y', 0, 10).step(1)
-		// for (const item of gltf.scene.children){
-        //     if (item.name === "board"){
-        //         Board = item;
-        //         item.position.y = 1.004;
-        //         item.position.x = 0;
-        //         item.position.z = 0.179;
-        //         // console.log(item.position);
-        //         // gui.add(item.position, 'x', 0, 10).step(0.1)
-        //         // gui.add(item.position, 'y', 0, 10).step(0.1)
-        //         // gui.add(item.position, 'z', 0, 10).step(0.1)
-        //         x -= 0.05;                    
-        //     }
-        //     else{
-        //         // gltf.scene.children[22].position.y = 1;
-        //         // scene.add( gltf.scene.children[22] );
-        //         item.position.y = 1.004;
-        //         item.position.x = x;
-        //         item.position.z = z;
-        //     }
-        //     scene.add(item)
-        //     x += 0.05;
-        // }
 
-        //Testing right apraoch
-        // let item;
-        // let posx = -0.36;
-		// while (gltf.scene.children.length){
-        //     item = gltf.scene.children[0];
-        //     if (x >= 16){
-        //         z = -0.25;
-        //         posx = -1.15;
-        //     }
-        //     if (item.name === "board"){
-        //         Board = item;
-        //         item.position.y = 1.004;
-        //         item.position.x = 0;
-        //         item.position.z = 0.179;
-        //         x -= 1;                    
-        //     }
-        //     else{
-        //         item.position.y = 1.004;
-        //         item.position.x = posx + (0.05 * x);
-        //         item.position.z = z;
-        //     }
-        //     scene.add(item)
-        //     x += 1;
-        // }
-        // console.log('x: ', x);
+        // Testing right apraoch
+        let item;
+        let posx = -0.36;
+		while (gltf.scene.children.length){
+            item = gltf.scene.children[0];
+            if (x >= 16){
+                z = -0.25;
+                posx = -1.15;
+            }
+            if (item.name === "board"){
+                Board = item;
+                item.position.y = 1.004;
+                item.position.x = 0;
+                item.position.z = 0.179;
+                x -= 1;                    
+            }
+            else{
+                item.position.y = 1.004;
+                item.position.x = posx + (0.05 * x);
+                item.position.z = z;
+            }
+            scene.add(item)
+            x += 1;
+        }
         
-        // item.position.y = 1.004;
-        // item.position.x = 0;
-        // item.position.z = 0.179;
-		// while (gltf.scene.children.length){
-        //     item = gltf.scene.children[0];
-        //     scene.add(item);
-        // }
-        gltf.scene.position.y = 1.004;
-        gui.add(gltf.scene.position, 'y', -50, 1).step(1);
-        scene.add(gltf.scene)
+        item.position.y = 1.004;
+        item.position.x = 0;
+        item.position.z = 0.179;
+		while (gltf.scene.children.length){
+            item = gltf.scene.children[0];
+            scene.add(item);
+        }
+        // gltf.scene.position.y = 1.004;
+        // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
+        // scene.add(gltf.scene)
     }
 );
 
