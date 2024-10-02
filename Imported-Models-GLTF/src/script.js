@@ -90,14 +90,6 @@ GLTFLoaderr.load(
     function ( gltf ) {
         gui.add(gltf.scene.children[0].position, 'y', -50, 1).step(1);
         scene.add( gltf.scene.children[0] );
-
-
-        // gltf.animations; // Array<THREE.AnimationClip>
-        // gltf.scene; // THREE.Group
-        // gltf.scenes; // Array<THREE.Group>
-        // gltf.cameras; // Array<THREE.Camera>
-        // gltf.asset; // Object
-        
     }
 );
 
@@ -110,7 +102,6 @@ GLTFLoaderr.load(
         let x = 0;
         let Board;
         let z = -0.2;
-        // console.log(z)
 
         // Testing right apraoch
         let item;
@@ -137,30 +128,20 @@ GLTFLoaderr.load(
             x += 1;
         }
         
-        item.position.y = 1.004;
-        item.position.x = 0;
-        item.position.z = 0.179;
-		while (gltf.scene.children.length){
-            item = gltf.scene.children[0];
-            scene.add(item);
-        }
         // gltf.scene.position.y = 1.004;
         // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
         // scene.add(gltf.scene)
     }
 );
-
 //
 
-const rgbeLoader = new RGBELoader();
-
-rgbeLoader.load('/models/envmap/photo_studio_loft_hall_8k.pic', (enviroment_map) => {
-
-    enviroment_map.mapping = THREE.EquirectangularReflectionMapping
-
-    scene.background  = enviroment_map;
-    scene.environment = enviroment_map;
-})
+//Enviroment Map
+// const rgbeLoader = new RGBELoader();
+// rgbeLoader.load('/models/envmap/photo_studio_loft_hall_8k.pic', (enviroment_map) => {
+//     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
+//     scene.background  = enviroment_map;
+//     scene.environment = enviroment_map;
+// })
 
 //  Animate
 const clock = new THREE.Clock()
