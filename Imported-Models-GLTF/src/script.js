@@ -88,48 +88,58 @@ const GLTFLoaderr = new GLTFLoader();
 GLTFLoaderr.load(
     '/models/round_wooden_table_01_4k.gltf/round_wooden_table_01_4k.gltf',
     function ( gltf ) {
-        gui.add(gltf.scene.children[0].position, 'y', -50, 1).step(1);
         scene.add( gltf.scene.children[0] );
     }
 );
 
-GLTFLoaderr.load(
-    '/models/chess_set_4k.gltf/chess_set_4k.gltf',
-	function ( gltf ) {
-        let x = 0;
-        let Board;
-        let z = -0.2;
+// GLTFLoaderr.load(
+//     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
+// 	function ( gltf ) {
+//         let x = 0;
+//         let Board;
+//         let z = -0.2;
 
-        // Testing right apraoch
-        let item;
-        let posx = -0.36;
-		while (gltf.scene.children.length){
-            item = gltf.scene.children[0];
-            if (x >= 16){
-                z = -0.25;
-                posx = -1.15;
-            }
-            if (item.name === "board"){
-                Board = item;
-                item.position.y = 1.004;
-                item.position.x = 0;
-                item.position.z = 0.179;
-                x -= 1;                    
-            }
-            else{
-                item.position.y = 1.004;
-                item.position.x = posx + (0.05 * x);
-                item.position.z = z;
-            }
-            scene.add(item)
-            x += 1;
-        }
+//         // Testing right apraoch
+//         let item;
+//         let posx = -0.36;
+// 		while (gltf.scene.children.length){
+//             item = gltf.scene.children[0];
+//             if (x >= 16){
+//                 z = -0.25;
+//                 posx = -1.15;
+//             }
+//             if (item.name === "board"){
+//                 Board = item;
+//                 item.position.y = 1.004;
+//                 item.position.x = 0;
+//                 item.position.z = 0.179;
+//                 x -= 1;                    
+//             }
+//             else{
+//                 item.position.y = 1.004;
+//                 item.position.x = posx + (0.05 * x);
+//                 item.position.z = z;
+//             }
+//             scene.add(item)
+//             x += 1;
+//         }
         
-        // gltf.scene.position.y = 1.004;
-        // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
-        // scene.add(gltf.scene)
+//         // gltf.scene.position.y = 1.004;
+//         // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
+//         // scene.add(gltf.scene)
+//     }
+// );
+
+//Importing Flight Helmet
+let item;
+GLTFLoaderr.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", function (gltf){
+    while (gltf.scene.children.length){
+        item = gltf.scene.children[0];
+        item.position.y = 1;
+        scene.add(item)
     }
-);
+})
+
 //
 
 //Enviroment Map
