@@ -23,7 +23,7 @@ const floor = new THREE.Mesh(
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
-// scene.add(floor)
+scene.add(floor)
 
 // Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 2.4)
@@ -92,9 +92,6 @@ GLTFLoaderr.load(
         scene.add( gltf.scene.children[0] );
     }
 );
-
-const group = new THREE.Group();
-
 
 GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
