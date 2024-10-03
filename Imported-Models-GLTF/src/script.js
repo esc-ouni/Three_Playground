@@ -92,6 +92,16 @@ GLTFLoaderr.load('/models/Fox/glTF/Fox.gltf',
                  function(gltf){
                     const fox = gltf.scene;
 
+                    // fox.traverse((node) => {
+                    //     if (!node.isMesh) return;
+                    //     node.material.wireframe   = true;
+                    //     node.material.needsUpdate = true;
+                    // });
+                    
+                    // fox.material.wireframe=true;
+                    // fox.material.needsUpdate = true;
+                    
+
                     mixer  = new THREE.AnimationMixer(fox)
                     const action = mixer.clipAction(gltf.animations[0])
 
