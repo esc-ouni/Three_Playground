@@ -85,12 +85,31 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 //GLTF Loading
 const GLTFLoaderr = new GLTFLoader();
 
-GLTFLoaderr.load(
-    '/models/round_wooden_table_01_4k.gltf/round_wooden_table_01_4k.gltf',
-    function ( gltf ) {
-        scene.add( gltf.scene.children[0] );
-    }
-);
+//Load Fox + Animations
+
+let mixer = null;
+GLTFLoaderr.load('/models/Fox/glTF/Fox.gltf',
+                 function(gltf){
+                    const fox = gltf.scene;
+
+                    mixer  = new THREE.AnimationMixer(fox)
+                    const action = mixer.clipAction(gltf.animations[0])
+
+                    action.play()
+
+                    fox.scale.set(0.02, 0.02, 0.02)
+                    scene.add(fox)
+                 }
+                 
+)
+
+
+// GLTFLoaderr.load(
+//     '/models/round_wooden_table_01_4k.gltf/round_wooden_table_01_4k.gltf',
+//     function ( gltf ) {
+//         scene.add( gltf.scene.children[0] );
+//     }
+// );
 
 // GLTFLoaderr.load(
 //     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
@@ -131,14 +150,14 @@ GLTFLoaderr.load(
 // );
 
 //Importing Flight Helmet
-let item;
-GLTFLoaderr.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", function (gltf){
-    while (gltf.scene.children.length){
-        item = gltf.scene.children[0];
-        item.position.y = 1;
-        scene.add(item)
-    }
-})
+// let item;
+// GLTFLoaderr.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", function (gltf){
+//     while (gltf.scene.children.length){
+//         item = gltf.scene.children[0];
+//         item.position.y = 1;
+//         scene.add(item)
+//     }
+// })
 
 //
 
@@ -159,6 +178,11 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
+
+    // Update Mixer
+    if (mixer !== null){
+        mixer.update(deltaTime)
+    }
 
     // Update controls
     controls.update()
