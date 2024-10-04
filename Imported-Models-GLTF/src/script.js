@@ -1,10 +1,8 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-
+import * as cannon from 'cannon-es'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-
-import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
 const gui = new GUI()
 
@@ -26,7 +24,7 @@ floor.material.side = THREE.DoubleSide;
 scene.add(floor)
 
 // Lights
-const ambientLight = new THREE.AmbientLight(0xffffff, 2.4)
+const ambientLight = new THREE.AmbientLight(0xffffff, 3.14)
 scene.add(ambientLight)
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8)
@@ -80,104 +78,171 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-
-
 //GLTF Loading
 const GLTFLoaderr = new GLTFLoader();
 
-//Load Fox + Animations
+//Load ping pong Table
+let i = 0
+GLTFLoaderr.load('/models/PP_Table/scene.gltf', function (gltf){
+    const model = gltf.scene;
+    model.scale.set(4, 4, 4)
+    model.position.y -= 0.01;
+    model.traverse(function (node) {
+          
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+            node.material.wireframe = true;
+            console.log('hello', i++)
+        }
+    })
+  
+    scene.add(model);
+})
 
-let mixer = null;
-GLTFLoaderr.load('/models/Fox/glTF/Fox.gltf',
-                 function(gltf){
-                    const fox = gltf.scene;
+//
+const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
-                    // fox.traverse((node) => {
-                    //     if (!node.isMesh) return;
-                    //     node.material.wireframe   = true;
-                    //     node.material.needsUpdate = true;
-                    // });
-                    
-                    // fox.material.wireframe=true;
-                    // fox.material.needsUpdate = true;
-                    
+const Pong_Ball_colide = (Collision) => {
+    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
 
-                    mixer  = new THREE.AnimationMixer(fox)
-                    const action = mixer.clipAction(gltf.animations[0])
+    hit_sound.volume = Math.min(strength, 1);
+    hit_sound.currentTime = 0;
+    hit_sound.play();
+}
 
-                    action.play()
+const hit__sound = new Audio("/sounds/hit.mp3");
+const Hit__ = (Collision) => {
+    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
 
-                    fox.scale.set(0.02, 0.02, 0.02)
-                    scene.add(fox)
-                 }
-                 
-)
+    hit__sound.volume = Math.min(strength, 1);
+    hit__sound.currentTime = 0;
+    hit__sound.play();
+}
 
+const TextureLoader = new THREE.TextureLoader();
+const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
-// GLTFLoaderr.load(
-//     '/models/round_wooden_table_01_4k.gltf/round_wooden_table_01_4k.gltf',
-//     function ( gltf ) {
-//         scene.add( gltf.scene.children[0] );
-//     }
-// );
+let Objects  = []
 
-// GLTFLoaderr.load(
-//     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
-// 	function ( gltf ) {
-//         let x = 0;
-//         let Board;
-//         let z = -0.2;
+const STDGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+const STDMaterial = new THREE.MeshStandardMaterial;
+STDMaterial.metalness = 0.1;
+STDMaterial.roughness = 0.1;
+STDMaterial.map       = Texture;
 
-//         // Testing right apraoch
-//         let item;
-//         let posx = -0.36;
-// 		while (gltf.scene.children.length){
-//             item = gltf.scene.children[0];
-//             if (x >= 16){
-//                 z = -0.25;
-//                 posx = -1.15;
-//             }
-//             if (item.name === "board"){
-//                 Board = item;
-//                 item.position.y = 1.004;
-//                 item.position.x = 0;
-//                 item.position.z = 0.179;
-//                 x -= 1;                    
-//             }
-//             else{
-//                 item.position.y = 1.004;
-//                 item.position.x = posx + (0.05 * x);
-//                 item.position.z = z;
-//             }
-//             scene.add(item)
-//             x += 1;
-//         }
+const sphereShape = new cannon.Sphere(0.1);
+
+const createSphere = (position) => {
+    const sphere = new THREE.Mesh(
+        STDGeometry,
+        STDMaterial)
+        sphere.castShadow = true
+        sphere.position.copy(position);
+        scene.add(sphere)
         
-//         // gltf.scene.position.y = 1.004;
-//         // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
-//         // scene.add(gltf.scene)
-//     }
-// );
+        const sphereBody  = new cannon.Body({
+            mass: 1,
+            shape: sphereShape,
+            material: plasticMaterial
+        });
+    sphereBody.addEventListener('collide', Pong_Ball_colide);
+    sphereBody.position.copy(sphere.position);
+    PhysicWorld.addBody(sphereBody);
+    Objects.push({sphere, sphereBody})
+}
 
-//Importing Flight Helmet
-// let item;
-// GLTFLoaderr.load("/models/FlightHelmet/glTF/FlightHelmet.gltf", function (gltf){
-//     while (gltf.scene.children.length){
-//         item = gltf.scene.children[0];
-//         item.position.y = 1;
-//         scene.add(item)
-//     }
-// })
+const PhysicWorld = new cannon.World();
+
+//Allow objects sleep => icrease performance
+PhysicWorld.allowSleep = true; 
+//Collision detction better than Naive
+PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
+
+
+PhysicWorld.gravity.set(0, - 8.92, 0);
+
+const concreteMaterial = new cannon.Material('concrete');
+const plasticMaterial  = new cannon.Material('plastic');
+const metalMaterial  = new cannon.Material('metal');
+
+const ContactMaterial = new cannon.ContactMaterial(
+    concreteMaterial,
+    plasticMaterial,
+    {
+        friction: 0.4,    // Increased for more realistic grip
+        restitution: 0.5, // Decreased for less bounce
+    }
+);
+
+const BallContactMaterial = new cannon.ContactMaterial(
+    plasticMaterial,
+    plasticMaterial,
+    {
+        friction: 0.2,    // Low friction for smooth surfaces
+        restitution: 0.9, // High restitution for bounciness
+    }
+);
+
+
+PhysicWorld.addContactMaterial(ContactMaterial)
+PhysicWorld.addContactMaterial(BallContactMaterial)
+
+// sphereBody.applyForce(new cannon.Vec3(200,0, 0), sphereBody.position) // world outside force (wind, gravity, ...) 
+// sphereBody.applyLocalForce(new cannon.Vec3(200, 0, 0), sphereBody.position) // like engine mounted on the body
+
+
+//plane
+const planeShape = new cannon.Plane();
+const planeBody  = new cannon.Body({
+    mass: 0,
+    position: new cannon.Vec3().copy(floor.position),
+    shape: planeShape,
+    material:concreteMaterial
+})
+planeBody.quaternion.setFromAxisAngle(
+    new cannon.Vec3(-1, 0, 0),
+    Math.PI * 0.5
+)
+PhysicWorld.addBody(planeBody);
 
 //
 
-//Enviroment Map
-// const rgbeLoader = new RGBELoader();
-// rgbeLoader.load('/models/envmap/photo_studio_loft_hall_8k.pic', (enviroment_map) => {
-//     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
-//     scene.background  = enviroment_map;
-//     scene.environment = enviroment_map;
-// })
+
+//To Add it To Dat Gui It has to be inside of an Object
+const BallCreator = {}
+BallCreator.createBall = () => {
+    let x = (Math.random() - 0.5) * 10
+    let y = 12
+    let z = (Math.random() - 0.5) * 10
+    createSphere(new THREE.Vector3(x, y, z))
+}
+
+BallCreator.reset = () => {
+    for (const object of Objects){
+        object.sphereBody.removeEventListener('collide', Pong_Ball_colide);
+        PhysicWorld.removeBody(object.sphereBody);
+        
+        scene.remove(object.sphere);
+    }
+    Objects.splice(0, Objects.length)
+
+    for (const object of Boxes){
+        object.BoxBody.removeEventListener('collide', Hit__)
+        PhysicWorld.removeBody(object.BoxBody);
+        
+        scene.remove(object.Box);
+    }
+    Boxes.splice(0, Boxes.length)
+}
+
+gui.add(BallCreator, 'createBall')
+gui.add(BallCreator, 'reset')
+//
+//
+
+
+
 
 //  Animate
 const clock = new THREE.Clock()
@@ -189,10 +254,19 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
 
-    // Update Mixer
-    if (mixer !== null){
-        mixer.update(deltaTime)
+
+    //
+    // update physic world
+    PhysicWorld.step(1/60, deltaTime, 3)
+        
+    for (const object of Objects){
+        object.sphere.position.copy(object.sphereBody.position);
+        object.sphere.quaternion.copy(object.sphereBody.quaternion);
+
     }
+
+    floor.position.copy(planeBody.position);
+    //
 
     // Update controls
     controls.update()
