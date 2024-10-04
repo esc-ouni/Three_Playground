@@ -84,8 +84,10 @@ const GLTFLoaderr = new GLTFLoader();
 //Load ping pong Table
 let i = 0
 GLTFLoaderr.load('/models/PP_Table/scene.gltf', function (gltf){
+// GLTFLoaderr.load('/models/table_v2/scene.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(4, 4, 4)
+    // model.scale.set(2, 2, 2)
     model.position.y -= 0.01;
     model.traverse(function (node) {
           
