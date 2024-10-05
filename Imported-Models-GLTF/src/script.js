@@ -3,6 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import * as cannon from 'cannon-es'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
+import CannonDebugger from 'cannon-es-debugger';
+
 
 const gui = new GUI()
 
@@ -81,30 +83,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 //GLTF Loading
 const GLTFLoaderr = new GLTFLoader();
 
-
-//createTrimesh
-function createTrimesh(geometry) {
-    if (!geometry.attributes.position) {
-        return null; // No position data
-    }
-
-    const vertices = geometry.attributes.position.array;
-    const indices = geometry.index ? geometry.index.array : null;
-
-    if (!indices) {
-        // If the geometry is not indexed, create indices
-        const numVertices = vertices.length / 3;
-        const generatedIndices = new Uint16Array(numVertices);
-        for (let i = 0; i < numVertices; i++) {
-            generatedIndices[i] = i;
-        }
-        return new cannon.Trimesh(Array.from(vertices), Array.from(generatedIndices));
-    }
-
-    return new cannon.Trimesh(Array.from(vertices), Array.from(indices));
-}
-//
-
 // Other Options
 // GLTFLoaderr.load('/models/PP_Table/scene.gltf', function (gltf){
 // GLTFLoaderr.load('/models/table_v2/scene.gltf', function (gltf){
@@ -112,9 +90,6 @@ function createTrimesh(geometry) {
 // model.position.y -= 0.04;
         
 //Load ping pong Table
-let shape = null;
-let mass = 0;
-
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/chinese_tea_table_4k.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(4, 4, 4)
@@ -124,20 +99,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/chinese_tea_table_4k.gltf', 
             node.castShadow = true;
             node.receiveShadow = true;
             // node.material.wireframe = true;
-
-            shape = createTrimesh(node.geometry);
-            if (shape != null) {
-                let body = new cannon.Body({
-                    mass: mass,
-                    shape: shape,
-                });
-    
-                body.position.copy(node.position);
-                body.quaternion.copy(node.quaternion);
-                console.log('Body Created !', body);
-                PhysicWorld.addBody(body);
-            }
-
         }
     })
     scene.add(model);
@@ -182,10 +143,17 @@ const createSphere = (position) => {
         STDMaterial)
         sphere.castShadow = true
         sphere.position.copy(position);
+
+        //add some imperfectness
+        sphere.rotation.x += (Math.random() - 0.5)
+        sphere.rotation.y += (Math.random() - 0.5)
+        sphere.rotation.z += (Math.random() - 0.5)
+        //
+
         scene.add(sphere)
         
         const sphereBody  = new cannon.Body({
-            mass: 1,
+            mass: 0.0027, // 2.7g per ping pong ball
             shape: sphereShape,
             material: plasticMaterial
         });
@@ -198,22 +166,23 @@ const createSphere = (position) => {
 const PhysicWorld = new cannon.World();
 
 //Allow objects sleep => icrease performance
-PhysicWorld.allowSleep = true; 
+PhysicWorld.allowSleep = true;
+
 //Collision detction better than Naive
 PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
-
 
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
 const concreteMaterial = new cannon.Material('concrete');
 const plasticMaterial  = new cannon.Material('plastic');
+const TableMaterial    = new cannon.Material('table');
 
 const ContactMaterial = new cannon.ContactMaterial(
     concreteMaterial,
     plasticMaterial,
     {
-        friction: 0.4,    // Increased for more realistic grip
-        restitution: 0.5, // Decreased for less bounce
+        friction: 0.4,   
+        restitution: 0.5
     }
 );
 
@@ -221,18 +190,23 @@ const BallContactMaterial = new cannon.ContactMaterial(
     plasticMaterial,
     plasticMaterial,
     {
-        friction: 0.2,    // Low friction for smooth surfaces
-        restitution: 0.9, // High restitution for bounciness
+        friction: 0.2,   
+        restitution: 0.9, 
     }
 );
 
+const BallTableMaterial = new cannon.ContactMaterial(
+    TableMaterial,
+    plasticMaterial,
+    {
+        friction: 0.3,   
+        restitution: 0.83
+    }
+);
 
 PhysicWorld.addContactMaterial(ContactMaterial)
+PhysicWorld.addContactMaterial(BallTableMaterial)
 PhysicWorld.addContactMaterial(BallContactMaterial)
-
-// sphereBody.applyForce(new cannon.Vec3(200,0, 0), sphereBody.position) // world outside force (wind, gravity, ...) 
-// sphereBody.applyLocalForce(new cannon.Vec3(200, 0, 0), sphereBody.position) // like engine mounted on the body
-
 
 //plane
 const planeShape = new cannon.Plane();
@@ -247,9 +221,7 @@ planeBody.quaternion.setFromAxisAngle(
     Math.PI * 0.5
 )
 PhysicWorld.addBody(planeBody);
-
 //
-
 
 //To Add it To Dat Gui It has to be inside of an Object
 const BallCreator = {}
@@ -281,7 +253,37 @@ BallCreator.reset = () => {
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
 //
+
+
+//Table Plane
+const geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
+const material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+material.transparent = true; 
+const Table = new THREE.Mesh( geometry, material ); 
+Table.position.y = 1.895;
+Table.scale.set(3.3, 0.1, 3.3)
+
+// scene.add(Table);
+
+// add the table to Physic world 
+const TableShape = new cannon.Box(new cannon.Vec3(3.3 / 2, 0.1, 3.3 / 2));
+const TableBody  = new cannon.Body({
+    mass: 0,
+    position: new cannon.Vec3().copy(Table.position),
+    shape: TableShape,
+    material:TableMaterial,
+    quaternion:Table.quaternion
+})
+
+// gui.add(TableBody.position, 'y', 0 , 3).step(0.001)
+PhysicWorld.addBody(TableBody);
 //
+
+//
+// Initialize the debugger after setting up your scene and physics world
+// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+//     color: 0xff0000, // Optional: Color of the debug visuals
+// });
 
 
 //  Animate
@@ -293,24 +295,28 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
-
-
-    //
+    
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
-        
+    
     for (const object of Objects){
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
-
     }
-
+    
     floor.position.copy(planeBody.position);
-    //
+    floor.quaternion.copy(planeBody.quaternion);
 
+    Table.position.copy(TableBody.position);
+    Table.quaternion.copy(TableBody.quaternion);
+    //
+    
     // Update controls
     controls.update()
-
+    
+    // Update debugger
+    // cannonDebugger.update();
+    
     // console.log(camera.position);
 
     // Render
