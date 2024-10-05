@@ -144,12 +144,6 @@ const createSphere = (position) => {
         sphere.castShadow = true
         sphere.position.copy(position);
 
-        //add some imperfectness
-        sphere.rotation.x += (Math.random() - 0.5)
-        sphere.rotation.y += (Math.random() - 0.5)
-        sphere.rotation.z += (Math.random() - 0.5)
-        //
-
         scene.add(sphere)
         
         const sphereBody  = new cannon.Body({
@@ -157,6 +151,15 @@ const createSphere = (position) => {
             shape: sphereShape,
             material: plasticMaterial
         });
+        //add some imperfectness
+        sphereBody.quaternion.setFromAxisAngle(
+            new cannon.Vec3((Math.random()*2-1),
+                            (Math.random()*2-1),
+                            (Math.random()*2-1))
+                            .unit(),
+            Math.PI * (Math.random() - 0.5)
+        )
+        //
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
     PhysicWorld.addBody(sphereBody);
@@ -274,6 +277,7 @@ const TableBody  = new cannon.Body({
     material:TableMaterial,
     quaternion:Table.quaternion
 })
+
 
 // gui.add(TableBody.position, 'y', 0 , 3).step(0.001)
 PhysicWorld.addBody(TableBody);
