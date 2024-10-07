@@ -90,17 +90,18 @@ const GLTFLoaderr = new GLTFLoader();
 // model.position.y -= 0.04;
         
 //Load ping pong Table
-GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/chinese_tea_table_4k.gltf', function (gltf){
+GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla.gltf', function (gltf){
     const model = gltf.scene;
-    model.scale.set(4, 4, 4)
-    model.position.y += 0.001;
-    model.traverse(function (node) {
-        if (node.isMesh) {
-            node.castShadow = true;
-            node.receiveShadow = true;
-            // node.material.wireframe = true;
-        }
-    })
+    // model.scale.set(4, 4, 4)
+    model.position.y += 1.25;
+    model.position.z = -1.3;
+    // gui.add(model.position , 'y', 1, 5).step(0.2)
+
+    gui.add(model.position, 'z', -5, 5).step(0.1).name('X Table');
+
+
+    model.castShadow = true;
+    model.receiveShadow = true;
     scene.add(model);
 })
 //
@@ -266,10 +267,16 @@ const Table = new THREE.Mesh( geometry, material );
 Table.position.y = 1.895;
 Table.scale.set(3.3, 0.1, 3.3)
 
+
+Table.position.y = 2.993;
+Table.scale.x = 5.5;
+Table.scale.y = 0.1;
+Table.scale.z = 12.35;
+
 // scene.add(Table);
 
 // add the table to Physic world 
-const TableShape = new cannon.Box(new cannon.Vec3(3.3 / 2, 0.1, 3.3 / 2));
+const TableShape = new cannon.Box(new cannon.Vec3(5.5 / 2, 0.1, 12.35 / 2));
 const TableBody  = new cannon.Body({
     mass: 0,
     position: new cannon.Vec3().copy(Table.position),
@@ -277,10 +284,18 @@ const TableBody  = new cannon.Body({
     material:TableMaterial,
     quaternion:Table.quaternion
 })
-
-
-// gui.add(TableBody.position, 'y', 0 , 3).step(0.001)
+TableBody.position.y = 2.881;
+TableBody.position.z = -0.0547;
 PhysicWorld.addBody(TableBody);
+
+
+// gui.add(TableBody.position, 'z', -5 , 5).step(0.0001)
+
+// gui.add(Table.scale, 'x', 0.1, 10).step(0.1).name('Width');
+// gui.add(Table.scale, 'y', 0.1, 10).step(0.1).name('Height');
+// gui.add(Table.scale, 'z', 0.1, 20).step(0.1).name('Depth');
+
+
 //
 
 //
@@ -289,6 +304,8 @@ PhysicWorld.addBody(TableBody);
 //     color: 0xff0000, // Optional: Color of the debug visuals
 // });
 
+
+// new cannon.Box()
 
 //  Animate
 const clock = new THREE.Clock()
