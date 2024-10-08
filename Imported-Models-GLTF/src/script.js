@@ -92,12 +92,12 @@ const GLTFLoaderr = new GLTFLoader();
 //Load ping pong Table
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla.gltf', function (gltf){
     const model = gltf.scene;
-    // model.scale.set(4, 4, 4)
+    model.scale.set(1.12, 1.12, 1.2)
     model.position.y += 1.25;
-    model.position.z = -1.3;
+    model.position.z = -1.5;
     // gui.add(model.position , 'y', 1, 5).step(0.2)
 
-    gui.add(model.position, 'z', -5, 5).step(0.1).name('X Table');
+    // gui.add(model.position, 'z', -5, 5).step(0.1).name('X Table');
 
 
     model.castShadow = true;
@@ -153,13 +153,13 @@ const createSphere = (position) => {
             material: plasticMaterial
         });
         //add some imperfectness
-        sphereBody.quaternion.setFromAxisAngle(
-            new cannon.Vec3((Math.random()*2-1),
-                            (Math.random()*2-1),
-                            (Math.random()*2-1))
-                            .unit(),
-            Math.PI * (Math.random() - 0.5)
-        )
+        // sphereBody.quaternion.setFromAxisAngle(
+        //     new cannon.Vec3((Math.random()*2-1),
+        //                     (Math.random()*2-1),
+        //                     (Math.random()*2-1))
+        //                     .unit(),
+        //     Math.PI * (Math.random() - 0.5)
+        // )
         //
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
@@ -231,8 +231,8 @@ PhysicWorld.addBody(planeBody);
 const BallCreator = {}
 BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 3
-    let y = 12
-    let z = (Math.random() - 0.5) * 3
+    let y =5.0387;
+    let z = (-5 * 3)
     createSphere(new THREE.Vector3(x, y, z))
 }
 
@@ -264,19 +264,18 @@ const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 const material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
 material.transparent = true; 
 const Table = new THREE.Mesh( geometry, material ); 
-Table.position.y = 1.895;
 Table.scale.set(3.3, 0.1, 3.3)
 
 
-Table.position.y = 2.993;
-Table.scale.x = 5.5;
-Table.scale.y = 0.1;
-Table.scale.z = 12.35;
+Table.position.y = 3.0387;
+Table.scale.x = 6.15;
+Table.scale.y = 0.3;
+Table.scale.z = 14.8;
 
 // scene.add(Table);
 
 // add the table to Physic world 
-const TableShape = new cannon.Box(new cannon.Vec3(5.5 / 2, 0.1, 12.35 / 2));
+const TableShape = new cannon.Box(new cannon.Vec3(Table.scale.x / 2, Table.scale.y / 2, Table.scale.z / 2));
 const TableBody  = new cannon.Body({
     mass: 0,
     position: new cannon.Vec3().copy(Table.position),
@@ -284,16 +283,44 @@ const TableBody  = new cannon.Body({
     material:TableMaterial,
     quaternion:Table.quaternion
 })
-TableBody.position.y = 2.881;
-TableBody.position.z = -0.0547;
+TableBody.position.x = Table.position.x;
+TableBody.position.y = Table.position.y;
+TableBody.position.z = Table.position.z;
 PhysicWorld.addBody(TableBody);
 
-
+// gui.add(TableBody.position, 'y', -5 , 5).step(0.0001)
 // gui.add(TableBody.position, 'z', -5 , 5).step(0.0001)
+// gui.add(TableBody.position, 'x', -5 , 5).step(0.0001)
 
 // gui.add(Table.scale, 'x', 0.1, 10).step(0.1).name('Width');
 // gui.add(Table.scale, 'y', 0.1, 10).step(0.1).name('Height');
 // gui.add(Table.scale, 'z', 0.1, 20).step(0.1).name('Depth');
+
+scene.add(new THREE.AxesHelper(15))
+
+//Net
+
+const Net = new THREE.Mesh( geometry, material ); 
+Net.position.x = 0;
+Net.position.y = 3.42;
+Net.position.z = 0.0371;
+Net.scale.set(7.8, 0.8, 0.05)
+
+// scene.add(Net);
+
+const NetShape = new cannon.Box(new cannon.Vec3(Net.scale.x / 2, Net.scale.y / 2, Net.scale.z / 2));
+const NetBody  = new cannon.Body({
+    mass: 0,
+    position: new cannon.Vec3().copy(Net.position),
+    shape: NetShape,
+    material:TableMaterial, //Tbc
+    quaternion:Net.quaternion
+})
+NetBody.position.x = Net.position.x;
+NetBody.position.y = Net.position.y;
+NetBody.position.z = Net.position.z;
+PhysicWorld.addBody(NetBody);
+
 
 
 //
@@ -321,6 +348,7 @@ const tick = () =>
     PhysicWorld.step(1/60, deltaTime, 3)
     
     for (const object of Objects){
+        object.sphereBody.applyLocalForce(new cannon.Vec3(0, 0, 5), object.sphereBody.position)
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
@@ -331,7 +359,7 @@ const tick = () =>
     Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
     //
-    
+
     // Update controls
     controls.update()
     
