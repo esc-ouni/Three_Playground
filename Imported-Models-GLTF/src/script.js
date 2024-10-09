@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import * as cannon from 'cannon-es'
+import * as cannon from 'cannon'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
 
@@ -13,7 +13,7 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
+    new THREE.PlaneGeometry(30, 30),
     new THREE.MeshStandardMaterial({
         color: '#444444',
         metalness: 0,
@@ -63,7 +63,7 @@ window.addEventListener('resize', () =>
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-0.71, 1.41, 0.78)
+camera.position.set(-12.09, 8.19, 12.46)
 scene.add(camera)
 
 // Controls
@@ -82,12 +82,6 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 //GLTF Loading
 const GLTFLoaderr = new GLTFLoader();
-
-// Other Options
-// GLTFLoaderr.load('/models/PP_Table/scene.gltf', function (gltf){
-// GLTFLoaderr.load('/models/table_v2/scene.gltf', function (gltf){
-// model.scale.set(2, 2, 2)
-// model.position.y -= 0.04;
         
 //Load ping pong Table
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla.gltf', function (gltf){
@@ -95,11 +89,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla.gltf', function (gltf)
     model.scale.set(1.12, 1.12, 1.2)
     model.position.y += 1.25;
     model.position.z = -1.5;
-    // gui.add(model.position , 'y', 1, 5).step(0.2)
-
-    // gui.add(model.position, 'z', -5, 5).step(0.1).name('X Table');
-
-
     model.castShadow = true;
     model.receiveShadow = true;
     scene.add(model);
@@ -153,16 +142,18 @@ const createSphere = (position) => {
             material: plasticMaterial
         });
         //add some imperfectness
-        // sphereBody.quaternion.setFromAxisAngle(
-        //     new cannon.Vec3((Math.random()*2-1),
-        //                     (Math.random()*2-1),
-        //                     (Math.random()*2-1))
-        //                     .unit(),
-        //     Math.PI * (Math.random() - 0.5)
-        // )
+        sphereBody.quaternion.setFromAxisAngle(
+            new cannon.Vec3((Math.random()*2-1),
+                            (Math.random()*2-1),
+                            (Math.random()*2-1))
+                            .unit(),
+            Math.PI * (Math.random() - 0.5)
+        )
         //
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
+    sphereBody.applyForce(new cannon.Vec3(0, -0.2, 2.0), sphereBody.position)
+    console.log('Force Applied');
     PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
 }
@@ -173,7 +164,7 @@ const PhysicWorld = new cannon.World();
 PhysicWorld.allowSleep = true;
 
 //Collision detction better than Naive
-PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
+PhysicWorld.broadphase = new cannon.NaiveBroadphase();
 
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
@@ -182,10 +173,10 @@ const plasticMaterial  = new cannon.Material('plastic');
 const TableMaterial    = new cannon.Material('table');
 
 const ContactMaterial = new cannon.ContactMaterial(
-    concreteMaterial,
     plasticMaterial,
+    concreteMaterial,
     {
-        friction: 0.4,   
+        friction: 0.7,   
         restitution: 0.5
     }
 );
@@ -200,8 +191,8 @@ const BallContactMaterial = new cannon.ContactMaterial(
 );
 
 const BallTableMaterial = new cannon.ContactMaterial(
-    TableMaterial,
     plasticMaterial,
+    TableMaterial,
     {
         friction: 0.3,   
         restitution: 0.83
@@ -231,8 +222,8 @@ PhysicWorld.addBody(planeBody);
 const BallCreator = {}
 BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 3
-    let y =5.0387;
-    let z = (-5 * 3)
+    let y = 4.0387;
+    let z = -8;
     createSphere(new THREE.Vector3(x, y, z))
 }
 
@@ -253,24 +244,22 @@ BallCreator.reset = () => {
     }
     Boxes.splice(0, Boxes.length)
 }
-
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
 //
 
-
 //Table Plane
-const geometry = new THREE.BoxGeometry( 1, 1, 1 ); 
-const material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+const geometry       = new THREE.BoxGeometry( 1, 1, 1 ); 
+const material       = new THREE.MeshBasicMaterial( {color: 0xffffff} );
 material.transparent = true; 
-const Table = new THREE.Mesh( geometry, material ); 
+const Table          = new THREE.Mesh( geometry, material ); 
 Table.scale.set(3.3, 0.1, 3.3)
 
 
 Table.position.y = 3.0387;
-Table.scale.x = 6.15;
-Table.scale.y = 0.3;
-Table.scale.z = 14.8;
+Table.scale.x    = 6.15;
+Table.scale.y    = 0.3;
+Table.scale.z    = 14.8;
 
 // scene.add(Table);
 
@@ -296,7 +285,7 @@ PhysicWorld.addBody(TableBody);
 // gui.add(Table.scale, 'y', 0.1, 10).step(0.1).name('Height');
 // gui.add(Table.scale, 'z', 0.1, 20).step(0.1).name('Depth');
 
-scene.add(new THREE.AxesHelper(15))
+// scene.add(new THREE.AxesHelper(15))
 
 //Net
 
@@ -320,16 +309,13 @@ NetBody.position.x = Net.position.x;
 NetBody.position.y = Net.position.y;
 NetBody.position.z = Net.position.z;
 PhysicWorld.addBody(NetBody);
-
-
-
 //
 
 //
 // Initialize the debugger after setting up your scene and physics world
-// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-//     color: 0xff0000, // Optional: Color of the debug visuals
-// });
+const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+    color: 0xff0000, // Optional: Color of the debug visuals
+});
 
 
 // new cannon.Box()
@@ -346,25 +332,26 @@ const tick = () =>
     
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
-    
-    for (const object of Objects){
-        object.sphereBody.applyLocalForce(new cannon.Vec3(0, 0, 5), object.sphereBody.position)
-        object.sphere.position.copy(object.sphereBody.position);
-        object.sphere.quaternion.copy(object.sphereBody.quaternion);
-    }
-    
+
     floor.position.copy(planeBody.position);
     floor.quaternion.copy(planeBody.quaternion);
 
     Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
+    
+    for (const object of Objects){
+        // object.sphereBody.applyLocalForce(new cannon.Vec3(0, 0, 5), object.sphereBody.position)
+        object.sphere.position.copy(object.sphereBody.position);
+        object.sphere.quaternion.copy(object.sphereBody.quaternion);
+    }
+    
     //
 
     // Update controls
     controls.update()
     
     // Update debugger
-    // cannonDebugger.update();
+    cannonDebugger.update();
     
     // console.log(camera.position);
 
