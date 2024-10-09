@@ -127,7 +127,7 @@ STDMaterial.map       = Texture;
 
 const sphereShape = new cannon.Sphere(0.1);
 
-const createSphere = (position) => {
+const createSphere = (position, T) => {
     const sphere = new THREE.Mesh(
         STDGeometry,
         STDMaterial)
@@ -142,17 +142,20 @@ const createSphere = (position) => {
             material: plasticMaterial
         });
         //add some imperfectness
-        sphereBody.quaternion.setFromAxisAngle(
-            new cannon.Vec3((Math.random()*2-1),
-                            (Math.random()*2-1),
-                            (Math.random()*2-1))
-                            .unit(),
-            Math.PI * (Math.random() - 0.5)
-        )
+        // sphereBody.quaternion.setFromAxisAngle(
+        //     new cannon.Vec3((Math.random()*2-1),
+        //                     (Math.random()*2-1),
+        //                     (Math.random()*2-1))
+        //                     .unit(),
+        //     Math.PI * (Math.random() - 0.5)
+        // )
         //
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
-    sphereBody.applyForce(new cannon.Vec3(0, -0.2, 2.0), sphereBody.position)
+
+    // sphereBody.applyImpulse(new cannon.Vec3(0, 0, 0.05), sphereBody.position)
+
+    sphereBody.applyForce(new cannon.Vec3(0, -0.4, 2.4), sphereBody.position)
     console.log('Force Applied');
     PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
@@ -161,16 +164,17 @@ const createSphere = (position) => {
 const PhysicWorld = new cannon.World();
 
 //Allow objects sleep => icrease performance
-PhysicWorld.allowSleep = true;
+// PhysicWorld.allowSleep = true;
 
 //Collision detction better than Naive
-PhysicWorld.broadphase = new cannon.NaiveBroadphase();
+// PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
 
 PhysicWorld.gravity.set(0, - 8.92, 0);
 
 const concreteMaterial = new cannon.Material('concrete');
 const plasticMaterial  = new cannon.Material('plastic');
 const TableMaterial    = new cannon.Material('table');
+const NetMaterial      = new cannon.Material('net');
 
 const ContactMaterial = new cannon.ContactMaterial(
     plasticMaterial,
@@ -199,9 +203,19 @@ const BallTableMaterial = new cannon.ContactMaterial(
     }
 );
 
+const BallNetMaterial = new cannon.ContactMaterial(
+    plasticMaterial,
+    NetMaterial,
+    {
+        friction: 0.1,   
+        restitution: 0.2
+    }
+);
+
 PhysicWorld.addContactMaterial(ContactMaterial)
 PhysicWorld.addContactMaterial(BallTableMaterial)
 PhysicWorld.addContactMaterial(BallContactMaterial)
+PhysicWorld.addContactMaterial(BallNetMaterial)
 
 //plane
 const planeShape = new cannon.Plane();
@@ -302,7 +316,7 @@ const NetBody  = new cannon.Body({
     mass: 0,
     position: new cannon.Vec3().copy(Net.position),
     shape: NetShape,
-    material:TableMaterial, //Tbc
+    material:NetMaterial, //Tbc
     quaternion:Net.quaternion
 })
 NetBody.position.x = Net.position.x;
@@ -313,9 +327,9 @@ PhysicWorld.addBody(NetBody);
 
 //
 // Initialize the debugger after setting up your scene and physics world
-const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-    color: 0xff0000, // Optional: Color of the debug visuals
-});
+// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+//     color: 0xff0000, // Optional: Color of the debug visuals
+// });
 
 
 // new cannon.Box()
@@ -351,7 +365,7 @@ const tick = () =>
     controls.update()
     
     // Update debugger
-    cannonDebugger.update();
+    // cannonDebugger.update();
     
     // console.log(camera.position);
 
