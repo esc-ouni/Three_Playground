@@ -127,7 +127,7 @@ STDMaterial.map       = Texture;
 
 const sphereShape = new cannon.Sphere(0.1);
 
-const createSphere = (position, T) => {
+const createSphere = (position) => {
     const sphere = new THREE.Mesh(
         STDGeometry,
         STDMaterial)
@@ -316,7 +316,7 @@ const NetBody  = new cannon.Body({
     mass: 0,
     position: new cannon.Vec3().copy(Net.position),
     shape: NetShape,
-    material:NetMaterial, //Tbc
+    material:NetMaterial,
     quaternion:Net.quaternion
 })
 NetBody.position.x = Net.position.x;
