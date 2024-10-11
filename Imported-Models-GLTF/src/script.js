@@ -139,22 +139,12 @@ const createSphere = (position) => {
         const sphereBody  = new cannon.Body({
             mass: 0.0027, // 2.7g per ping pong ball
             shape: sphereShape,
-            material: plasticMaterial
+            material: plasticMaterial,
+            linearDamping: 0.05, // Simulate air resistance
+            angularDamping:0.05 // Simulate rotational resistance
         });
-        //add some imperfectness
-        // sphereBody.quaternion.setFromAxisAngle(
-        //     new cannon.Vec3((Math.random()*2-1),
-        //                     (Math.random()*2-1),
-        //                     (Math.random()*2-1))
-        //                     .unit(),
-        //     Math.PI * (Math.random() - 0.5)
-        // )
-        //
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
-
-    // sphereBody.applyImpulse(new cannon.Vec3(0, 0, 0.05), sphereBody.position)
-
     sphereBody.applyForce(new cannon.Vec3(0, -0.4, 2.4), sphereBody.position)
     console.log('Force Applied');
     PhysicWorld.addBody(sphereBody);
@@ -223,7 +213,9 @@ const planeBody  = new cannon.Body({
     mass: 0,
     position: new cannon.Vec3().copy(floor.position),
     shape: planeShape,
-    material:concreteMaterial
+    material:concreteMaterial,
+    linearDamping: 0.05, // Simulate air resistance
+    angularDamping:0.05 // Simulate rotational resistance
 })
 planeBody.quaternion.setFromAxisAngle(
     new cannon.Vec3(-1, 0, 0),
@@ -284,7 +276,9 @@ const TableBody  = new cannon.Body({
     position: new cannon.Vec3().copy(Table.position),
     shape: TableShape,
     material:TableMaterial,
-    quaternion:Table.quaternion
+    quaternion:Table.quaternion,
+    linearDamping: 0.05, // Simulate air resistance
+    angularDamping:0.05 // Simulate rotational resistance
 })
 TableBody.position.x = Table.position.x;
 TableBody.position.y = Table.position.y;
@@ -317,7 +311,9 @@ const NetBody  = new cannon.Body({
     position: new cannon.Vec3().copy(Net.position),
     shape: NetShape,
     material:NetMaterial,
-    quaternion:Net.quaternion
+    quaternion:Net.quaternion,
+    linearDamping: 0.05, // Simulate air resistance
+    angularDamping:0.05 // Simulate rotational resistance
 })
 NetBody.position.x = Net.position.x;
 NetBody.position.y = Net.position.y;
