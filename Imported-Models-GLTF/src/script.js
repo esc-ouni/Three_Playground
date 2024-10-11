@@ -34,11 +34,11 @@ scene.add(ambientLight)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far = 150
-directionalLight.shadow.camera.left = - 7
-directionalLight.shadow.camera.top = 7
-directionalLight.shadow.camera.right = 7
-directionalLight.shadow.camera.bottom = - 7
+directionalLight.shadow.camera.far    = 300
+directionalLight.shadow.camera.left   = - 20
+directionalLight.shadow.camera.top    = 20
+directionalLight.shadow.camera.right  = 20
+directionalLight.shadow.camera.bottom = - 20
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
 
@@ -101,11 +101,8 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
     model.scale.set(1.12, 1.12, 1.12)
     model.position.y += 1.25;
     model.position.z = -1.5;
-    model.castShadow = true;
-    model.receiveShadow = true;
 
     model.traverse(function (node) {
-          
         if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
@@ -119,11 +116,18 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
 //paddle 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf){
     const model = gltf.scene;
-    model.scale.set(1.4, 1.4, 1.4)
+    model.scale.set(1.8, 1.8, 1.8)
     model.position.y = 4.0387;
     model.position.z = -8;
-    model.castShadow = true;
-    model.receiveShadow = true;
+
+    model.traverse(function (node) {          
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+            // node.material.wireframe = true;
+        }
+    })
+
 
     scene.add(model);
 })
