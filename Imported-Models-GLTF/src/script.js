@@ -183,7 +183,7 @@ const createSphere = (position) => {
         });
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
-    sphereBody.applyForce(new cannon.Vec3(0, -0.5, 2.5), sphereBody.position)
+    sphereBody.applyForce(new cannon.Vec3(0, -0.6, 2.5), sphereBody.position)
     console.log('Force Applied');
     PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
