@@ -31,16 +31,26 @@ scene.add(floor)
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.14)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far = 100
+directionalLight.shadow.camera.far = 150
 directionalLight.shadow.camera.left = - 7
 directionalLight.shadow.camera.top = 7
 directionalLight.shadow.camera.right = 7
 directionalLight.shadow.camera.bottom = - 7
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
+
+//spotlight
+// const SpotLight = new THREE.SpotLight(0xffffff, 5)
+
+// SpotLight.position.y = 7;
+// scene.add(SpotLight)
+
+// gui.add(SpotLight.position, 'y', 0, 10).step(0.5);
+
+//
 
 //  Sizes
 const sizes = {
@@ -86,7 +96,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 const GLTFLoaderr = new GLTFLoader();
         
 //Load ping pong Table
-GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla.gltf', function (gltf){
+GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.12, 1.12, 1.2)
     model.position.y += 1.25;
