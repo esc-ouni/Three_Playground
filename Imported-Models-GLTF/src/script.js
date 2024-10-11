@@ -361,7 +361,6 @@ PhysicWorld.addBody(NetBody);
 //     color: 0xff0000, // Optional: Color of the debug visuals
 // });
 
-
 //  Animate
 const clock = new THREE.Clock()
 let previousTime = 0
