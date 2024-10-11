@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import * as cannon from 'cannon'
+import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
 
@@ -114,6 +115,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
 })
 
 //paddle 
+let paddle =null;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.8, 1.8, 1.8)
@@ -128,7 +130,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf
         }
     })
 
-
+    paddle = model;
     scene.add(model);
 })
 //
@@ -181,6 +183,7 @@ const createSphere = (position) => {
             linearDamping: 0.05, // Simulate air resistance
             angularDamping:0.05 // Simulate rotational resistance
         });
+
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
     sphereBody.applyForce(new cannon.Vec3(0, -0.6, 2.5), sphereBody.position)
@@ -283,6 +286,19 @@ BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 4
     let y = 4.0387;
     let z = -8;
+
+    if (paddle != null) {
+        gsap.to(paddle.position, {
+            x: x,
+            y: y - 0.5,
+            z: z,
+            duration: 0.05,
+            ease: "power1.inOut",
+            onComplete: () => {
+                console.log("Animation finished");
+            },
+        });
+    }
     createSphere(new THREE.Vector3(x, y, z))
 }
 
