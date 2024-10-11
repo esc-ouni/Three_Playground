@@ -157,7 +157,7 @@ const createSphere = (position) => {
         });
     sphereBody.addEventListener('collide', Pong_Ball_colide);
     sphereBody.position.copy(sphere.position);
-    sphereBody.applyForce(new cannon.Vec3(0, -0.4, 2.4), sphereBody.position)
+    sphereBody.applyForce(new cannon.Vec3(0, -0.5, 2.5), sphereBody.position)
     console.log('Force Applied');
     PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
@@ -175,6 +175,7 @@ PhysicWorld.gravity.set(0, - 8.92, 0);
 
 const concreteMaterial = new cannon.Material('concrete');
 const plasticMaterial  = new cannon.Material('plastic');
+const PaddleMaterial   = new cannon.Material('paddle');
 const TableMaterial    = new cannon.Material('table');
 const NetMaterial      = new cannon.Material('net');
 
@@ -214,9 +215,19 @@ const BallNetMaterial = new cannon.ContactMaterial(
     }
 );
 
-PhysicWorld.addContactMaterial(ContactMaterial)
-PhysicWorld.addContactMaterial(BallTableMaterial)
+const PaddleBallContact = new cannon.ContactMaterial(
+    plasticMaterial,
+    PaddleMaterial,
+    {
+        friction: 0.45,   
+        restitution: 0.75
+    }
+);
+
 PhysicWorld.addContactMaterial(BallContactMaterial)
+PhysicWorld.addContactMaterial(BallTableMaterial)
+PhysicWorld.addContactMaterial(PaddleBallContact)
+PhysicWorld.addContactMaterial(ContactMaterial)
 PhysicWorld.addContactMaterial(BallNetMaterial)
 
 //plane
@@ -243,7 +254,7 @@ PhysicWorld.addBody(planeBody);
 //To Add it To Dat Gui It has to be inside of an Object
 const BallCreator = {}
 BallCreator.createBall = () => {
-    let x = (Math.random() - 0.5) * 3
+    let x = (Math.random() - 0.5) * 4
     let y = 4.0387;
     let z = -8;
     createSphere(new THREE.Vector3(x, y, z))
