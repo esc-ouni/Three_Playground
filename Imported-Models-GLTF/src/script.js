@@ -23,6 +23,8 @@ const floor = new THREE.Mesh(
 floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
+
+
 scene.add(floor)
 
 // Lights
@@ -32,7 +34,7 @@ scene.add(ambientLight)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far = 15
+directionalLight.shadow.camera.far = 100
 directionalLight.shadow.camera.left = - 7
 directionalLight.shadow.camera.top = 7
 directionalLight.shadow.camera.right = 7
@@ -89,8 +91,18 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla.gltf', function (gltf)
     model.scale.set(1.12, 1.12, 1.2)
     model.position.y += 1.25;
     model.position.z = -1.5;
-    model.castShadow = true;
-    model.receiveShadow = true;
+    // model.castShadow = true;
+    // model.receiveShadow = true;
+
+    model.traverse(function (node) {
+          
+        if (node.isMesh) {
+            node.castShadow = true;
+            node.receiveShadow = true;
+            node.material.wireframe = false;
+        }
+    })
+
     scene.add(model);
 })
 //
@@ -154,7 +166,7 @@ const createSphere = (position) => {
 const PhysicWorld = new cannon.World();
 
 //Allow objects sleep => icrease performance
-// PhysicWorld.allowSleep = true;
+PhysicWorld.allowSleep = true;
 
 //Collision detction better than Naive
 // PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
@@ -221,6 +233,10 @@ planeBody.quaternion.setFromAxisAngle(
     new cannon.Vec3(-1, 0, 0),
     Math.PI * 0.5
 )
+
+planeBody.position.y = -0.137;
+
+
 PhysicWorld.addBody(planeBody);
 //
 
