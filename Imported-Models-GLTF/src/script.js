@@ -28,7 +28,6 @@ floor.material.side = THREE.DoubleSide;
 
 scene.add(floor)
 
-// Lights
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.14)
 scene.add(ambientLight)
 
@@ -43,17 +42,6 @@ directionalLight.shadow.camera.bottom = - 20
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
 
-//spotlight
-// const SpotLight = new THREE.SpotLight(0xffffff, 5)
-
-// SpotLight.position.y = 7;
-// scene.add(SpotLight)
-
-// gui.add(SpotLight.position, 'y', 0, 10).step(0.5);
-
-//
-
-//  Sizes
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
@@ -61,30 +49,23 @@ const sizes = {
 
 window.addEventListener('resize', () =>
 {
-    // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
-
-    // Update camera
     camera.aspect = sizes.width / sizes.height
     camera.updateProjectionMatrix()
-
-    // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
-// Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-12.09, 8.19, 12.46)
+// camera.position.set(-12.09, 8.19, 12.46)
+camera.position.set(-1.95, 5.14, 10.40)
 scene.add(camera)
 
-// Controls
 const controls = new OrbitControls(camera, canvas)
 controls.target.set(0, 0.75, 0)
 controls.enableDamping = true
 
-//  Renderer
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
 })
@@ -94,15 +75,13 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 //GLTF Loading
-const GLTFLoaderr = new GLTFLoader();
-        
-//Load ping pong Table
+const GLTFLoaderr = new GLTFLoader(); 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.12, 1.12, 1.12)
     model.position.y += 1.25;
-    model.position.z = -1.5;
-
+    model.position.z = -1.4;
+    
     model.traverse(function (node) {
         if (node.isMesh) {
             node.castShadow = true;
@@ -110,18 +89,17 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
             node.material.wireframe = false;
         }
     })
-
+    
     scene.add(model);
 })
 
-//paddle 
 let paddle =null;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.8, 1.8, 1.8)
     model.position.y = 4.0387;
     model.position.z = -8;
-
+    
     model.traverse(function (node) {          
         if (node.isMesh) {
             node.castShadow = true;
@@ -129,7 +107,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf
             // node.material.wireframe = true;
         }
     })
-
+    
     paddle = model;
     scene.add(model);
 })
@@ -139,7 +117,7 @@ const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
 const Pong_Ball_colide = (Collision) => {
     let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
-
+    
     hit_sound.volume = Math.min(strength, 1);
     hit_sound.currentTime = 0;
     hit_sound.play();
@@ -148,7 +126,7 @@ const Pong_Ball_colide = (Collision) => {
 const hit__sound = new Audio("/sounds/hit.mp3");
 const Hit__ = (Collision) => {
     let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
-
+    
     hit__sound.volume = Math.min(strength, 1);
     hit__sound.currentTime = 0;
     hit__sound.play();
@@ -173,22 +151,22 @@ const createSphere = (position) => {
         STDMaterial)
         sphere.castShadow = true
         sphere.position.copy(position);
-
+        
         scene.add(sphere)
         
         const sphereBody  = new cannon.Body({
-            mass: 0.0027, // 2.7g per ping pong ball
+            mass: 0.0027,
             shape: sphereShape,
             material: plasticMaterial,
-            linearDamping: 0.05, // Simulate air resistance
-            angularDamping:0.05 // Simulate rotational resistance
+            linearDamping: 0.05,
+            angularDamping:0.05
         });
-
-    sphereBody.addEventListener('collide', Pong_Ball_colide);
-    sphereBody.position.copy(sphere.position);
-    sphereBody.applyForce(new cannon.Vec3(0, -0.6, 2.5), sphereBody.position)
-    console.log('Force Applied');
-    PhysicWorld.addBody(sphereBody);
+        
+        sphereBody.addEventListener('collide', Pong_Ball_colide);
+        sphereBody.position.copy(sphere.position);
+        sphereBody.applyForce(new cannon.Vec3(0, -0.6, 2.5), sphereBody.position)
+        console.log('Force Applied');
+        PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
 }
 
@@ -196,7 +174,6 @@ const PhysicWorld = new cannon.World();
 
 //Allow objects sleep => icrease performance
 PhysicWorld.allowSleep = true;
-
 //Collision detction better than Naive
 // PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
 
@@ -286,7 +263,7 @@ BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 4
     let y = 4.0387;
     let z = -8;
-
+    
     if (paddle != null) {
         gsap.to(paddle.position, {
             x: x,
@@ -310,7 +287,7 @@ BallCreator.reset = () => {
         scene.remove(object.sphere);
     }
     Objects.splice(0, Objects.length)
-
+    
     for (const object of Boxes){
         object.BoxBody.removeEventListener('collide', Hit__)
         PhysicWorld.removeBody(object.BoxBody);
@@ -334,7 +311,7 @@ Table.scale.set(3.3, 0.1, 3.3)
 Table.position.y = 3.0387;
 Table.scale.x    = 6.15;
 Table.scale.y    = 0.3;
-Table.scale.z    = 14.8;
+Table.scale.z    = 13.84;
 
 // scene.add(Table);
 
@@ -354,18 +331,7 @@ TableBody.position.y = Table.position.y;
 TableBody.position.z = Table.position.z;
 PhysicWorld.addBody(TableBody);
 
-// gui.add(TableBody.position, 'y', -5 , 5).step(0.0001)
-// gui.add(TableBody.position, 'z', -5 , 5).step(0.0001)
-// gui.add(TableBody.position, 'x', -5 , 5).step(0.0001)
-
-// gui.add(Table.scale, 'x', 0.1, 10).step(0.1).name('Width');
-// gui.add(Table.scale, 'y', 0.1, 10).step(0.1).name('Height');
-// gui.add(Table.scale, 'z', 0.1, 20).step(0.1).name('Depth');
-
-// scene.add(new THREE.AxesHelper(15))
-
 //Net
-
 const Net = new THREE.Mesh( geometry, material ); 
 Net.position.x = 0;
 Net.position.y = 3.42;
@@ -373,7 +339,6 @@ Net.position.z = 0.0371;
 Net.scale.set(7.8, 0.8, 0.05)
 
 // scene.add(Net);
-
 const NetShape = new cannon.Box(new cannon.Vec3(Net.scale.x / 2, Net.scale.y / 2, Net.scale.z / 2));
 const NetBody  = new cannon.Body({
     mass: 0,
@@ -396,8 +361,6 @@ PhysicWorld.addBody(NetBody);
 //     color: 0xff0000, // Optional: Color of the debug visuals
 // });
 
-
-// new cannon.Box()
 
 //  Animate
 const clock = new THREE.Clock()
@@ -423,17 +386,16 @@ const tick = () =>
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
-    
-    //
 
     // Update controls
     controls.update()
     
     // Update debugger
     // cannonDebugger.update();
-    
-    // console.log(camera.position);
 
+    //camera
+    // console.log(camera.position);
+    
     // Render
     renderer.render(scene, camera)
 
