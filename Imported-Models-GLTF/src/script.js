@@ -98,11 +98,11 @@ const GLTFLoaderr = new GLTFLoader();
 //Load ping pong Table
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
-    model.scale.set(1.12, 1.12, 1.2)
+    model.scale.set(1.12, 1.12, 1.12)
     model.position.y += 1.25;
     model.position.z = -1.5;
-    // model.castShadow = true;
-    // model.receiveShadow = true;
+    model.castShadow = true;
+    model.receiveShadow = true;
 
     model.traverse(function (node) {
           
@@ -112,6 +112,18 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
             node.material.wireframe = false;
         }
     })
+
+    scene.add(model);
+})
+
+//paddle 
+GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf){
+    const model = gltf.scene;
+    model.scale.set(1.4, 1.4, 1.4)
+    model.position.y = 4.0387;
+    model.position.z = -8;
+    model.castShadow = true;
+    model.receiveShadow = true;
 
     scene.add(model);
 })
