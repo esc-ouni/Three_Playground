@@ -5,6 +5,10 @@ import * as cannon from 'cannon'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
+// import { threeToCannon, ShapeType } from 'three-to-cannon';
+// import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { threeToCannon, ShapeType } from 'three-to-cannon';
+import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 
 const gui = new GUI()
@@ -75,6 +79,7 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 //GLTF Loading
+
 const GLTFLoaderr = new GLTFLoader(); 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
@@ -89,12 +94,14 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
             node.material.wireframe = false;
         }
     })
-    
+    paddle = model;
     scene.add(model);
 })
 
-let paddle =null;
-GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf){
+//paddle
+const geometries = []
+let paddle, paddleBody;
+GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.8, 1.8, 1.8)
     model.position.y = 4.0387;
@@ -104,13 +111,27 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle.gltf', function (gltf
         if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
-            // node.material.wireframe = true;
+            node.material.wireframe = true;
+            
+            geometries.push(node.geometry.clone());
         }
     })
+    console.log(geometries);
+
+    const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
+
+    const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    
+    mergedMesh.position.copy(model.position);
+    mergedMesh.scale.set(1.8, 1.8, 1.8)
+    mergedMesh.quaternion.copy(model.quaternion);
+    scene.add(mergedMesh); // Optional
     
     paddle = model;
     scene.add(model);
 })
+
+
 //
 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
@@ -165,7 +186,6 @@ const createSphere = (position) => {
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
         sphereBody.applyForce(new cannon.Vec3(0, -0.6, 2.5), sphereBody.position)
-        console.log('Force Applied');
         PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
 }
@@ -253,7 +273,6 @@ planeBody.quaternion.setFromAxisAngle(
 
 planeBody.position.y = -0.137;
 
-
 PhysicWorld.addBody(planeBody);
 //
 
@@ -271,9 +290,9 @@ BallCreator.createBall = () => {
             z: z,
             duration: 0.05,
             ease: "power1.inOut",
-            onComplete: () => {
-                console.log("Animation finished");
-            },
+            // onComplete: () => {
+            //     console.log("Animation finished");
+            // },
         });
     }
     createSphere(new THREE.Vector3(x, y, z))
@@ -287,14 +306,6 @@ BallCreator.reset = () => {
         scene.remove(object.sphere);
     }
     Objects.splice(0, Objects.length)
-    
-    for (const object of Boxes){
-        object.BoxBody.removeEventListener('collide', Hit__)
-        PhysicWorld.removeBody(object.BoxBody);
-        
-        scene.remove(object.Box);
-    }
-    Boxes.splice(0, Boxes.length)
 }
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
@@ -357,9 +368,9 @@ PhysicWorld.addBody(NetBody);
 
 //
 // Initialize the debugger after setting up your scene and physics world
-// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-//     color: 0xff0000, // Optional: Color of the debug visuals
-// });
+const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+    color: 0xff0000, // Optional: Color of the debug visuals
+});
 
 //  Animate
 const clock = new THREE.Clock()
@@ -371,6 +382,12 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
     
+    // Synchronize the physics body with the paddle mesh
+    if (paddleBody && paddle) {
+        paddleBody.position.copy(paddle.position);
+        paddleBody.quaternion.copy(paddle.quaternion);
+    }
+
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
 
@@ -390,7 +407,7 @@ const tick = () =>
     controls.update()
     
     // Update debugger
-    // cannonDebugger.update();
+    cannonDebugger.update();
 
     //camera
     // console.log(camera.position);

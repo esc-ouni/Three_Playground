@@ -1,0 +1,86 @@
+{
+  "name": "three-to-cannon",
+  "version": "5.0.2",
+  "description": "Convert a THREE.Mesh to a CANNON.Shape.",
+  "type": "module",
+  "sideEffects": false,
+  "source": "./src/index.ts",
+  "types": "./dist/src/index.d.ts",
+  "main": "./dist/three-to-cannon.cjs",
+  "module": "./dist/three-to-cannon.esm.js",
+  "exports": {
+    "types": "./dist/src/index.d.ts",
+    "require": "./dist/three-to-cannon.cjs",
+    "default": "./dist/three-to-cannon.modern.js"
+  },
+  "scripts": {
+    "dist": "microbundle --format cjs,esm,modern,umd --no-compress --globals three=THREE --external three",
+    "watch": "microbundle watch --format cjs,esm,modern,umd --no-compress --globals three=THREE --external three",
+    "test": "ava --no-worker-threads test/*.test.ts",
+    "coverage": "c8 --reporter=lcov --reporter=text ava --no-worker-threads test/*.ts --tap",
+    "coverage:report": "c8 report --reporter=text-lcov > coverage/coverage.lcov",
+    "preversion": "rimraf dist/* && npm run dist && npm test",
+    "postversion": "git push && git push --tags && npm publish && yarn coverage:report",
+    "lint": "eslint src/* test/* --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donmccurdy/three-to-cannon.git"
+  },
+  "keywords": [
+    "threejs",
+    "three",
+    "cannonjs",
+    "cannon",
+    "physics",
+    "simulation"
+  ],
+  "author": "Don McCurdy <dm@donmccurdy.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/donmccurdy/three-to-cannon/issues"
+  },
+  "homepage": "https://github.com/donmccurdy/three-to-cannon#readme",
+  "peerDependencies": {
+    "cannon-es": "0.x.x",
+    "three": ">=0.125.x"
+  },
+  "dependencies": {
+    "@types/three": ">=0.160.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "8.4.0",
+    "@typescript-eslint/parser": "8.4.0",
+    "ava": "6.1.3",
+    "c8": "10.1.2",
+    "cannon-es": "0.20.0",
+    "eslint": "9.1.1",
+    "microbundle": "0.15.1",
+    "rimraf": "5.0.10",
+    "three": "0.160.0",
+    "tsx": "^4.7.0",
+    "typescript": "5.5.4"
+  },
+  "files": [
+    "dist/",
+    "lib/",
+    "index.js",
+    "README.md",
+    "LICENSE",
+    "package.json",
+    "package-lock.json"
+  ],
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "node >= 14"
+  ],
+  "ava": {
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--import=tsx"
+    ]
+  }
+}
