@@ -100,7 +100,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
 
 //paddle
 const geometries = []
-let paddle, paddleBody;
+let paddle;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.8, 1.8, 1.8)
@@ -119,7 +119,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (g
     console.log(geometries);
 
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
-
     const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
     
     mergedMesh.position.copy(model.position);
@@ -131,6 +130,19 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (g
     scene.add(model);
 })
 
+// const paddleShape = ;
+const paddleBody  = new cannon.Body({
+    mass: 0,
+    position: new cannon.Vec3().copy(paddle.position),
+    // shape: paddleShape,
+    material:PaddleMaterial,
+    linearDamping: 0.05, // Simulate air resistance
+    angularDamping:0.05 // Simulate rotational resistance
+})
+
+paddleBody.position.y = -0.137;
+
+PhysicWorld.addBody(paddleBody);
 
 //
 
