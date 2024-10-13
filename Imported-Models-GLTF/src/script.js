@@ -98,25 +98,26 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
     scene.add(model);
 })
 
+scene.add(new THREE.AxesHelper(15))
+
 //paddle
 const geometries = []
-let paddle;
+let paddle, paddleBody;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.8, 1.8, 1.8)
     model.position.y = 4.0387;
-    model.position.z = -8;
+    model.position.z = 8; //-8
     
     model.traverse(function (node) {          
         if (node.isMesh) {
             node.castShadow = true;
             node.receiveShadow = true;
-            node.material.wireframe = true;
+            // node.material.wireframe = true;
             
             geometries.push(node.geometry.clone());
         }
     })
-    console.log(geometries);
 
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
     const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
@@ -124,25 +125,37 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (g
     mergedMesh.position.copy(model.position);
     mergedMesh.scale.set(1.8, 1.8, 1.8)
     mergedMesh.quaternion.copy(model.quaternion);
-    scene.add(mergedMesh); // Optional
+    // scene.add(mergedMesh); // Optional
+    // scene.add(mergedMesh);
     
+    //n9leb mha had tabla
+    // paddle.rotation.x -= Math.PI/2;
+    
+    // paddle.rotation.x -= Math.PI/2;
     paddle = model;
-    scene.add(model);
+
+    scene.add(paddle);
+    
+    gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
+    gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
+    gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
+    paddleBody  = new cannon.Body({
+        mass: 0,
+        position: new cannon.Vec3().copy(paddle.position),
+        shape: threeToCannon(mergedMesh,{type: ShapeType.MESH}).shape,
+        material:PaddleMaterial,
+        linearDamping: 0.05,
+        angularDamping:0.05
+    })
+    
+    paddleBody.quaternion.setFromEuler(3*(Math.PI/2), 0, 0);
+
+    // paddle.quaternion.
+    
+    PhysicWorld.addBody(paddleBody);
 })
 
 // const paddleShape = ;
-const paddleBody  = new cannon.Body({
-    mass: 0,
-    position: new cannon.Vec3().copy(paddle.position),
-    // shape: paddleShape,
-    material:PaddleMaterial,
-    linearDamping: 0.05, // Simulate air resistance
-    angularDamping:0.05 // Simulate rotational resistance
-})
-
-paddleBody.position.y = -0.137;
-
-PhysicWorld.addBody(paddleBody);
 
 //
 
@@ -388,8 +401,12 @@ const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
 const clock = new THREE.Clock()
 let previousTime = 0
 
+const offsetQuaternion = new THREE.Quaternion();
+offsetQuaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
+
 const tick = () =>
 {
+    // console.log( renderer.info.render.triangles );
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
@@ -397,7 +414,14 @@ const tick = () =>
     // Synchronize the physics body with the paddle mesh
     if (paddleBody && paddle) {
         paddleBody.position.copy(paddle.position);
-        paddleBody.quaternion.copy(paddle.quaternion);
+        // paddleBody.quaternion.copy(paddle.quaternion);
+        paddleBody.quaternion.setFromEuler(paddle.rotation.x + 3*(Math.PI/2), -paddle.rotation.z, paddle.rotation.y)
+
+        // paddleBody.quaternion.;
+        
+        // paddleBody.quaternion.copy(paddle.quaternion);
+        // paddleBody.position.copy(paddle.position);
+        // console.log(paddle.quaternion, paddleBody.quaternion);
     }
 
     // update physic world
