@@ -407,6 +407,7 @@ const tick = () =>
         paddleBody.position.copy(paddle.position);
         // paddleBody.quaternion = rotationOffset.mult(paddle.quaternion);
 
+        
         let paddleQuat = new cannon.Quaternion(
             paddle.quaternion.x,
             paddle.quaternion.y,
