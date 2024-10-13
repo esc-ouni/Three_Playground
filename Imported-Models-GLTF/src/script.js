@@ -405,7 +405,18 @@ const tick = () =>
     // Synchronize the physics body with the paddle mesh
     if (paddleBody && paddle) {
         paddleBody.position.copy(paddle.position);
-        paddleBody.quaternion = rotationOffset.mult(paddle.quaternion);
+        // paddleBody.quaternion = rotationOffset.mult(paddle.quaternion);
+
+        let paddleQuat = new cannon.Quaternion(
+            paddle.quaternion.x,
+            paddle.quaternion.y,
+            paddle.quaternion.z,
+            paddle.quaternion.w
+        );
+
+        paddleQuat = paddleQuat.mult(rotationOffset);
+
+        paddleBody.quaternion.copy(paddleQuat);
     }
 
     // update physic world
