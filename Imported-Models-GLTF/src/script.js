@@ -5,8 +5,6 @@ import * as cannon from 'cannon'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
-// import { threeToCannon, ShapeType } from 'three-to-cannon';
-// import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
@@ -103,7 +101,7 @@ scene.add(new THREE.AxesHelper(15))
 //paddle
 const geometries = []
 let paddle, paddleBody;
-GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (gltf){
+GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.8, 1.8, 1.8)
     model.position.y = 4.0387;
@@ -144,8 +142,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_v2.gltf', function (g
         linearDamping: 0.05,
         angularDamping:0.05
     })
-    
-    paddleBody.quaternion.setFromEuler(-Math.PI/2, 0, 0);
 
     PhysicWorld.addBody(paddleBody);
 })
@@ -397,10 +393,7 @@ const clock = new THREE.Clock()
 let previousTime = 0
 
 var rotationOffset = new cannon.Quaternion();
-   rotationOffset.setFromAxisAngle(new cannon.Vec3(1, 0, 0), -Math.PI / 2);
-
-
-//check quaternion multiply + remesh in blender
+   rotationOffset.setFromEuler(-(Math.PI / 2), 0, 0);
 
 const tick = () =>
 {
@@ -411,16 +404,8 @@ const tick = () =>
     
     // Synchronize the physics body with the paddle mesh
     if (paddleBody && paddle) {
-        // paddleBody.position.copy(paddle.position);
-        // paddleBody.quaternion.copy(paddle.quaternion);
-
         paddleBody.position.copy(paddle.position);
-
-        // Combine the paddle's quaternion with the rotation offset
-        paddleBody.quaternion.copy(rotationOffset);
-
-        // paddleBody.quaternion.copy(paddle.quaternion);
-        // paddleBody.quaternion.multiply(rotationOffset);
+        paddleBody.quaternion = rotationOffset.mult(paddle.quaternion);
     }
 
     // update physic world
@@ -433,9 +418,8 @@ const tick = () =>
     Table.quaternion.copy(TableBody.quaternion);
     
     for (const object of Objects){
-        // object.sphereBody.applyLocalForce(new cannon.Vec3(0, 0, 5), object.sphereBody.position)
         object.sphere.position.copy(object.sphereBody.position);
-        object.sphere.quaternion.copy(object.sphereBody.quaternion);
+        object.sphere.quaternion.mult(object.sphereBody.quaternion);
     }
 
     // Update controls
