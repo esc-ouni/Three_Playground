@@ -8,7 +8,6 @@ import CannonDebugger from 'cannon-es-debugger';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-
 const gui = new GUI()
 
 const canvas = document.querySelector('canvas.webgl')
@@ -60,7 +59,6 @@ window.addEventListener('resize', () =>
 })
 
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-// camera.position.set(-12.09, 8.19, 12.46)
 camera.position.set(-1.95, 5.14, 10.40)
 scene.add(camera)
 
@@ -119,12 +117,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
     const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    
-    mergedMesh.position.copy(model.position);
-    mergedMesh.scale.set(1.8, 1.8, 1.8)
-    mergedMesh.quaternion.copy(model.quaternion);
-    // scene.add(mergedMesh); // Optional
-
+    mergedMesh.scale.copy(model.scale);
     
     paddle = model;
 
@@ -145,10 +138,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 
     PhysicWorld.addBody(paddleBody);
 })
-
-// const paddleShape = ;
-
-//
 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
@@ -210,6 +199,7 @@ const PhysicWorld = new cannon.World();
 
 //Allow objects sleep => icrease performance
 PhysicWorld.allowSleep = true;
+
 //Collision detction better than Naive
 // PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
 
@@ -306,9 +296,6 @@ BallCreator.createBall = () => {
             z: z,
             duration: 0.05,
             ease: "power1.inOut",
-            // onComplete: () => {
-            //     console.log("Animation finished");
-            // },
         });
     }
     createSphere(new THREE.Vector3(x, y, z))
@@ -380,10 +367,7 @@ NetBody.position.x = Net.position.x;
 NetBody.position.y = Net.position.y;
 NetBody.position.z = Net.position.z;
 PhysicWorld.addBody(NetBody);
-//
 
-//
-// Initialize the debugger after setting up your scene and physics world
 const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
     color: 0xff0000, // Optional: Color of the debug visuals
 });
@@ -405,8 +389,6 @@ const tick = () =>
     // Synchronize the physics body with the paddle mesh
     if (paddleBody && paddle) {
         paddleBody.position.copy(paddle.position);
-        // paddleBody.quaternion = rotationOffset.mult(paddle.quaternion);
-
         
         let paddleQuat = new cannon.Quaternion(
             paddle.quaternion.x,
