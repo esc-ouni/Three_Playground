@@ -94,8 +94,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
     scene.add(model);
 })
 
-scene.add(new THREE.AxesHelper(15))
-
 //paddle
 const geometries = []
 let paddle, paddleBody;
@@ -368,9 +366,9 @@ NetBody.position.y = Net.position.y;
 NetBody.position.z = Net.position.z;
 PhysicWorld.addBody(NetBody);
 
-const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-    color: 0xff0000, // Optional: Color of the debug visuals
-});
+// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+//     color: 0xff0000, // Optional: Color of the debug visuals
+// });
 
 //  Animate
 const clock = new THREE.Clock()
@@ -420,7 +418,7 @@ const tick = () =>
     controls.update()
     
     // Update debugger
-    cannonDebugger.update();
+    // cannonDebugger.update();
 
     //camera
     // console.log(camera.position);
