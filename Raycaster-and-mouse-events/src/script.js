@@ -4,7 +4,7 @@ import GUI from 'lil-gui'
 
 /**
  * Base
- */
+*/
 // Debug
 const gui = new GUI()
 
@@ -24,6 +24,9 @@ const object1 = new THREE.Mesh(
     new THREE.MeshBasicMaterial({ color: '#ff0000' })
 )
 object1.position.x = - 2
+
+
+
 
 const object2 = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
@@ -84,39 +87,52 @@ window.addEventListener('resize', () =>
     
     //mouse event listener
     const mouse = new THREE.Vector2();
-
+    
     window.addEventListener('mousemove', function (info) {
         // console.log('Mouse Moved: x:', ((info.clientX/window.innerWidth)*2)-1 ,' y:', -((info.clientY/window.innerHeight)*2 -1 ));
         mouse.x = ((info.clientX/window.innerWidth)*2)-1;
         mouse.y = -((info.clientY/window.innerHeight)*2 - 1);
     })
     
-    
-    
     //Raycaster
     const Raycaster = new THREE.Raycaster();
+    const ObjectsToTest = [object1, object2, object3];
+    let   Intersects   =  Raycaster.intersectObjects(ObjectsToTest);
+    let   CurrentIntersect = null;
+    
+    window.addEventListener('click', function() {
+        if (CurrentIntersect){
+            CurrentIntersect.object.scale.set(2,2,2);
+        }
+    })
     
     /**
      * Animate
     
     */
-    const clock = new THREE.Clock()
-    
-    const tick = () =>
+   const clock = new THREE.Clock()
+   
+
+const tick = () =>
         {
-            const ObjectsToTest = [object1, object2, object3];
-            const Intersects   = Raycaster.intersectObjects(ObjectsToTest);
             
             Raycaster.setFromCamera(mouse, camera);
+            Intersects   =  Raycaster.intersectObjects(ObjectsToTest);
             
             const elapsedTime = clock.getElapsedTime()
             
             object1.position.y = Math.sin(elapsedTime * 0.3) * 1.5;
             object2.position.y = Math.sin(elapsedTime * 0.8) * 1.5;
-        object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5;
+            object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5;
         
         if (Intersects.length){
-            console.log('Elements intersected : ', Intersects.length);
+            CurrentIntersect = Intersects[0];
+            console.log(CurrentIntersect.object);
+        }
+        else{
+            for (const object of ObjectsToTest){
+                object.scale.set(1, 1, 1);
+            }
         }
         
         for (const intersect of ObjectsToTest){
