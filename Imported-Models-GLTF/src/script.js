@@ -383,7 +383,6 @@ var rotationOffset = new cannon.Quaternion();
 let paddleQuat = new cannon.Quaternion();
 
 
-
 //mouse event listener
 const mouse = new THREE.Vector2();
 
