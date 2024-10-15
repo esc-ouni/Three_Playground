@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import {GLTFLoader}  from 'three/examples/jsm/loaders/GLTFLoader.js'
 import GUI from 'lil-gui'
 
 /**
@@ -7,8 +8,6 @@ import GUI from 'lil-gui'
 */
 // Debug
 const gui = new GUI()
-
-
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -24,9 +23,6 @@ const object1 = new THREE.Mesh(
     new THREE.MeshBasicMaterial({ color: '#ff0000' })
 )
 object1.position.x = - 2
-
-
-
 
 const object2 = new THREE.Mesh(
     new THREE.SphereGeometry(0.5, 16, 16),
@@ -105,32 +101,61 @@ window.addEventListener('resize', () =>
             CurrentIntersect.object.scale.set(2,2,2);
         }
     })
+  
     
+//GLTF
+
+const light = new THREE.AmbientLight('', 4);
+scene.add(light);
+
+
+let model = null;
+
+const loaderr = new GLTFLoader();
+loaderr.load(
+	// resource URL
+	'/models/Duck/glTF-Embedded/Duck.gltf',
+	// called when the resource is loaded
+	function ( gltf ) {
+        model = gltf.scene;
+		scene.add( gltf.scene );
+    });
+//
+
     /**
      * Animate
     
     */
    const clock = new THREE.Clock()
    
-
+let inter_with_model = 0;
 const tick = () =>
         {
             
             Raycaster.setFromCamera(mouse, camera);
             Intersects   =  Raycaster.intersectObjects(ObjectsToTest);
-            
+            if (model){
+                inter_with_model = Raycaster.intersectObject(model).length;
+                if (inter_with_model){
+                    model.scale.set(2, 2, 2);
+                    model.position.x += 1;
+                }
+                else{
+                    model.scale.set(1, 1, 1);
+                }
+            }
+
             const elapsedTime = clock.getElapsedTime()
             
             object1.position.y = Math.sin(elapsedTime * 0.3) * 1.5;
             object2.position.y = Math.sin(elapsedTime * 0.8) * 1.5;
             object3.position.y = Math.sin(elapsedTime * 1.4) * 1.5;
-        
-        if (Intersects.length){
-            CurrentIntersect = Intersects[0];
-            console.log(CurrentIntersect.object);
-        }
-        else{
-            for (const object of ObjectsToTest){
+            
+            if (Intersects.length){
+                CurrentIntersect = Intersects[0];
+            }
+            else{
+                for (const object of ObjectsToTest){
                 object.scale.set(1, 1, 1);
             }
         }
