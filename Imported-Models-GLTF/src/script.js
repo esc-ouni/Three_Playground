@@ -411,7 +411,7 @@ const tick = () =>
     
     for (const object of Objects){
         object.sphere.position.copy(object.sphereBody.position);
-        object.sphere.quaternion.mult(object.sphereBody.quaternion);
+        object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
 
     // Update controls
