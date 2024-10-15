@@ -382,6 +382,18 @@ var rotationOffset = new cannon.Quaternion();
 
 let paddleQuat = new cannon.Quaternion();
 
+
+
+//mouse event listener
+const mouse = new THREE.Vector2();
+
+window.addEventListener('mousemove', function (info) {
+    console.log('Mouse Moved', ((info.clientX/window.innerWidth)*2)-1 , -((info.clientY/window.innerHeight)*2)-1);
+})
+
+//
+
+
 const tick = () =>
 {
     // console.log( renderer.info.render.triangles );
