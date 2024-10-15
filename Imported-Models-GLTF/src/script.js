@@ -120,10 +120,14 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddle = model;
 
     scene.add(paddle);
+
+    paddle.rotation.x = 3.04;
+    paddle.rotation.y = 3.19;
+    paddle.rotation.z = 2.03;
     
-    gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
-    gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
-    gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
 
     paddleBody  = new cannon.Body({
         mass: 0,
@@ -319,7 +323,6 @@ material.transparent = true;
 const Table          = new THREE.Mesh( geometry, material ); 
 Table.scale.set(3.3, 0.1, 3.3)
 
-
 Table.position.y = 3.0387;
 Table.scale.x    = 6.15;
 Table.scale.y    = 0.3;
@@ -377,6 +380,8 @@ let previousTime = 0
 var rotationOffset = new cannon.Quaternion();
    rotationOffset.setFromEuler(-(Math.PI / 2), 0, 0);
 
+let paddleQuat = new cannon.Quaternion();
+
 const tick = () =>
 {
     // console.log( renderer.info.render.triangles );
@@ -387,13 +392,8 @@ const tick = () =>
     // Synchronize the physics body with the paddle mesh
     if (paddleBody && paddle) {
         paddleBody.position.copy(paddle.position);
-        
-        let paddleQuat = new cannon.Quaternion(
-            paddle.quaternion.x,
-            paddle.quaternion.y,
-            paddle.quaternion.z,
-            paddle.quaternion.w
-        );
+
+        paddleQuat.copy(paddle.quaternion);
 
         paddleQuat = paddleQuat.mult(rotationOffset);
 
