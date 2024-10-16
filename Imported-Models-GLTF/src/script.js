@@ -128,9 +128,9 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddle.rotation.y = 3.19;
     paddle.rotation.z = 2.03;
     
-    gui.add(paddle.position, 'x', -1.76, 1.76).step(0.005)
-    // gui.add(paddle.position, 'y', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
+    gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
+    gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
+    gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
     
     paddleBody  = new cannon.Body({
         mass: 0,
@@ -148,6 +148,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
 const Pong_Ball_colide = (Collision) => {
+    console.log(Collision.Body);
     let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
     
     hit_sound.volume = Math.min(strength, 1);
@@ -177,6 +178,8 @@ STDMaterial.map       = Texture;
 
 const sphereShape = new cannon.Sphere(0.1);
 
+let isCollidingWithPaddle = false;
+
 const createSphere = (position, px, py, pz) => {
     const sphere = new THREE.Mesh(
         STDGeometry,
@@ -194,7 +197,24 @@ const createSphere = (position, px, py, pz) => {
             angularDamping:0.05
         });
         
-        sphereBody.addEventListener('collide', Pong_Ball_colide);
+        sphereBody.addEventListener('collide', (event) => {
+            if (event.body === paddleBody) {
+                if (!isCollidingWithPaddle) {
+                    console.log('contacted!');
+                    isCollidingWithPaddle = true; // Set the flag to true
+                    // Apply force or any other logic here
+                }
+            }
+        });
+    
+        sphereBody.addEventListener('end', (event) => {
+            if (event.body === paddleBody) {
+                isCollidingWithPaddle = false; // Reset the flag when the collision ends
+            }
+        });
+        // sphereBody.applyForce(new cannon.Vec3(0, 0.01, -0.19), sphereBody.position)
+
+        // sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
         sphereBody.applyForce(new cannon.Vec3(px, py, pz), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
@@ -289,6 +309,11 @@ PhysicWorld.addBody(planeBody);
 //
 
 //To Add it To Dat Gui It has to be inside of an Object
+const BallCreator = {
+    px: 0,
+    py: 0.5,
+    pz: 2 
+}
 
 BallCreator.reset = () => {
     for (const object of Objects){
@@ -300,19 +325,17 @@ BallCreator.reset = () => {
     Objects.splice(0, Objects.length)
 }
 
-const BallCreator = {}
+
 BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 4
     let y = 4.0387;
     let z = -8;
-
-    let px, py, pz;
     
-    createSphere(new THREE.Vector3(x, y, z), px, py, pz)
+    createSphere(new THREE.Vector3(x, y, z), BallCreator.px, BallCreator.py, BallCreator.pz)
 }
-gui.add(BallCreator.createBall, 'px', 0, 5).step(0.1)
-gui.add(BallCreator.createBall, 'py', 0, 5).step(0.1)
-gui.add(BallCreator.createBall, 'pz', 0, 5).step(0.1)
+gui.add(BallCreator, 'px', 0, 5).step(0.1)
+gui.add(BallCreator, 'py', 0, 5).step(0.1)
+gui.add(BallCreator, 'pz', 0, 5).step(0.1)
 
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
@@ -394,9 +417,9 @@ window.addEventListener('mousemove', function (info) {
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
 })
 
-window.addEventListener('click', function (info){
-    //IF not working by default implement it ; 
-})
+// window.addEventListener('click', function (info){
+//     //IF not working by default implement it ; 
+// })
 
 const tick = () =>
 {
