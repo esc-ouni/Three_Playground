@@ -177,7 +177,7 @@ STDMaterial.map       = Texture;
 
 const sphereShape = new cannon.Sphere(0.1);
 
-const createSphere = (position) => {
+const createSphere = (position, px, py, pz) => {
     const sphere = new THREE.Mesh(
         STDGeometry,
         STDMaterial)
@@ -196,7 +196,7 @@ const createSphere = (position) => {
         
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
-        sphereBody.applyForce(new cannon.Vec3(0, -0.7, 1.9), sphereBody.position)
+        sphereBody.applyForce(new cannon.Vec3(px, py, pz), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
 }
@@ -289,14 +289,6 @@ PhysicWorld.addBody(planeBody);
 //
 
 //To Add it To Dat Gui It has to be inside of an Object
-const BallCreator = {}
-BallCreator.createBall = () => {
-    let x = (Math.random() - 0.5) * 4
-    let y = 4.0387;
-    let z = -8;
-    
-    createSphere(new THREE.Vector3(x, y, z))
-}
 
 BallCreator.reset = () => {
     for (const object of Objects){
@@ -307,6 +299,21 @@ BallCreator.reset = () => {
     }
     Objects.splice(0, Objects.length)
 }
+
+const BallCreator = {}
+BallCreator.createBall = () => {
+    let x = (Math.random() - 0.5) * 4
+    let y = 4.0387;
+    let z = -8;
+
+    let px, py, pz;
+    
+    createSphere(new THREE.Vector3(x, y, z), px, py, pz)
+}
+gui.add(BallCreator.createBall, 'px', 0, 5).step(0.1)
+gui.add(BallCreator.createBall, 'py', 0, 5).step(0.1)
+gui.add(BallCreator.createBall, 'pz', 0, 5).step(0.1)
+
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
 //
