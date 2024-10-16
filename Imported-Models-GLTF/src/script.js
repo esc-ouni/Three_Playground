@@ -125,9 +125,12 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddle.rotation.y = 3.19;
     paddle.rotation.z = 2.03;
     
-    // gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
+    gui.add(paddle.position, 'x', -2.53, 2.53).step(0.005)
+    // gui.add(paddle.position, 'y', 0, 2 * Math.PI).step(0.005)
+    gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
+
+    // x:0, y:4.0387, z:8
+
 
     paddleBody  = new cannon.Body({
         mass: 0,
@@ -387,11 +390,20 @@ let paddleQuat = new cannon.Quaternion();
 const mouse = new THREE.Vector2();
 
 window.addEventListener('mousemove', function (info) {
-    console.log('Mouse Moved', ((info.clientX/window.innerWidth)*2)-1 , -((info.clientY/window.innerHeight)*2)-1);
+    // console.log('Mouse Moved', (info.clientX/window.innerWidth)*2-1 , -((info.clientY/window.innerHeight)*2-1));
+    mouse.x = (info.clientX/window.innerWidth)*2-1;
+    mouse.y = -((info.clientY/window.innerHeight)*2-1);
 })
 
-//
+window.addEventListener('click', function (info){
+    //IF not working by default implement it ; 
+})
 
+
+//Raycaster
+// const Raycaster = new THREE.Raycaster();
+
+//
 
 const tick = () =>
 {
@@ -402,6 +414,20 @@ const tick = () =>
     
     // Synchronize the physics body with the paddle mesh
     if (paddleBody && paddle) {
+        if (paddle.position.x >0){
+            gsap.to(paddle.rotation, {
+                z: 1.98,
+                duration: 0.08,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddle.rotation, {
+                z: 4.42,
+                duration: 0.08,
+                ease: "power2.inOut",
+            });
+        }
         paddleBody.position.copy(paddle.position);
 
         paddleQuat.copy(paddle.quaternion);
