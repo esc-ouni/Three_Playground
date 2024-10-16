@@ -8,6 +8,8 @@ import CannonDebugger from 'cannon-es-debugger';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
+import { DragControls } from 'three/addons/controls/DragControls.js';
+
 const gui = new GUI()
 
 const canvas = document.querySelector('canvas.webgl')
@@ -62,9 +64,9 @@ const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 
 camera.position.set(-1.95, 5.14, 10.40)
 scene.add(camera)
 
-const controls = new OrbitControls(camera, canvas)
-controls.target.set(0, 0.75, 0)
-controls.enableDamping = true
+const controls2 = new OrbitControls(camera, canvas)
+controls2.enableDamping = true
+
 
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
@@ -116,7 +118,9 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
     const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
     mergedMesh.scale.copy(model.scale);
+    // scene.add(mergedMesh);
     
+
     paddle = model;
 
     scene.add(paddle);
@@ -405,6 +409,10 @@ window.addEventListener('click', function (info){
 
 //
 
+const objects = [floor]
+
+const controls = new DragControls( objects, camera, renderer.domElement);
+
 const tick = () =>
 {
     // console.log( renderer.info.render.triangles );
@@ -440,7 +448,7 @@ const tick = () =>
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
 
-    floor.position.copy(planeBody.position);
+    // floor.position.copy(planeBody.position);
     floor.quaternion.copy(planeBody.quaternion);
 
     Table.position.copy(TableBody.position);
@@ -452,7 +460,7 @@ const tick = () =>
     }
 
     // Update controls
-    controls.update()
+    // controls.update()
     
     // Update debugger
     // cannonDebugger.update();
