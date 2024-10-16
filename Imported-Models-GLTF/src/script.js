@@ -8,8 +8,6 @@ import CannonDebugger from 'cannon-es-debugger';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-import { DragControls } from 'three/addons/controls/DragControls.js';
-
 const gui = new GUI()
 
 const canvas = document.querySelector('canvas.webgl')
@@ -61,12 +59,13 @@ window.addEventListener('resize', () =>
 })
 
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(0, 5.81, 11.77)
+camera.position.set(-15, 4, 0)
+// camera.position.set(0, 5.81, 11.77)
 // {x: -0.006796629480714592, y: 5.816349904903697, z: 11.774813465294566}
 scene.add(camera)
 
-// const controls2 = new OrbitControls(camera, canvas)
-// controls2.enableDamping = true
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
 
 
 const renderer = new THREE.WebGLRenderer({
@@ -129,7 +128,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddle.rotation.y = 3.19;
     paddle.rotation.z = 2.03;
     
-    gui.add(paddle.position, 'x', -2.53, 2.53).step(0.005)
+    gui.add(paddle.position, 'x', -1.76, 1.76).step(0.005)
     // gui.add(paddle.position, 'y', 0, 2 * Math.PI).step(0.005)
     // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
     
@@ -197,7 +196,7 @@ const createSphere = (position) => {
         
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
-        sphereBody.applyForce(new cannon.Vec3(0, -1, 1.8), sphereBody.position)
+        sphereBody.applyForce(new cannon.Vec3(0, -0.7, 1.9), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
 }
@@ -241,7 +240,7 @@ const BallTableMaterial = new cannon.ContactMaterial(
     TableMaterial,
     {
         friction: 0.3,   
-        restitution: 0.83
+        restitution: 0.9
     }
 );
 
@@ -392,14 +391,8 @@ window.addEventListener('click', function (info){
     //IF not working by default implement it ; 
 })
 
-let  controls = null;
 const tick = () =>
 {
-    if (paddle != null && controls === null){
-        const objects = [paddle]
-        controls = new DragControls( objects, camera, renderer.domElement);
-        console.log('control', paddle);
-    }
     // console.log( renderer.info.render.triangles );
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
@@ -407,6 +400,8 @@ const tick = () =>
     
     // Synchronize the physics body with the paddle mesh
     if (paddleBody != null && paddle != null) {
+        paddle.position.x = 1.76 * mouse.x;
+        paddle.position.y = 4.03 + (1 * mouse.y);
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
                 z: 1.98,
@@ -433,7 +428,7 @@ const tick = () =>
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
 
-    // floor.position.copy(planeBody.position);
+    floor.position.copy(planeBody.position);
     floor.quaternion.copy(planeBody.quaternion);
 
     Table.position.copy(TableBody.position);
@@ -445,7 +440,7 @@ const tick = () =>
     }
 
     // Update controls
-    // controls.update()
+    controls.update()
     
     // Update debugger
     // cannonDebugger.update();
