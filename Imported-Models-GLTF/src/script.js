@@ -61,11 +61,12 @@ window.addEventListener('resize', () =>
 })
 
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-1.95, 5.14, 10.40)
+camera.position.set(0, 5.81, 11.77)
+// {x: -0.006796629480714592, y: 5.816349904903697, z: 11.774813465294566}
 scene.add(camera)
 
-const controls2 = new OrbitControls(camera, canvas)
-controls2.enableDamping = true
+// const controls2 = new OrbitControls(camera, canvas)
+// controls2.enableDamping = true
 
 
 const renderer = new THREE.WebGLRenderer({
@@ -98,7 +99,8 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
 
 //paddle
 const geometries = []
-let paddle, paddleBody;
+let paddle = null;
+let paddleBody = null;;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.8, 1.8, 1.8)
@@ -119,7 +121,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
     mergedMesh.scale.copy(model.scale);
     // scene.add(mergedMesh);
-    
 
     paddle = model;
 
@@ -131,10 +132,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     
     gui.add(paddle.position, 'x', -2.53, 2.53).step(0.005)
     // gui.add(paddle.position, 'y', 0, 2 * Math.PI).step(0.005)
-    gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
-
-    // x:0, y:4.0387, z:8
-
+    // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
 
     paddleBody  = new cannon.Body({
         mass: 0,
@@ -199,7 +197,7 @@ const createSphere = (position) => {
         
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
-        sphereBody.applyForce(new cannon.Vec3(0, -0.6, 2.5), sphereBody.position)
+        sphereBody.applyForce(new cannon.Vec3(0, -1, 1.8), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     Objects.push({sphere, sphereBody})
 }
@@ -298,15 +296,15 @@ BallCreator.createBall = () => {
     let y = 4.0387;
     let z = -8;
     
-    if (paddle != null) {
-        gsap.to(paddle.position, {
-            x: x,
-            y: y - 0.5,
-            z: z,
-            duration: 0.05,
-            ease: "power1.inOut",
-        });
-    }
+    // if (paddle != null) {
+    //     gsap.to(paddle.position, {
+    //         x: x,
+    //         y: y - 0.5,
+    //         z: z,
+    //         duration: 0.05,
+    //         ease: "power1.inOut",
+    //     });
+    // }
     createSphere(new THREE.Vector3(x, y, z))
 }
 
@@ -409,12 +407,14 @@ window.addEventListener('click', function (info){
 
 //
 
-const objects = [floor]
 
-const controls = new DragControls( objects, camera, renderer.domElement);
-
+let  controls = null;
 const tick = () =>
 {
+        if (paddle != null && controls == null){
+        const objects = [paddle]
+        controls = new DragControls( objects, camera, renderer.domElement);
+    }
     // console.log( renderer.info.render.triangles );
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
@@ -470,6 +470,8 @@ const tick = () =>
     
     // Render
     renderer.render(scene, camera)
+
+    // console.log(camera.position);
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
