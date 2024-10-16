@@ -93,16 +93,17 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
             node.material.wireframe = false;
         }
     })
-    paddle = model;
     scene.add(model);
 })
 
 //paddle
 const geometries = []
+
 let paddle = null;
 let paddleBody = null;;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
+    paddle = model;
     model.scale.set(1.8, 1.8, 1.8)
     model.position.y = 4.0387;
     model.position.z = 8; //-8
@@ -122,10 +123,8 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     mergedMesh.scale.copy(model.scale);
     // scene.add(mergedMesh);
 
-    paddle = model;
-
-    scene.add(paddle);
-
+    
+    
     paddle.rotation.x = 3.04;
     paddle.rotation.y = 3.19;
     paddle.rotation.z = 2.03;
@@ -133,7 +132,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     gui.add(paddle.position, 'x', -2.53, 2.53).step(0.005)
     // gui.add(paddle.position, 'y', 0, 2 * Math.PI).step(0.005)
     // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
-
+    
     paddleBody  = new cannon.Body({
         mass: 0,
         position: new cannon.Vec3().copy(paddle.position),
@@ -142,8 +141,9 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         linearDamping: 0.05,
         angularDamping:0.05
     })
-
+    
     PhysicWorld.addBody(paddleBody);
+    scene.add(paddle);
 })
 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
@@ -258,8 +258,8 @@ const PaddleBallContact = new cannon.ContactMaterial(
     plasticMaterial,
     PaddleMaterial,
     {
-        friction: 0.45,   
-        restitution: 0.75
+        friction: 0.1,   
+        restitution: 0.9
     }
 );
 
@@ -296,15 +296,6 @@ BallCreator.createBall = () => {
     let y = 4.0387;
     let z = -8;
     
-    // if (paddle != null) {
-    //     gsap.to(paddle.position, {
-    //         x: x,
-    //         y: y - 0.5,
-    //         z: z,
-    //         duration: 0.05,
-    //         ease: "power1.inOut",
-    //     });
-    // }
     createSphere(new THREE.Vector3(x, y, z))
 }
 
@@ -401,19 +392,13 @@ window.addEventListener('click', function (info){
     //IF not working by default implement it ; 
 })
 
-
-//Raycaster
-// const Raycaster = new THREE.Raycaster();
-
-//
-
-
 let  controls = null;
 const tick = () =>
 {
-        if (paddle != null && controls == null){
+    if (paddle != null && controls === null){
         const objects = [paddle]
         controls = new DragControls( objects, camera, renderer.domElement);
+        console.log('control', paddle);
     }
     // console.log( renderer.info.render.triangles );
     const elapsedTime = clock.getElapsedTime()
@@ -421,7 +406,7 @@ const tick = () =>
     previousTime = elapsedTime
     
     // Synchronize the physics body with the paddle mesh
-    if (paddleBody && paddle) {
+    if (paddleBody != null && paddle != null) {
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
                 z: 1.98,
