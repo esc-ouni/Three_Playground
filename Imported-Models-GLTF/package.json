@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "cannon": "^0.6.2",
+    "cannon-det": "^0.20.2",
     "cannon-es": "^0.20.0",
     "cannon-es-debugger": "^1.0.0",
     "gasp": "^0.0.2",

@@ -103,7 +103,7 @@ let paddleBody = null;;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
     paddle = model;
-    model.scale.set(1.8, 1.8, 1.8)
+    model.scale.set(2.1, 2.1, 2.1)
     model.position.y = 4.0387;
     model.position.z = 8; //-8
     
@@ -135,12 +135,12 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddleBody  = new cannon.Body({
         mass: 0,
         position: new cannon.Vec3().copy(paddle.position),
-        shape: threeToCannon(mergedMesh,{type: ShapeType.MESH}).shape,
+        shape: threeToCannon(mergedMesh,{type: ShapeType.HULL}).shape,
         material:PaddleMaterial,
         linearDamping: 0.05,
         angularDamping:0.05
     })
-    
+    // paddleBody.position.y += 5;
     PhysicWorld.addBody(paddleBody);
     scene.add(paddle);
 })
@@ -169,6 +169,8 @@ const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
 let Objects  = [];
 
+let ball = null;
+
 const STDGeometry = new THREE.SphereGeometry(0.1, 32, 32);
 const STDMaterial = new THREE.MeshStandardMaterial;
 STDMaterial.metalness = 0.1;
@@ -194,26 +196,28 @@ const createSphere = (position, px, py, pz) => {
             angularDamping:0.05
         });
         
-        // sphereBody.addEventListener('collide', (event) => {
-        //     if (event.body === paddleBody) {
-        //             console.log('contacted!');
-        //         }
-        //     }
-        // );
+        sphereBody.addEventListener('collide', (event) => {
+            if (event.body === paddleBody) {
+                    console.log('contacted!');
+                    sphereBody.applyForce(new cannon.Vec3(0, 0.2, -4), sphereBody.position)
+                }
+            }
+        );
     
-        // sphereBody.applyForce(new cannon.Vec3(0, 0.01, -0.19), sphereBody.position)
 
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
-        sphereBody.applyForce(new cannon.Vec3(px, py, pz), sphereBody.position)
+        // sphereBody.applyForce(new cannon.Vec3(px, py, pz), sphereBody.position)
+        sphereBody.applyForce(new cannon.Vec3(0, -0.8, 1.7), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
+    ball = sphere;
     Objects.push({sphere, sphereBody})
 }
 
 const PhysicWorld = new cannon.World();
 
 //Allow objects sleep => icrease performance
-PhysicWorld.allowSleep = true;
+// PhysicWorld.allowSleep = true;
 
 //Collision detction better than Naive
 // PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
@@ -322,9 +326,9 @@ BallCreator.createBall = () => {
     
     createSphere(new THREE.Vector3(x, y, z), BallCreator.px, BallCreator.py, BallCreator.pz)
 }
-gui.add(BallCreator, 'px', 0, 5).step(0.1)
-gui.add(BallCreator, 'py', 0, 5).step(0.1)
-gui.add(BallCreator, 'pz', 0, 5).step(0.1)
+gui.add(BallCreator, 'px', -5, 5).step(0.1)
+gui.add(BallCreator, 'py', -5, 5).step(0.1)
+gui.add(BallCreator, 'pz', -5, 5).step(0.1)
 
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
@@ -412,8 +416,9 @@ let   Intersects   =  [];
 let   ppBalls = [];
 
 // Create an ArrowHelper
-const arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), 1, 0xff0000);
-scene.add(arrowHelper);
+// const arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), 1, 0xff0000);
+// scene.add(arrowHelper);
+
 const tick = () =>
     {
         const elapsedTime = clock.getElapsedTime()
@@ -424,18 +429,18 @@ const tick = () =>
         if (paddleBody != null && paddle != null) {
             Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
 
-            arrowHelper.position.copy(paddle.position)
-            arrowHelper.setDirection(new THREE.Vector3(0, 0, -1))
+            // arrowHelper.position.copy(paddle.position)
+            // arrowHelper.setDirection(new THREE.Vector3(0, 0, -1))
             //raycaster
-            if (Objects.length){
+            // if (Objects.length){
                 
-                ppBalls = Objects.map(obj => obj.sphere)
-                Intersects = Raycaster.intersectObjects(ppBalls);
+            //     ppBalls = Objects.map(obj => obj.sphere)
+            //     Intersects = Raycaster.intersectObjects(ppBalls);
                 
-                if (Intersects.length > 0){
-                    console.log(Intersects[0]);
-                }
-            }
+            //     if (Intersects.length > 0){
+            //         console.log(Intersects[0]);
+            //     }
+            // }
         
 
         paddle.position.x = 1.76 * mouse.x;
