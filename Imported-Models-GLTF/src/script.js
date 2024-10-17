@@ -148,7 +148,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
 const Pong_Ball_colide = (Collision) => {
-    console.log(Collision.Body);
     let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
     
     hit_sound.volume = Math.min(strength, 1);
@@ -168,7 +167,7 @@ const Hit__ = (Collision) => {
 const TextureLoader = new THREE.TextureLoader();
 const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
-let Objects  = []
+let Objects  = [];
 
 const STDGeometry = new THREE.SphereGeometry(0.1, 32, 32);
 const STDMaterial = new THREE.MeshStandardMaterial;
@@ -177,8 +176,6 @@ STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
 const sphereShape = new cannon.Sphere(0.1);
-
-let isCollidingWithPaddle = false;
 
 const createSphere = (position, px, py, pz) => {
     const sphere = new THREE.Mesh(
@@ -197,24 +194,16 @@ const createSphere = (position, px, py, pz) => {
             angularDamping:0.05
         });
         
-        sphereBody.addEventListener('collide', (event) => {
-            if (event.body === paddleBody) {
-                if (!isCollidingWithPaddle) {
-                    console.log('contacted!');
-                    isCollidingWithPaddle = true; // Set the flag to true
-                    // Apply force or any other logic here
-                }
-            }
-        });
+        // sphereBody.addEventListener('collide', (event) => {
+        //     if (event.body === paddleBody) {
+        //             console.log('contacted!');
+        //         }
+        //     }
+        // );
     
-        sphereBody.addEventListener('end', (event) => {
-            if (event.body === paddleBody) {
-                isCollidingWithPaddle = false; // Reset the flag when the collision ends
-            }
-        });
         // sphereBody.applyForce(new cannon.Vec3(0, 0.01, -0.19), sphereBody.position)
 
-        // sphereBody.addEventListener('collide', Pong_Ball_colide);
+        sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
         sphereBody.applyForce(new cannon.Vec3(px, py, pz), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
@@ -417,19 +406,38 @@ window.addEventListener('mousemove', function (info) {
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
 })
 
-// window.addEventListener('click', function (info){
-//     //IF not working by default implement it ; 
-// })
+//Raycaster
+const Raycaster = new THREE.Raycaster();
+let   Intersects   =  [];
+let   ppBalls = [];
 
+// Create an ArrowHelper
+const arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), 1, 0xff0000);
+scene.add(arrowHelper);
 const tick = () =>
-{
-    // console.log( renderer.info.render.triangles );
-    const elapsedTime = clock.getElapsedTime()
-    const deltaTime = elapsedTime - previousTime
-    previousTime = elapsedTime
-    
-    // Synchronize the physics body with the paddle mesh
-    if (paddleBody != null && paddle != null) {
+    {
+        const elapsedTime = clock.getElapsedTime()
+        const deltaTime = elapsedTime - previousTime
+        previousTime = elapsedTime
+        
+        // Synchronize the physics body with the paddle mesh
+        if (paddleBody != null && paddle != null) {
+            Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
+
+            arrowHelper.position.copy(paddle.position)
+            arrowHelper.setDirection(new THREE.Vector3(0, 0, -1))
+            //raycaster
+            if (Objects.length){
+                
+                ppBalls = Objects.map(obj => obj.sphere)
+                Intersects = Raycaster.intersectObjects(ppBalls);
+                
+                if (Intersects.length > 0){
+                    console.log(Intersects[0]);
+                }
+            }
+        
+
         paddle.position.x = 1.76 * mouse.x;
         paddle.position.y = 4.03 + (1 * mouse.y);
         if (paddle.position.x >0){
