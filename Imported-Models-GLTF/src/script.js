@@ -99,7 +99,9 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
 const geometries = []
 
 let paddle = null;
-let paddleBody = null;;
+let paddleAi = null;
+let paddleBody = null;
+let paddleBodyAi = null;
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
     paddle = model;
@@ -123,10 +125,11 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     // scene.add(mergedMesh);
 
     
-    
     paddle.rotation.x = 3.04;
     paddle.rotation.y = 3.19;
     paddle.rotation.z = 2.03;
+
+
     
     gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
     gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
@@ -140,9 +143,28 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         linearDamping: 0.05,
         angularDamping:0.05
     })
-    // paddleBody.position.y += 5;
+    
+    paddleAi = paddle.clone();
+    paddleAi.position.z = -8;
+
+    paddleBodyAi  = new cannon.Body({
+        mass: 0,
+        position: new cannon.Vec3().copy(paddleAi.position),
+        shape: threeToCannon(mergedMesh,{type: ShapeType.HULL}).shape,
+        material:PaddleMaterial,
+        linearDamping: 0.05,
+        angularDamping:0.05
+    })
+    
+    // paddleBodyAi = paddleBody.clone();
+
     PhysicWorld.addBody(paddleBody);
+
+    paddleBodyAi.position.z = -8;
+    PhysicWorld.addBody(paddleBodyAi);
+
     scene.add(paddle);
+    scene.add(paddleAi);
 })
 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
@@ -387,9 +409,9 @@ NetBody.position.y = Net.position.y;
 NetBody.position.z = Net.position.z;
 PhysicWorld.addBody(NetBody);
 
-// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-//     color: 0xff0000, // Optional: Color of the debug visuals
-// });
+const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+    color: 0xff0000, // Optional: Color of the debug visuals
+});
 
 //  Animate
 const clock = new THREE.Clock()
@@ -419,53 +441,62 @@ let   ppBalls = [];
 // const arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), 1, 0xff0000);
 // scene.add(arrowHelper);
 
+
 const tick = () =>
-    {
-        const elapsedTime = clock.getElapsedTime()
-        const deltaTime = elapsedTime - previousTime
-        previousTime = elapsedTime
-        
-        // Synchronize the physics body with the paddle mesh
-        if (paddleBody != null && paddle != null) {
-            Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
+{
+    const elapsedTime = clock.getElapsedTime()
+    const deltaTime = elapsedTime - previousTime
+    previousTime = elapsedTime
+    
+    // Synchronize the physics body with the paddle mesh
+    if (paddleBody != null && paddle != null) {
+        Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
 
-            // arrowHelper.position.copy(paddle.position)
-            // arrowHelper.setDirection(new THREE.Vector3(0, 0, -1))
-            //raycaster
-            // if (Objects.length){
-                
-            //     ppBalls = Objects.map(obj => obj.sphere)
-            //     Intersects = Raycaster.intersectObjects(ppBalls);
-                
-            //     if (Intersects.length > 0){
-            //         console.log(Intersects[0]);
-            //     }
-            // }
-        
+        // arrowHelper.position.copy(paddle.position)
+        // arrowHelper.setDirection(new THREE.Vector3(0, 0, -1))
+        //raycaster
+        // if (Objects.length){
+            
+        //     ppBalls = Objects.map(obj => obj.sphere)
+        //     Intersects = Raycaster.intersectObjects(ppBalls);
+            
+        //     if (Intersects.length > 0){
+        //         console.log(Intersects[0]);
+        //     }
+        // }
+    
 
-        paddle.position.x = 1.76 * mouse.x;
-        paddle.position.y = 4.03 + (1 * mouse.y);
-        if (paddle.position.x >0){
-            gsap.to(paddle.rotation, {
-                z: 1.98,
-                duration: 0.08,
-                ease: "power2.inOut",
-            });
-        }
-        else{
-            gsap.to(paddle.rotation, {
-                z: 4.42,
-                duration: 0.08,
-                ease: "power2.inOut",
-            });
-        }
+    paddle.position.x = 1.76 * mouse.x;
+    paddle.position.y = 4.03 + (1 * mouse.y);
+    if (paddle.position.x >0){
+        gsap.to(paddle.rotation, {
+            z: 1.98,
+            duration: 0.08,
+            ease: "power2.inOut",
+        });
+    }
+    else{
+        gsap.to(paddle.rotation, {
+            z: 4.42,
+            duration: 0.08,
+            ease: "power2.inOut",
+        });
+    }
+
         paddleBody.position.copy(paddle.position);
-
+        
         paddleQuat.copy(paddle.quaternion);
-
+        
         paddleQuat = paddleQuat.mult(rotationOffset);
-
+        
         paddleBody.quaternion.copy(paddleQuat);
+        
+
+        paddleBodyAi.position.copy(paddleAi.position);
+
+        paddleBodyAi.quaternion.copy(paddleQuat);
+
+
     }
 
     // update physic world
@@ -481,12 +512,19 @@ const tick = () =>
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
-
+    
+    if (Objects.length && paddleAi){
+        // paddleAi.position.copy(paddleBodyAi.position);
+        // paddleAi.quaternion.copy(paddleBodyAi.quaternion);
+        paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
+        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y; 
+    }
+    
     // Update controls
     controls.update()
     
     // Update debugger
-    // cannonDebugger.update();
+    cannonDebugger.update();
 
     //camera
     // console.log(camera.position);
