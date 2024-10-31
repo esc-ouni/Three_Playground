@@ -193,13 +193,13 @@ let Objects  = [];
 
 let ball = null;
 
-const STDGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+const STDGeometry = new THREE.SphereGeometry(0.072, 32, 32);
 const STDMaterial = new THREE.MeshStandardMaterial;
 STDMaterial.metalness = 0.1;
 STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
-const sphereShape = new cannon.Sphere(0.1);
+const sphereShape = new cannon.Sphere(0.072);
 
 const createSphere = (position, px, py, pz) => {
     const sphere = new THREE.Mesh(
