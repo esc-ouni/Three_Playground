@@ -7,6 +7,7 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
 import { threeToCannon, ShapeType } from 'three-to-cannon';
 import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 const gui = new GUI()
 
@@ -27,7 +28,9 @@ floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
 
 
-scene.add(floor)
+// scene.add(floor)
+
+
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.14)
 scene.add(ambientLight)
@@ -193,13 +196,13 @@ let Objects  = [];
 
 let ball = null;
 
-const STDGeometry = new THREE.SphereGeometry(0.072, 32, 32);
+const STDGeometry = new THREE.SphereGeometry(0.1, 32, 32);
 const STDMaterial = new THREE.MeshStandardMaterial;
 STDMaterial.metalness = 0.1;
 STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
-const sphereShape = new cannon.Sphere(0.072);
+const sphereShape = new cannon.Sphere(0.1);
 
 const createSphere = (position, px, py, pz) => {
     const sphere = new THREE.Mesh(
@@ -409,9 +412,9 @@ NetBody.position.y = Net.position.y;
 NetBody.position.z = Net.position.z;
 PhysicWorld.addBody(NetBody);
 
-const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-    color: 0xff0000, // Optional: Color of the debug visuals
-});
+// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+//     color: 0xff0000, // Optional: Color of the debug visuals
+// });
 
 //  Animate
 const clock = new THREE.Clock()
@@ -441,6 +444,14 @@ let   ppBalls = [];
 // const arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), 1, 0xff0000);
 // scene.add(arrowHelper);
 
+//enviroment map
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
+    enviroment_map.mapping = THREE.EquirectangularReflectionMapping
+    scene.background  = enviroment_map;
+    scene.environment = enviroment_map;
+})
+//
 
 const tick = () =>
 {
@@ -470,15 +481,19 @@ const tick = () =>
     paddle.position.y = 4.03 + (1 * mouse.y);
     if (paddle.position.x >0){
         gsap.to(paddle.rotation, {
-            z: 1.98,
-            duration: 0.08,
+            x: 2.81,
+            y: 2.96,
+            z: 2.81,
+            duration: 0.095,
             ease: "power2.inOut",
         });
     }
     else{
         gsap.to(paddle.rotation, {
-            z: 4.42,
-            duration: 0.08,
+            x: 2.81,
+            y: 6.28,
+            z: 2.81,
+            duration: 0.095,
             ease: "power2.inOut",
         });
     }
@@ -524,7 +539,7 @@ const tick = () =>
     controls.update()
     
     // Update debugger
-    cannonDebugger.update();
+    // cannonDebugger.update();
 
     //camera
     // console.log(camera.position);
