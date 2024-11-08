@@ -330,7 +330,8 @@ PhysicWorld.addBody(planeBody);
 const BallCreator = {
     px: 0,
     py: 0.5,
-    pz: 2 
+    pz: 2 ,
+    cameraFixed: false 
 }
 
 BallCreator.reset = () => {
@@ -445,13 +446,17 @@ let   ppBalls = [];
 // scene.add(arrowHelper);
 
 //enviroment map
-const rgbeLoader = new RGBELoader();
-rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
-    enviroment_map.mapping = THREE.EquirectangularReflectionMapping
-    scene.background  = enviroment_map;
-    scene.environment = enviroment_map;
-})
+// const rgbeLoader = new RGBELoader();
+// rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
+//     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
+//     scene.background  = enviroment_map;
+//     scene.environment = enviroment_map;
+// })
 //
+
+scene.add(new THREE.AxesHelper(15))
+
+gui.add(BallCreator, 'cameraFixed');
 
 const tick = () =>
 {
@@ -476,27 +481,6 @@ const tick = () =>
         //     }
         // }
     
-
-    paddle.position.x = 1.76 * mouse.x;
-    paddle.position.y = 4.03 + (1 * mouse.y);
-    if (paddle.position.x >0){
-        gsap.to(paddle.rotation, {
-            x: 2.81,
-            y: 2.96,
-            z: 2.81,
-            duration: 0.095,
-            ease: "power2.inOut",
-        });
-    }
-    else{
-        gsap.to(paddle.rotation, {
-            x: 2.81,
-            y: 6.28,
-            z: 2.81,
-            duration: 0.095,
-            ease: "power2.inOut",
-        });
-    }
 
         paddleBody.position.copy(paddle.position);
         
@@ -532,7 +516,61 @@ const tick = () =>
         // paddleAi.position.copy(paddleBodyAi.position);
         // paddleAi.quaternion.copy(paddleBodyAi.quaternion);
         paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
-        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y; 
+        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
+    }
+
+    if (BallCreator.cameraFixed){
+        camera.position.x = 0;
+        camera.position.y = 5.8;
+        camera.position.z = 10.8;
+
+        // console.log(paddle.position.z);
+        
+        // console.log(camera.position.x, camera.position.y, camera.position.z);
+        camera.position.x = 4 * mouse.x;
+        camera.position.y = 5.8 + ( 1 * mouse.y);
+
+        paddle.position.x = 4 * mouse.x;
+        paddle.position.z = 8 - Math.abs((2 * mouse.x));
+        paddle.position.y = 4.03 + (2 * mouse.y);
+
+        if (paddle.position.x >0){
+            gsap.to(paddle.rotation, {
+                x: 2.81,
+                y: 2.96,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddle.rotation, {
+                x: 2.81,
+                y: 6.28,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        // if (paddleAi.position.x >0){
+        //     gsap.to(paddle.rotation, {
+        //         x: 2.81,
+        //         y: 6.28,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }
+        // else{
+        //     gsap.to(paddle.rotation, {
+        //         x: 2.81,
+        //         y: 2.96,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }    
+
     }
     
     // Update controls
@@ -554,3 +592,9 @@ const tick = () =>
 }
 
 tick()
+
+
+// -0.0394104840668026 5.451454332183686
+
+// 3.9495296465566594 5.224859320767735
+// -4.253731684360619 5.80444415426392
