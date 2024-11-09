@@ -84,7 +84,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 const GLTFLoaderr = new GLTFLoader(); 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
-    model.scale.set(1.12, 1.12, 1.12)
+    model.scale.set(1.5, 1.5, 1.5)
     model.position.y += 1.25;
     model.position.z = -1.4;
     
@@ -110,7 +110,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddle = model;
     model.scale.set(2.1, 2.1, 2.1)
     model.position.y = 4.0387;
-    model.position.z = 8; //-8
+    model.position.z = 10; //-8
     
     model.traverse(function (node) {          
         if (node.isMesh) {
@@ -134,9 +134,9 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 
 
     
-    gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
-    gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
-    gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
     
     paddleBody  = new cannon.Body({
         mass: 0,
@@ -148,7 +148,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     })
     
     paddleAi = paddle.clone();
-    paddleAi.position.z = -8;
+    paddleAi.position.z = -10;
 
     paddleBodyAi  = new cannon.Body({
         mass: 0,
@@ -163,7 +163,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 
     PhysicWorld.addBody(paddleBody);
 
-    paddleBodyAi.position.z = -8;
+    paddleBodyAi.position.z = -10;
     PhysicWorld.addBody(paddleBodyAi);
 
     scene.add(paddle);
@@ -233,7 +233,7 @@ const createSphere = (position, px, py, pz) => {
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
         // sphereBody.applyForce(new cannon.Vec3(px, py, pz), sphereBody.position)
-        sphereBody.applyForce(new cannon.Vec3(0, -0.8, 1.7), sphereBody.position)
+        sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.2), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
     Objects.push({sphere, sphereBody})
@@ -367,10 +367,18 @@ material.transparent = true;
 const Table          = new THREE.Mesh( geometry, material ); 
 Table.scale.set(3.3, 0.1, 3.3)
 
-Table.position.y = 3.0387;
-Table.scale.x    = 6.15;
+Table.position.y = 3.7;
+Table.position.z = 0.48;
+
+Table.scale.x    = 8.28;
 Table.scale.y    = 0.3;
-Table.scale.z    = 13.84;
+Table.scale.z    = 18.51;
+
+// gui.add(Table.position, 'y', 3, 10).step(0.01)
+// gui.add(Table.position, 'z', -10, 10).step(0.01)
+// gui.add(Table.scale, 'x', 3, 20).step(0.01)
+// gui.add(Table.scale, 'y', 0, 20).step(0.01)
+// gui.add(Table.scale, 'z', 3, 20).step(0.01)
 
 // scene.add(Table);
 
@@ -393,11 +401,19 @@ PhysicWorld.addBody(TableBody);
 //Net
 const Net = new THREE.Mesh( geometry, material ); 
 Net.position.x = 0;
-Net.position.y = 3.42;
-Net.position.z = 0.0371;
-Net.scale.set(7.8, 0.8, 0.05)
+Net.position.y = 4.25;
+Net.position.z = 0.53;
+Net.scale.set(10.2, 0.93, 0.05)
+
+gui.add(Net.position, 'y', 3, 10).step(0.01)
+gui.add(Net.position, 'z', -10, 10).step(0.01)
+gui.add(Net.scale, 'x', 3, 20).step(0.01)
+gui.add(Net.scale, 'y', 0, 20).step(0.01)
+gui.add(Net.scale, 'z', 3, 20).step(0.01)
 
 // scene.add(Net);
+
+
 const NetShape = new cannon.Box(new cannon.Vec3(Net.scale.x / 2, Net.scale.y / 2, Net.scale.z / 2));
 const NetBody  = new cannon.Body({
     mass: 0,
@@ -413,9 +429,9 @@ NetBody.position.y = Net.position.y;
 NetBody.position.z = Net.position.z;
 PhysicWorld.addBody(NetBody);
 
-// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-//     color: 0xff0000, // Optional: Color of the debug visuals
-// });
+const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+    color: 0xff0000, // Optional: Color of the debug visuals
+});
 
 //  Animate
 const clock = new THREE.Clock()
@@ -438,8 +454,6 @@ window.addEventListener('mousemove', function (info) {
 
 //Raycaster
 const Raycaster = new THREE.Raycaster();
-let   Intersects   =  [];
-let   ppBalls = [];
 
 // Create an ArrowHelper
 // const arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), 1, 0xff0000);
@@ -504,7 +518,7 @@ const tick = () =>
     floor.position.copy(planeBody.position);
     floor.quaternion.copy(planeBody.quaternion);
 
-    Table.position.copy(TableBody.position);
+    // Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
     
     for (const object of Objects){
@@ -522,7 +536,7 @@ const tick = () =>
     if (BallCreator.cameraFixed){
         camera.position.x = 0;
         camera.position.y = 5.8;
-        camera.position.z = 10.8;
+        camera.position.z = 12.8;
 
         // console.log(paddle.position.z);
         
@@ -531,7 +545,7 @@ const tick = () =>
         camera.position.y = 5.8 + ( 1 * mouse.y);
 
         paddle.position.x = 4 * mouse.x;
-        paddle.position.z = 8 - Math.abs((2 * mouse.x));
+        paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 4.03 + (2 * mouse.y);
 
         if (paddle.position.x >0){
@@ -577,7 +591,7 @@ const tick = () =>
     controls.update()
     
     // Update debugger
-    // cannonDebugger.update();
+    cannonDebugger.update();
 
     //camera
     // console.log(camera.position);
