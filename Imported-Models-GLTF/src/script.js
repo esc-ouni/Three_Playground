@@ -30,7 +30,7 @@ floor.material.side = THREE.DoubleSide;
 
 // scene.add(floor)
 
-
+let Cameras = []
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.14)
 scene.add(ambientLight)
@@ -51,24 +51,56 @@ const sizes = {
     height: window.innerHeight
 }
 
+// window.addEventListener('resize', () =>
+// {
+//     sizes.width = window.innerWidth
+//     sizes.height = window.innerHeight
+//     camera.aspect = sizes.width / sizes.height
+//     camera.updateProjectionMatrix()
+//     renderer.setSize(sizes.width, sizes.height)
+//     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+// })
+
+// const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+// camera.position.set(-15, 4, 0)
+// // camera.position.set(0, 5.81, 11.77)
+// // {x: -0.006796629480714592, y: 5.816349904903697, z: 11.774813465294566}
+// scene.add(camera)
+
+// const controls = new OrbitControls(camera, canvas)
+// controls.enableDamping = true
+
+
 window.addEventListener('resize', () =>
 {
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
+    topCamera.aspect = sizes.width / (sizes.height / 2)
+    bottomCamera.aspect = sizes.width / (sizes.height / 2)
+    topCamera.updateProjectionMatrix()
+    bottomCamera.updateProjectionMatrix()
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-15, 4, 0)
-// camera.position.set(0, 5.81, 11.77)
-// {x: -0.006796629480714592, y: 5.816349904903697, z: 11.774813465294566}
-scene.add(camera)
+const topCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
+topCamera.position.set(-15, 4, 0)
+scene.add(topCamera)
 
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+Cameras.push(topCamera)
+
+const bottomCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
+bottomCamera.position.set(15, 4, 0)
+scene.add(bottomCamera)
+
+Cameras.push(bottomCamera)
+
+
+const topControls = new OrbitControls(topCamera, canvas)
+topControls.enableDamping = true
+
+const bottomControls = new OrbitControls(bottomCamera, canvas)
+bottomControls.enableDamping = true
 
 
 const renderer = new THREE.WebGLRenderer({
@@ -134,9 +166,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 
 
     
-    // gui.add(paddle.rotation, 'x', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddle.rotation, 'y', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddle.rotation, 'z', 0, 2 * Math.PI).step(0.005)
     
     paddleBody  = new cannon.Body({
         mass: 0,
@@ -149,7 +178,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     
     paddleAi = paddle.clone();
     paddleAi.position.z = -10;
-
+    
     paddleBodyAi  = new cannon.Body({
         mass: 0,
         position: new cannon.Vec3().copy(paddleAi.position),
@@ -160,11 +189,17 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     })
     
     // paddleBodyAi = paddleBody.clone();
-
+    
     PhysicWorld.addBody(paddleBody);
-
+    
     paddleBodyAi.position.z = -10;
     PhysicWorld.addBody(paddleBodyAi);
+    
+    // gui.add(paddleAi.rotation, 'x', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddleAi.rotation, 'y', 0, 2 * Math.PI).step(0.005)
+    // gui.add(paddleAi.rotation, 'z', 0, 2 * Math.PI).step(0.005)
+    
+    paddleAi.rotation.set(0, 0, 0);
 
     scene.add(paddle);
     scene.add(paddleAi);
@@ -224,15 +259,20 @@ const createSphere = (position, px, py, pz) => {
         sphereBody.addEventListener('collide', (event) => {
             if (event.body === paddleBody) {
                     console.log('contacted!');
-                    sphereBody.applyForce(new cannon.Vec3(0, 0.2, -4), sphereBody.position)
-                }
+                    sphereBody.velocity.set(0, 0, 0);
+                    sphereBody.applyForce(new cannon.Vec3(0, -0.8, -2.2), sphereBody.position)
             }
+            else if (event.body === paddleBodyAi) {
+                console.log('contacted!');
+                sphereBody.velocity.set(0, 0, 0);
+                sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.2), sphereBody.position)
+            }
+        }
         );
-    
-
+        
+        
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
-        // sphereBody.applyForce(new cannon.Vec3(px, py, pz), sphereBody.position)
         sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.2), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
@@ -247,7 +287,7 @@ const PhysicWorld = new cannon.World();
 //Collision detction better than Naive
 // PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
 
-PhysicWorld.gravity.set(0, - 8.92, 0);
+PhysicWorld.gravity.set(0, -8.92, 0);
 
 const concreteMaterial = new cannon.Material('concrete');
 const plasticMaterial  = new cannon.Material('plastic');
@@ -403,7 +443,7 @@ const Net = new THREE.Mesh( geometry, material );
 Net.position.x = 0;
 Net.position.y = 4.25;
 Net.position.z = 0.53;
-Net.scale.set(10.2, 0.93, 0.05)
+Net.scale.set(10.2, 1, 0.05)
 
 gui.add(Net.position, 'y', 3, 10).step(0.01)
 gui.add(Net.position, 'z', -10, 10).step(0.01)
@@ -427,7 +467,8 @@ const NetBody  = new cannon.Body({
 NetBody.position.x = Net.position.x;
 NetBody.position.y = Net.position.y;
 NetBody.position.z = Net.position.z;
-PhysicWorld.addBody(NetBody);
+
+// PhysicWorld.addBody(NetBody);
 
 const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
     color: 0xff0000, // Optional: Color of the debug visuals
@@ -445,19 +486,58 @@ let paddleQuat = new cannon.Quaternion();
 
 //mouse event listener
 const mouse = new THREE.Vector2();
+const keyboard = new THREE.Vector2();
+keyboard.x = 0;
+keyboard.y = 0;
+
 
 window.addEventListener('mousemove', function (info) {
     // console.log('Mouse Moved', (info.clientX/window.innerWidth)*2-1 , -((info.clientY/window.innerHeight)*2-1));
     mouse.x = (info.clientX/window.innerWidth)*2-1;
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
-})
+    // console.log(mouse.x, mouse.y);
+}
+)
+document.addEventListener(
+    "keypress",
+    (event) => {
+      const keyName = event.key;
 
+    //   console.log(keyboard.x, keyboard.y);
+
+        if ( keyName === "w") {
+            keyboard.y += 0.05;
+            return ;
+        }
+        else if (keyName === "s"){
+            keyboard.y -= 0.05;
+            return ;
+        }
+        else if (keyName === "d"){
+            keyboard.x -= 0.05;
+            return ;
+        }
+        else if (keyName === "a"){
+            keyboard.x += 0.05; 
+            return ;       
+        }
+
+        // if (keyboard.x > 0){
+        //     keyboard.x = Math.min(keyboard.x, 1);
+        // }
+        // else if (keyboard.x < 0){
+        //     keyboard.x = Math.max(keyboard.x, -1);
+        // }
+        // if (keyboard.y > 0){
+        //     keyboard.y = Math.min(keyboard.y, 1);
+        // }
+        // else if (keyboard.y < 0){
+        //     keyboard.y = Math.max(keyboard.y, -1);
+        // }
+    } 
+)
 //Raycaster
-const Raycaster = new THREE.Raycaster();
 
-// Create an ArrowHelper
-// const arrowHelper = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -1, 0), 1, 0xff0000);
-// scene.add(arrowHelper);
 
 //enviroment map
 // const rgbeLoader = new RGBELoader();
@@ -467,6 +547,7 @@ const Raycaster = new THREE.Raycaster();
 //     scene.environment = enviroment_map;
 // })
 //
+// paddleAi.quaternion.copy(rotationOffset);
 
 scene.add(new THREE.AxesHelper(15))
 
@@ -480,21 +561,7 @@ const tick = () =>
     
     // Synchronize the physics body with the paddle mesh
     if (paddleBody != null && paddle != null) {
-        Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
-
-        // arrowHelper.position.copy(paddle.position)
-        // arrowHelper.setDirection(new THREE.Vector3(0, 0, -1))
-        //raycaster
-        // if (Objects.length){
-            
-        //     ppBalls = Objects.map(obj => obj.sphere)
-        //     Intersects = Raycaster.intersectObjects(ppBalls);
-            
-        //     if (Intersects.length > 0){
-        //         console.log(Intersects[0]);
-        //     }
-        // }
-    
+        // Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
 
         paddleBody.position.copy(paddle.position);
         
@@ -505,19 +572,17 @@ const tick = () =>
         paddleBody.quaternion.copy(paddleQuat);
         
 
-        paddleBodyAi.position.copy(paddleAi.position);
-
-        paddleBodyAi.quaternion.copy(paddleQuat);
-
-
+        // paddleBodyAi.position.copy(paddleAi.position);
+        
+        paddleBodyAi.quaternion.copy(rotationOffset);
     }
-
+    
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
-
+    
     floor.position.copy(planeBody.position);
     floor.quaternion.copy(planeBody.quaternion);
-
+    
     // Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
     
@@ -529,24 +594,43 @@ const tick = () =>
     if (Objects.length && paddleAi){
         // paddleAi.position.copy(paddleBodyAi.position);
         // paddleAi.quaternion.copy(paddleBodyAi.quaternion);
-        paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
-        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
+        // paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
+        // paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
     }
-
-    if (BallCreator.cameraFixed){
-        camera.position.x = 0;
-        camera.position.y = 5.8;
-        camera.position.z = 12.8;
-
-        // console.log(paddle.position.z);
+    
+    if (BallCreator.cameraFixed & Cameras.length === 2){
+        Cameras[0].position.x = 0;
+        Cameras[0].position.y = 5.8;
+        Cameras[0].position.z = 12.8;
         
-        // console.log(camera.position.x, camera.position.y, camera.position.z);
-        camera.position.x = 4 * mouse.x;
-        camera.position.y = 5.8 + ( 1 * mouse.y);
+        
+        Cameras[0].position.x = 4 * mouse.x;
+        Cameras[0].position.y = 5.8 + ( 1 * mouse.y);
+        
+        // Cameras[0].lookAt(paddleAi.position);
+        // console.log(paddle.position);
+        
+        Cameras[1].position.x = 0;
+        Cameras[1].position.y = 5.8;
+        Cameras[1].position.z = -12.8;
+        
+        
+        Cameras[1].position.x = 4 * keyboard.x;
+        Cameras[1].position.y = 5.8 + ( 1 * keyboard.y);
 
         paddle.position.x = 4 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 4.03 + (2 * mouse.y);
+        
+        
+        paddleAi.position.x = 4 * keyboard.x;
+        paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
+        paddleAi.position.y = 4.03 + (2 * keyboard.y);
+        
+        paddleBodyAi.position.copy(paddleAi.position);
+        
+
+
 
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
@@ -566,38 +650,33 @@ const tick = () =>
                 ease: "power2.inOut",
             });
         }
-        // if (paddleAi.position.x >0){
-        //     gsap.to(paddle.rotation, {
-        //         x: 2.81,
-        //         y: 6.28,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-        // else{
-        //     gsap.to(paddle.rotation, {
-        //         x: 2.81,
-        //         y: 2.96,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }    
 
     }
     
     // Update controls
-    controls.update()
+    topControls.update()
+    bottomControls.update()
     
     // Update debugger
     cannonDebugger.update();
-
-    //camera
-    // console.log(camera.position);
     
     // Render
-    renderer.render(scene, camera)
+    // renderer.render(scene, camera)
+
+    renderer.setScissorTest(true);
+
+    // Top half
+    renderer.setViewport(0, sizes.height / 2, sizes.width, sizes.height / 2);
+    renderer.setScissor(0, sizes.height / 2, sizes.width, sizes.height / 2);
+    renderer.render(scene, topCamera);
+
+    // Bottom half
+    renderer.setViewport(0, 0, sizes.width, sizes.height / 2);
+    renderer.setScissor(0, 0, sizes.width, sizes.height / 2);
+    renderer.render(scene, bottomCamera);
+
+    renderer.setScissorTest(false);
+
 
     // console.log(camera.position);
 
