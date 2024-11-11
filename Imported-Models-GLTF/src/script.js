@@ -112,13 +112,13 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 //GLTF Loading
-
 const GLTFLoaderr = new GLTFLoader(); 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.5, 1.5, 1.5)
-    model.position.y += 1.25;
-    model.position.z = -1.4;
+    model.position.y += 1.7;
+    model.position.z = -1.94;
+
     
     model.traverse(function (node) {
         if (node.isMesh) {
@@ -260,12 +260,12 @@ const createSphere = (position, px, py, pz) => {
             if (event.body === paddleBody) {
                     console.log('contacted!');
                     sphereBody.velocity.set(0, 0, 0);
-                    sphereBody.applyForce(new cannon.Vec3(0, -0.8, -2.2), sphereBody.position)
+                    sphereBody.applyForce(new cannon.Vec3(0, -0.8, -2.3), sphereBody.position)
             }
             else if (event.body === paddleBodyAi) {
                 console.log('contacted!');
                 sphereBody.velocity.set(0, 0, 0);
-                sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.2), sphereBody.position)
+                sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.3), sphereBody.position)
             }
         }
         );
@@ -281,11 +281,15 @@ const createSphere = (position, px, py, pz) => {
 
 const PhysicWorld = new cannon.World();
 
+
+PhysicWorld.solver.iterations = 10; // Default is 10
+PhysicWorld.solver.tolerance = 0.001; // Default is 0.001
+
 //Allow objects sleep => icrease performance
-// PhysicWorld.allowSleep = true;
+PhysicWorld.allowSleep = true;
 
 //Collision detction better than Naive
-// PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
+PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
 
 PhysicWorld.gravity.set(0, -8.92, 0);
 
@@ -414,13 +418,11 @@ Table.scale.x    = 8.28;
 Table.scale.y    = 0.3;
 Table.scale.z    = 18.51;
 
-// gui.add(Table.position, 'y', 3, 10).step(0.01)
-// gui.add(Table.position, 'z', -10, 10).step(0.01)
-// gui.add(Table.scale, 'x', 3, 20).step(0.01)
-// gui.add(Table.scale, 'y', 0, 20).step(0.01)
-// gui.add(Table.scale, 'z', 3, 20).step(0.01)
+gui.add(Table.position, 'x', -10, 20).step(0.01)
+gui.add(Table.position, 'y', -10, 20).step(0.01)
+gui.add(Table.position, 'z', -10, 20).step(0.01)
 
-// scene.add(Table);
+scene.add(Table);
 
 // add the table to Physic world 
 const TableShape = new cannon.Box(new cannon.Vec3(Table.scale.x / 2, Table.scale.y / 2, Table.scale.z / 2));
@@ -445,11 +447,11 @@ Net.position.y = 4.25;
 Net.position.z = 0.53;
 Net.scale.set(10.2, 1, 0.05)
 
-gui.add(Net.position, 'y', 3, 10).step(0.01)
-gui.add(Net.position, 'z', -10, 10).step(0.01)
-gui.add(Net.scale, 'x', 3, 20).step(0.01)
-gui.add(Net.scale, 'y', 0, 20).step(0.01)
-gui.add(Net.scale, 'z', 3, 20).step(0.01)
+// gui.add(Net.position, 'y', 3, 10).step(0.01)
+// gui.add(Net.position, 'z', -10, 10).step(0.01)
+// gui.add(Net.scale, 'x', 3, 20).step(0.01)
+// gui.add(Net.scale, 'y', 0, 20).step(0.01)
+// gui.add(Net.scale, 'z', 3, 20).step(0.01)
 
 // scene.add(Net);
 
@@ -499,7 +501,7 @@ window.addEventListener('mousemove', function (info) {
 }
 )
 document.addEventListener(
-    "keypress",
+    "keydown",
     (event) => {
       const keyName = event.key;
 
@@ -580,7 +582,8 @@ const tick = () =>
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
     
-    floor.position.copy(planeBody.position);
+    // floor.position.copy(planeBody.position);
+
     floor.quaternion.copy(planeBody.quaternion);
     
     // Table.position.copy(TableBody.position);
@@ -599,6 +602,8 @@ const tick = () =>
     }
     
     if (BallCreator.cameraFixed & Cameras.length === 2){
+        gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
+        // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
         Cameras[0].position.x = 0;
         Cameras[0].position.y = 5.8;
         Cameras[0].position.z = 12.8;
