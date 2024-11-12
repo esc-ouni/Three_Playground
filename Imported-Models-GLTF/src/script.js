@@ -27,11 +27,13 @@ floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
 
+
 // scene.add(floor)
+
+let Cameras = []
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.14)
 scene.add(ambientLight)
-
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
 directionalLight.castShadow = true
@@ -49,24 +51,36 @@ const sizes = {
     height: window.innerHeight
 }
 
-const camera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
-camera.position.set(-15, 4, 0)
-
 window.addEventListener('resize', () =>
 {
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
-    camera.aspect = sizes.width / (sizes.height)
-    camera.updateProjectionMatrix()
+    topCamera.aspect = sizes.width / (sizes.height / 2)
+    bottomCamera.aspect = sizes.width / (sizes.height / 2)
+    topCamera.updateProjectionMatrix()
+    bottomCamera.updateProjectionMatrix()
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
+const topCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
+topCamera.position.set(-15, 4, 0)
+scene.add(topCamera)
+
+Cameras.push(topCamera)
+
+const bottomCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
+bottomCamera.position.set(15, 4, 0)
+scene.add(bottomCamera)
+
+Cameras.push(bottomCamera)
 
 
-const topControls = new OrbitControls(camera, canvas)
+const topControls = new OrbitControls(topCamera, canvas)
 topControls.enableDamping = true
 
+const bottomControls = new OrbitControls(bottomCamera, canvas)
+bottomControls.enableDamping = true
 
 
 const renderer = new THREE.WebGLRenderer({
@@ -572,15 +586,27 @@ const tick = () =>
         // paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
     }
     
-    if (BallCreator.cameraFixed){
+    if (BallCreator.cameraFixed & Cameras.length === 2){
         // gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
         // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
-        camera.position.x = 0;
-        camera.position.y = 7.8;
-        camera.position.z = 12.8;
-        camera.position.x = 4 * mouse.x;
-        camera.position.y = 6.8 + ( 1 * mouse.y);
+        Cameras[0].position.x = 0;
+        Cameras[0].position.y = 7.8;
+        Cameras[0].position.z = 12.8;
         
+        
+        Cameras[0].position.x = 4 * mouse.x;
+        Cameras[0].position.y = 6.8 + ( 1 * mouse.y);
+        
+        // Cameras[0].lookAt(paddleAi.position);
+        // console.log(paddle.position);
+        
+        Cameras[1].position.x = 0;
+        Cameras[1].position.y = 7.8;
+        Cameras[1].position.z = -12.8;
+        
+        
+        Cameras[1].position.x = 5.5 * keyboard.x;
+        Cameras[1].position.y = 6.8 + ( 1 * keyboard.y);
 
         paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
@@ -638,13 +664,27 @@ const tick = () =>
     
     // Update controls
     topControls.update()
+    bottomControls.update()
     
     // Update debugger
     // cannonDebugger.update();
     
     // Render
-    renderer.render(scene, camera)
+    // renderer.render(scene, camera)
 
+    renderer.setScissorTest(true);
+
+    // Top half
+    renderer.setViewport(0, sizes.height / 2, sizes.width, sizes.height / 2);
+    renderer.setScissor(0, sizes.height / 2, sizes.width, sizes.height / 2);
+    renderer.render(scene, topCamera);
+
+    // Bottom half
+    renderer.setViewport(0, 0, sizes.width, sizes.height / 2);
+    renderer.setScissor(0, 0, sizes.width, sizes.height / 2);
+    renderer.render(scene, bottomCamera);
+
+    renderer.setScissorTest(false);
 
 
     // console.log(camera.position);
