@@ -51,26 +51,6 @@ const sizes = {
     height: window.innerHeight
 }
 
-// window.addEventListener('resize', () =>
-// {
-//     sizes.width = window.innerWidth
-//     sizes.height = window.innerHeight
-//     camera.aspect = sizes.width / sizes.height
-//     camera.updateProjectionMatrix()
-//     renderer.setSize(sizes.width, sizes.height)
-//     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-// })
-
-// const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-// camera.position.set(-15, 4, 0)
-// // camera.position.set(0, 5.81, 11.77)
-// // {x: -0.006796629480714592, y: 5.816349904903697, z: 11.774813465294566}
-// scene.add(camera)
-
-// const controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
-
-
 window.addEventListener('resize', () =>
 {
     sizes.width = window.innerWidth
@@ -273,7 +253,7 @@ const createSphere = (position, px, py, pz) => {
         
         sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
-        sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.2), sphereBody.position)
+        sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
     Objects.push({sphere, sphereBody})
@@ -391,14 +371,14 @@ BallCreator.reset = () => {
 
 BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 4
-    let y = 4.0387;
+    let y = 5.0387;
     let z = -8;
     
     createSphere(new THREE.Vector3(x, y, z), BallCreator.px, BallCreator.py, BallCreator.pz)
 }
-gui.add(BallCreator, 'px', -5, 5).step(0.1)
-gui.add(BallCreator, 'py', -5, 5).step(0.1)
-gui.add(BallCreator, 'pz', -5, 5).step(0.1)
+// gui.add(BallCreator, 'px', -5, 5).step(0.1)
+// gui.add(BallCreator, 'py', -5, 5).step(0.1)
+// gui.add(BallCreator, 'pz', -5, 5).step(0.1)
 
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
@@ -411,18 +391,19 @@ material.transparent = true;
 const Table          = new THREE.Mesh( geometry, material ); 
 Table.scale.set(3.3, 0.1, 3.3)
 
-Table.position.y = 3.7;
-Table.position.z = 0.48;
+Table.position.x = -0.01;
+Table.position.y = 4.15;
+Table.position.z = -0.06;
 
 Table.scale.x    = 8.28;
 Table.scale.y    = 0.3;
 Table.scale.z    = 18.51;
 
-gui.add(Table.position, 'x', -10, 20).step(0.01)
-gui.add(Table.position, 'y', -10, 20).step(0.01)
-gui.add(Table.position, 'z', -10, 20).step(0.01)
+// gui.add(Table.position, 'x', -10, 20).step(0.01)
+// gui.add(Table.position, 'y', -10, 20).step(0.01)
+// gui.add(Table.position, 'z', -10, 20).step(0.01)
 
-scene.add(Table);
+// scene.add(Table);
 
 // add the table to Physic world 
 const TableShape = new cannon.Box(new cannon.Vec3(Table.scale.x / 2, Table.scale.y / 2, Table.scale.z / 2));
@@ -501,41 +482,41 @@ window.addEventListener('mousemove', function (info) {
 }
 )
 document.addEventListener(
-    "keydown",
+    "keypress",
     (event) => {
       const keyName = event.key;
 
     //   console.log(keyboard.x, keyboard.y);
 
         if ( keyName === "w") {
-            keyboard.y += 0.05;
-            return ;
+            keyboard.y += 0.075;
+            // return ;
         }
         else if (keyName === "s"){
-            keyboard.y -= 0.05;
-            return ;
+            keyboard.y -= 0.075;
+            // return ;
         }
         else if (keyName === "d"){
-            keyboard.x -= 0.05;
-            return ;
+            keyboard.x -= 0.075;
+            // return ;
         }
         else if (keyName === "a"){
-            keyboard.x += 0.05; 
-            return ;       
+            keyboard.x += 0.075; 
+            // return ;       
         }
 
-        // if (keyboard.x > 0){
-        //     keyboard.x = Math.min(keyboard.x, 1);
-        // }
-        // else if (keyboard.x < 0){
-        //     keyboard.x = Math.max(keyboard.x, -1);
-        // }
-        // if (keyboard.y > 0){
-        //     keyboard.y = Math.min(keyboard.y, 1);
-        // }
-        // else if (keyboard.y < 0){
-        //     keyboard.y = Math.max(keyboard.y, -1);
-        // }
+        if (keyboard.x > 0){
+            keyboard.x = Math.min(keyboard.x, 1);
+        }
+        else if (keyboard.x < 0){
+            keyboard.x = Math.max(keyboard.x, -1);
+        }
+        if (keyboard.y > 0){
+            keyboard.y = Math.min(keyboard.y, 1);
+        }
+        else if (keyboard.y < 0){
+            keyboard.y = Math.max(keyboard.y, -1);
+        }
     } 
 )
 //Raycaster
@@ -547,9 +528,13 @@ document.addEventListener(
 //     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
 //     scene.background  = enviroment_map;
 //     scene.environment = enviroment_map;
+
+//     scene.backgroundBlurriness = 0.5; // Adjust this value between 0 (sharp) and 1 (very blurry)
+
+//     // Optionally, adjust the background intensity
+//     scene.backgroundIntensity = 0.007; // Adjust the brightne
 // })
-//
-// paddleAi.quaternion.copy(rotationOffset);
+
 
 scene.add(new THREE.AxesHelper(15))
 
@@ -602,35 +587,35 @@ const tick = () =>
     }
     
     if (BallCreator.cameraFixed & Cameras.length === 2){
-        gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
+        // gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
         // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
         Cameras[0].position.x = 0;
-        Cameras[0].position.y = 5.8;
+        Cameras[0].position.y = 7.8;
         Cameras[0].position.z = 12.8;
         
         
         Cameras[0].position.x = 4 * mouse.x;
-        Cameras[0].position.y = 5.8 + ( 1 * mouse.y);
+        Cameras[0].position.y = 6.8 + ( 1 * mouse.y);
         
         // Cameras[0].lookAt(paddleAi.position);
         // console.log(paddle.position);
         
         Cameras[1].position.x = 0;
-        Cameras[1].position.y = 5.8;
+        Cameras[1].position.y = 7.8;
         Cameras[1].position.z = -12.8;
         
         
-        Cameras[1].position.x = 4 * keyboard.x;
-        Cameras[1].position.y = 5.8 + ( 1 * keyboard.y);
+        Cameras[1].position.x = 5.5 * keyboard.x;
+        Cameras[1].position.y = 6.8 + ( 1 * keyboard.y);
 
-        paddle.position.x = 4 * mouse.x;
+        paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
-        paddle.position.y = 4.03 + (2 * mouse.y);
+        paddle.position.y = 5.03 + (2 * mouse.y);
         
         
-        paddleAi.position.x = 4 * keyboard.x;
+        paddleAi.position.x = 5.5 * keyboard.x;
         paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
-        paddleAi.position.y = 4.03 + (2 * keyboard.y);
+        paddleAi.position.y = 5.03 + (2 * keyboard.y);
         
         paddleBodyAi.position.copy(paddleAi.position);
         
@@ -655,6 +640,25 @@ const tick = () =>
                 ease: "power2.inOut",
             });
         }
+        
+        // if (paddleBodyAi.position.x >0){
+        //     gsap.to(paddleBodyAi.rotation, {
+        //         x: 2.81,
+        //         y: 6.28,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }
+        // else{
+        //     gsap.to(paddleBodyAi.rotation, {
+        //         x: 2.81,
+        //         y: 2.96,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }
 
     }
     
@@ -663,7 +667,7 @@ const tick = () =>
     bottomControls.update()
     
     // Update debugger
-    cannonDebugger.update();
+    // cannonDebugger.update();
     
     // Render
     // renderer.render(scene, camera)
