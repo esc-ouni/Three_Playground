@@ -27,7 +27,6 @@ floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
 
-
 // scene.add(floor)
 
 let Cameras = []
