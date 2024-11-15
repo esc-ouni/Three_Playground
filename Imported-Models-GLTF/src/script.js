@@ -181,22 +181,20 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
-const Pong_Ball_colide = (Collision) => {
-    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
+const Pong_Ball_colide = (impact) => {
     
-    hit_sound.volume = Math.min(strength, 1);
+    hit_sound.volume = Math.min(impact, 1);
     hit_sound.currentTime = 0;
     hit_sound.play();
 }
 
-const hit__sound = new Audio("/sounds/hit.mp3");
-const Hit__ = (Collision) => {
-    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
+// const hit__sound = new Audio("/sounds/hit.mp3");
+// const Hit__ = (Collision) => {
     
-    hit__sound.volume = Math.min(strength, 1);
-    hit__sound.currentTime = 0;
-    hit__sound.play();
-}
+//     hit__sound.volume = Math.min(strength, 1);
+//     hit__sound.currentTime = 0;
+//     hit__sound.play();
+// }
 
 const TextureLoader = new THREE.TextureLoader();
 const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
@@ -229,27 +227,9 @@ const createSphere = (position, px, py, pz) => {
             linearDamping: 0.05,
             angularDamping:0.05
         });
+    
         
-        sphereBody.addEventListener('collide', (event) => {
-            if (event.body === paddleBody) {
-                    console.log('contacted!');
-                    // sphereBody.force.setZero();
-                    sphereBody.applyForce(new cannon.Vec3(0, -0.9, -2.2), sphereBody.position)
-                    sphereBody.torque.setZero();
-                    sphereBody.velocity.set(0, 0, 0);
-            }
-            else if (event.body === paddleBodyAi) {
-                console.log('contacted!');
-                // sphereBody.force.setZero();
-                sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
-                sphereBody.torque.setZero();
-                sphereBody.velocity.set(0, 0, 0);
-            }
-        }
-        );
-        
-        
-        // sphereBody.addEventListener('collide', Pong_Ball_colide);
+        sphereBody.addEventListener('collide', () => {Pong_Ball_colide(0.5)});
         sphereBody.position.copy(sphere.position);
         sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
@@ -541,9 +521,9 @@ const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
 const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
 
 
-scene.add(paddleBoxHelper1);
-scene.add(paddleBoxHelper2);
-scene.add(paddleBoxHelper3);
+// scene.add(paddleBoxHelper1);
+// scene.add(paddleBoxHelper2);
+// scene.add(paddleBoxHelper3);
 
 
 
@@ -557,21 +537,23 @@ const updateHelper = () => {
 
 function checkCollision() {
     if (Objects.length){
-    // Update bounding boxes with the current positions of the models
-    paddleBoundingBox.setFromObject(paddle);
-    paddleBoundingAiBox.setFromObject(paddleAi);
-    ballBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
-
-    // Check for intersection between paddle and ball
+        // Update bounding boxes with the current positions of the models
+        paddleBoundingBox.setFromObject(paddle);
+        paddleBoundingAiBox.setFromObject(paddleAi);
+        ballBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
+        
+        // Check for intersection between paddle and ball
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
+            Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
-            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, -0.9, -2.2), Objects[Objects.length - 1].sphereBody.position)
         }
         else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
+            Pong_Ball_colide(0.7);
             console.log('paddleAi and ball!');
-            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), Objects[Objects.length - 1].sphereBody.position)
     
