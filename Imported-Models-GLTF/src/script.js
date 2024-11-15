@@ -137,24 +137,15 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         }
     })
 
-    const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
-    const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    mergedMesh.scale.copy(model.scale);
-    // scene.add(mergedMesh);
-
-    
-    paddle.rotation.x = 3.04;
-    paddle.rotation.y = 3.19;
-    paddle.rotation.z = 2.03;
+    const sphereRadius = 0.8;
+    const paddleShape = new cannon.Sphere(sphereRadius);
 
 
-    
-    
     paddleBody  = new cannon.Body({
         mass: 0,
         position: new cannon.Vec3().copy(paddle.position),
-        shape: threeToCannon(mergedMesh,{type: ShapeType.HULL}).shape,
-        material:PaddleMaterial,
+        shape: paddleShape,
+        // material:PaddleMaterial,
         linearDamping: 0.05,
         angularDamping:0.05
     })
@@ -165,18 +156,18 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddleBodyAi  = new cannon.Body({
         mass: 0,
         position: new cannon.Vec3().copy(paddleAi.position),
-        shape: threeToCannon(mergedMesh,{type: ShapeType.HULL}).shape,
-        material:PaddleMaterial,
+        shape: paddleShape,
+        // material:PaddleMaterial,
         linearDamping: 0.05,
         angularDamping:0.05
     })
     
     // paddleBodyAi = paddleBody.clone();
     
-    PhysicWorld.addBody(paddleBody);
+    // PhysicWorld.addBody(paddleBody);
     
     paddleBodyAi.position.z = -10;
-    PhysicWorld.addBody(paddleBodyAi);
+    // PhysicWorld.addBody(paddleBodyAi);
     
     // gui.add(paddleAi.rotation, 'x', 0, 2 * Math.PI).step(0.005)
     // gui.add(paddleAi.rotation, 'y', 0, 2 * Math.PI).step(0.005)
@@ -242,19 +233,23 @@ const createSphere = (position, px, py, pz) => {
         sphereBody.addEventListener('collide', (event) => {
             if (event.body === paddleBody) {
                     console.log('contacted!');
+                    // sphereBody.force.setZero();
+                    sphereBody.applyForce(new cannon.Vec3(0, -0.9, -2.2), sphereBody.position)
+                    sphereBody.torque.setZero();
                     sphereBody.velocity.set(0, 0, 0);
-                    sphereBody.applyForce(new cannon.Vec3(0, -0.8, -2.3), sphereBody.position)
             }
             else if (event.body === paddleBodyAi) {
                 console.log('contacted!');
+                // sphereBody.force.setZero();
+                sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
+                sphereBody.torque.setZero();
                 sphereBody.velocity.set(0, 0, 0);
-                sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.3), sphereBody.position)
             }
         }
         );
         
         
-        sphereBody.addEventListener('collide', Pong_Ball_colide);
+        // sphereBody.addEventListener('collide', Pong_Ball_colide);
         sphereBody.position.copy(sphere.position);
         sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
@@ -327,11 +322,11 @@ const PaddleBallContact = new cannon.ContactMaterial(
     }
 );
 
-PhysicWorld.addContactMaterial(BallContactMaterial)
-PhysicWorld.addContactMaterial(BallTableMaterial)
-PhysicWorld.addContactMaterial(PaddleBallContact)
-PhysicWorld.addContactMaterial(ContactMaterial)
-PhysicWorld.addContactMaterial(BallNetMaterial)
+PhysicWorld.addContactMaterial(BallTableMaterial) // ball table
+PhysicWorld.addContactMaterial(ContactMaterial) // floor
+// PhysicWorld.addContactMaterial(BallContactMaterial)
+// PhysicWorld.addContactMaterial(PaddleBallContact)
+// PhysicWorld.addContactMaterial(BallNetMaterial)
 
 //plane
 const planeShape = new cannon.Plane();
@@ -537,6 +532,52 @@ document.addEventListener(
 //     // Optionally, adjust the background intensity
 //     scene.backgroundIntensity = 0.007; // Adjust the brightne
 // })
+const paddleBoundingBox = new THREE.Box3();
+const paddleBoundingAiBox = new THREE.Box3();
+const ballBoundingBox = new THREE.Box3();
+
+const paddleBoxHelper1 = new THREE.Box3Helper(paddleBoundingBox, 0xff0000);
+const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
+const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
+
+
+scene.add(paddleBoxHelper1);
+scene.add(paddleBoxHelper2);
+scene.add(paddleBoxHelper3);
+
+
+
+// Function to update BoxHelper every frame
+const updateHelper = () => {
+
+    paddleBoxHelper1.update(); // Update the BoxHelper to match the object's bounding box
+    paddleBoxHelper2.update(); // Update the BoxHelper to match the object's bounding box
+    paddleBoxHelper3.update(); // Update the BoxHelper to match the object's bounding box
+};
+
+function checkCollision() {
+    if (Objects.length){
+    // Update bounding boxes with the current positions of the models
+    paddleBoundingBox.setFromObject(paddle);
+    paddleBoundingAiBox.setFromObject(paddleAi);
+    ballBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
+
+    // Check for intersection between paddle and ball
+        if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
+            console.log('paddle and ball!');
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, -0.9, -2.2), Objects[Objects.length - 1].sphereBody.position)
+        }
+        else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
+            console.log('paddleAi and ball!');
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), Objects[Objects.length - 1].sphereBody.position)
+    
+        }
+    }
+}
 
 
 scene.add(new THREE.AxesHelper(15))
@@ -570,7 +611,12 @@ const tick = () =>
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
     
-    // floor.position.copy(planeBody.position);
+
+    TableBody.position.x = Table.position.x;
+    TableBody.position.y = Table.position.y;
+    TableBody.position.z = Table.position.z;
+
+    floor.position.copy(planeBody.position);
 
     floor.quaternion.copy(planeBody.quaternion);
     
@@ -585,11 +631,13 @@ const tick = () =>
     if (Objects.length && paddleAi){
         // paddleAi.position.copy(paddleBodyAi.position);
         // paddleAi.quaternion.copy(paddleBodyAi.quaternion);
-        // paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
-        // paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
+        paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
+        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
     }
     
     if (BallCreator.cameraFixed){
+        checkCollision();
+        // updateHelper();
         // gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
         // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
         camera.position.x = 0;
@@ -604,11 +652,11 @@ const tick = () =>
         paddle.position.y = 5.03 + (2 * mouse.y);
         
         
-        paddleAi.position.x = 5.5 * keyboard.x;
-        paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
-        paddleAi.position.y = 5.03 + (2 * keyboard.y);
+        // paddleAi.position.x = 5.5 * keyboard.x;
+        // paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
+        // paddleAi.position.y = 5.03 + (2 * keyboard.y);
         
-        paddleBodyAi.position.copy(paddleAi.position);
+        paddleBodyAi.position.copy(paddle.position);
         
 
 
@@ -632,32 +680,13 @@ const tick = () =>
             });
         }
         
-        // if (paddleBodyAi.position.x >0){
-        //     gsap.to(paddleBodyAi.rotation, {
-        //         x: 2.81,
-        //         y: 6.28,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-        // else{
-        //     gsap.to(paddleBodyAi.rotation, {
-        //         x: 2.81,
-        //         y: 2.96,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-
     }
     
     // Update controls
     topControls.update()
     
     // Update debugger
-    // cannonDebugger.update();
+    cannonDebugger.update();
     
     // Render
     renderer.render(scene, camera)
