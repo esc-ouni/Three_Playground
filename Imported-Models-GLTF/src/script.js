@@ -145,7 +145,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         mass: 0,
         position: new cannon.Vec3().copy(paddle.position),
         shape: paddleShape,
-        // material:PaddleMaterial,
+        material:PaddleMaterial,
         linearDamping: 0.05,
         angularDamping:0.05
     })
@@ -157,7 +157,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         mass: 0,
         position: new cannon.Vec3().copy(paddleAi.position),
         shape: paddleShape,
-        // material:PaddleMaterial,
+        material:PaddleMaterial,
         linearDamping: 0.05,
         angularDamping:0.05
     })
@@ -231,7 +231,8 @@ const createSphere = (position, px, py, pz) => {
         
         sphereBody.addEventListener('collide', () => {Pong_Ball_colide(0.5)});
         sphereBody.position.copy(sphere.position);
-        sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
+        // sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
+        sphereBody.applyForce(new cannon.Vec3(0, 0.4, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
     Objects.push({sphere, sphereBody})
@@ -297,16 +298,16 @@ const PaddleBallContact = new cannon.ContactMaterial(
     plasticMaterial,
     PaddleMaterial,
     {
-        friction: 0.1,   
-        restitution: 0.9
+        friction: 0,   
+        restitution: 0
     }
 );
 
 PhysicWorld.addContactMaterial(BallTableMaterial) // ball table
 PhysicWorld.addContactMaterial(ContactMaterial) // floor
-// PhysicWorld.addContactMaterial(BallContactMaterial)
-// PhysicWorld.addContactMaterial(PaddleBallContact)
-// PhysicWorld.addContactMaterial(BallNetMaterial)
+PhysicWorld.addContactMaterial(BallContactMaterial)
+PhysicWorld.addContactMaterial(PaddleBallContact)
+PhysicWorld.addContactMaterial(BallNetMaterial)
 
 //plane
 const planeShape = new cannon.Plane();
@@ -521,9 +522,9 @@ const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
 const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
 
 
-// scene.add(paddleBoxHelper1);
-// scene.add(paddleBoxHelper2);
-// scene.add(paddleBoxHelper3);
+scene.add(paddleBoxHelper1);
+scene.add(paddleBoxHelper2);
+scene.add(paddleBoxHelper3);
 
 
 
@@ -546,16 +547,16 @@ function checkCollision() {
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
             Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
-            // Objects[Objects.length - 1].sphereBody.torque.setZero();
-            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, -0.9, -2.2), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 1, 0);
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.5, -3), Objects[Objects.length - 1].sphereBody.position)
         }
         else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
             Pong_Ball_colide(0.7);
             console.log('paddleAi and ball!');
-            // Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), Objects[Objects.length - 1].sphereBody.position)
     
         }
     }
@@ -668,7 +669,7 @@ const tick = () =>
     topControls.update()
     
     // Update debugger
-    cannonDebugger.update();
+    // cannonDebugger.update();
     
     // Render
     renderer.render(scene, camera)
