@@ -513,9 +513,9 @@ document.addEventListener(
 //     // Optionally, adjust the background intensity
 //     scene.backgroundIntensity = 0.007; // Adjust the brightne
 // })
-const paddleBoundingBox = new THREE.Box3();
+const paddleBoundingBox   = new THREE.Box3();
 const paddleBoundingAiBox = new THREE.Box3();
-const ballBoundingBox = new THREE.Box3();
+const ballBoundingBox     = new THREE.Box3();
 
 const paddleBoxHelper1 = new THREE.Box3Helper(paddleBoundingBox, 0xff0000);
 const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
@@ -530,7 +530,7 @@ scene.add(paddleBoxHelper3);
 
 // Function to update BoxHelper every frame
 const updateHelper = () => {
-
+    
     paddleBoxHelper1.update(); // Update the BoxHelper to match the object's bounding box
     paddleBoxHelper2.update(); // Update the BoxHelper to match the object's bounding box
     paddleBoxHelper3.update(); // Update the BoxHelper to match the object's bounding box
@@ -547,16 +547,17 @@ function checkCollision() {
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
             Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
+            paddle.position.x -= 0.5;
             Objects[Objects.length - 1].sphereBody.torque.setZero();
-            Objects[Objects.length - 1].sphereBody.velocity.set(0, 1, 0);
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.5, -3), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
         }
         else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
             Pong_Ball_colide(0.7);
             console.log('paddleAi and ball!');
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
     
         }
     }
