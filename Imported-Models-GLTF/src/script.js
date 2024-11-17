@@ -5,8 +5,6 @@ import * as cannon from 'cannon'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
-import { threeToCannon, ShapeType } from 'three-to-cannon';
-import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 const gui = new GUI()
@@ -522,9 +520,9 @@ const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
 const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
 
 
-scene.add(paddleBoxHelper1);
-scene.add(paddleBoxHelper2);
-scene.add(paddleBoxHelper3);
+// scene.add(paddleBoxHelper1);
+// scene.add(paddleBoxHelper2);
+// scene.add(paddleBoxHelper3);
 
 
 
