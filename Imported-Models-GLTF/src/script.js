@@ -635,19 +635,19 @@ const tick = () =>
         // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
 
         if ( Chained_Keys.w === 1) {
-            keyboard.y += 0.01;
+            keyboard.y += 0.03;
             // return ;
         }
         else if (Chained_Keys.s === 1){
-            keyboard.y -= 0.01;
+            keyboard.y -= 0.03;
             // return ;
         }
         else if (Chained_Keys.d === 1){
-            keyboard.x -= 0.01;
+            keyboard.x -= 0.03;
             // return ;
         }
         else if (Chained_Keys.a === 1){
-            keyboard.x += 0.01; 
+            keyboard.x += 0.03; 
             // return ;       
         }
 
@@ -718,24 +718,24 @@ const tick = () =>
         
 
 
-        // if (paddleBodyAi.position.x >0){
-        //     gsap.to(paddleBodyAi.rotation, {
-        //         x: 2.81,
-        //         y: 6.28,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-        // else{
-        //     gsap.to(paddleBodyAi.rotation, {
-        //         x: 2.81,
-        //         y: 2.96,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
+        if (paddleBodyAi.position.x >0){
+            gsap.to(paddleBodyAi.rotation, {
+                x: 2.81,
+                y: 6.28,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddleBodyAi.rotation, {
+                x: 2.81,
+                y: 2.96,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
 
     }
     
