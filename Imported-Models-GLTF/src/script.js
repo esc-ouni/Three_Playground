@@ -401,9 +401,9 @@ PhysicWorld.addBody(TableBody);
 //Net
 const Net = new THREE.Mesh( geometry, material ); 
 Net.position.x = 0;
-Net.position.y = 4.25;
-Net.position.z = 0.53;
-Net.scale.set(10.2, 1, 0.05)
+Net.position.y = 4.66;
+Net.position.z = -0.02;
+Net.scale.set(10.29, 1, 0.05)
 
 // gui.add(Net.position, 'y', 3, 10).step(0.01)
 // gui.add(Net.position, 'z', -10, 10).step(0.01)
@@ -413,22 +413,6 @@ Net.scale.set(10.2, 1, 0.05)
 
 // scene.add(Net);
 
-
-const NetShape = new cannon.Box(new cannon.Vec3(Net.scale.x / 2, Net.scale.y / 2, Net.scale.z / 2));
-const NetBody  = new cannon.Body({
-    mass: 0,
-    position: new cannon.Vec3().copy(Net.position),
-    shape: NetShape,
-    material:NetMaterial,
-    quaternion:Net.quaternion,
-    linearDamping: 0.05, // Simulate air resistance
-    angularDamping:0.05 // Simulate rotational resistance
-})
-NetBody.position.x = Net.position.x;
-NetBody.position.y = Net.position.y;
-NetBody.position.z = Net.position.z;
-
-// PhysicWorld.addBody(NetBody);
 
 const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
     color: 0xff0000, // Optional: Color of the debug visuals
@@ -514,15 +498,18 @@ document.addEventListener(
 const paddleBoundingBox   = new THREE.Box3();
 const paddleBoundingAiBox = new THREE.Box3();
 const ballBoundingBox     = new THREE.Box3();
+const NetBoundingBox      = new THREE.Box3();
 
 const paddleBoxHelper1 = new THREE.Box3Helper(paddleBoundingBox, 0xff0000);
 const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
 const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
+const NetHelper3       = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
 
 
 // scene.add(paddleBoxHelper1);
 // scene.add(paddleBoxHelper2);
 // scene.add(paddleBoxHelper3);
+// scene.add(NetHelper3);
 
 
 
@@ -540,6 +527,7 @@ function checkCollision() {
         paddleBoundingBox.setFromObject(paddle);
         paddleBoundingAiBox.setFromObject(paddleAi);
         ballBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
+        NetBoundingBox.setFromObject(Net)
         
         // Check for intersection between paddle and ball
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
@@ -556,7 +544,18 @@ function checkCollision() {
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
-    
+            
+        }
+        else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
+            console.log('ball collided with the Net!');
+
+            // Objects[Objects.length - 1].sphereBody.torque.setZero();
+            // console.log(Objects[Objects.length - 1].sphereBody.velocity.x);
+            // console.log(Objects[Objects.length - 1].sphereBody.velocity.z);
+            // console.log(Objects[Objects.length - 1].sphereBody.velocity.y);
+            // setTimeout(()=>{}, 999999)
+
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z)/ 4));
         }
     }
 }
