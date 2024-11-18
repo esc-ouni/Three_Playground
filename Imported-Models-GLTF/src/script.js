@@ -442,59 +442,25 @@ window.addEventListener('mousemove', function (info) {
     // console.log(mouse.x, mouse.y);
 }
 )
-document.addEventListener(
-    "keypress",
-    (event) => {
-      const keyName = event.key;
-
-    //   console.log(keyboard.x, keyboard.y);
-
-        if ( keyName === "w") {
-            keyboard.y += 0.075;
-            // return ;
-        }
-        else if (keyName === "s"){
-            keyboard.y -= 0.075;
-            // return ;
-        }
-        else if (keyName === "d"){
-            keyboard.x -= 0.075;
-            // return ;
-        }
-        else if (keyName === "a"){
-            keyboard.x += 0.075; 
-            // return ;       
-        }
-
-        if (keyboard.x > 0){
-            keyboard.x = Math.min(keyboard.x, 1);
-        }
-        else if (keyboard.x < 0){
-            keyboard.x = Math.max(keyboard.x, -1);
-        }
-        if (keyboard.y > 0){
-            keyboard.y = Math.min(keyboard.y, 1);
-        }
-        else if (keyboard.y < 0){
-            keyboard.y = Math.max(keyboard.y, -1);
-        }
-    } 
-)
 
 
 
-//enviroment map
-// const rgbeLoader = new RGBELoader();
-// rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
-//     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
-//     scene.background  = enviroment_map;
-//     scene.environment = enviroment_map;
 
-//     scene.backgroundBlurriness = 0.5; // Adjust this value between 0 (sharp) and 1 (very blurry)
+// enviroment map
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
+    enviroment_map.mapping = THREE.EquirectangularReflectionMapping
+    scene.background  = enviroment_map;
+    scene.environment = enviroment_map;
 
-//     // Optionally, adjust the background intensity
-//     scene.backgroundIntensity = 0.007; // Adjust the brightne
-// })
+    scene.backgroundBlurriness = 0.5; // Adjust this value between 0 (sharp) and 1 (very blurry)
+    scene.environmentIntensity = 0.01;
+
+
+    // Optionally, adjust the background intensity
+    scene.backgroundIntensity = 0.007; // Adjust the brightne
+})
+
 const paddleBoundingBox   = new THREE.Box3();
 const paddleBoundingAiBox = new THREE.Box3();
 const ballBoundingBox     = new THREE.Box3();
@@ -555,7 +521,7 @@ function checkCollision() {
             // console.log(Objects[Objects.length - 1].sphereBody.velocity.y);
             // setTimeout(()=>{}, 999999)
 
-            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z)/ 4));
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z)));
         }
     }
 }
