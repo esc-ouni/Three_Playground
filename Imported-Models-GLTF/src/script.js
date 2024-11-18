@@ -521,7 +521,7 @@ function checkCollision() {
             // console.log(Objects[Objects.length - 1].sphereBody.velocity.y);
             // setTimeout(()=>{}, 999999)
 
-            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z)));
+            // Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z))); //to be rechecked !
         }
     }
 }
