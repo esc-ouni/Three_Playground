@@ -481,44 +481,44 @@ window.addEventListener('mousemove', function (info) {
     // console.log(mouse.x, mouse.y);
 }
 )
-document.addEventListener(
-    "keypress",
-    (event) => {
-      const keyName = event.key;
+// document.addEventListener(
+//     "keypress",
+//     (event) => {
+//       const keyName = event.key;
 
-    //   console.log(keyboard.x, keyboard.y);
+//     //   console.log(keyboard.x, keyboard.y);
 
-        if ( keyName === "w") {
-            keyboard.y += 0.075;
-            // return ;
-        }
-        else if (keyName === "s"){
-            keyboard.y -= 0.075;
-            // return ;
-        }
-        else if (keyName === "d"){
-            keyboard.x -= 0.075;
-            // return ;
-        }
-        else if (keyName === "a"){
-            keyboard.x += 0.075; 
-            // return ;       
-        }
+//         if ( keyName === "w") {
+//             keyboard.y += 0.075;
+//             // return ;
+//         }
+//         else if (keyName === "s"){
+//             keyboard.y -= 0.075;
+//             // return ;
+//         }
+//         else if (keyName === "d"){
+//             keyboard.x -= 0.075;
+//             // return ;
+//         }
+//         else if (keyName === "a"){
+//             keyboard.x += 0.075; 
+//             // return ;       
+//         }
 
-        if (keyboard.x > 0){
-            keyboard.x = Math.min(keyboard.x, 1);
-        }
-        else if (keyboard.x < 0){
-            keyboard.x = Math.max(keyboard.x, -1);
-        }
-        if (keyboard.y > 0){
-            keyboard.y = Math.min(keyboard.y, 1);
-        }
-        else if (keyboard.y < 0){
-            keyboard.y = Math.max(keyboard.y, -1);
-        }
-    } 
-)
+//         if (keyboard.x > 0){
+//             keyboard.x = Math.min(keyboard.x, 1);
+//         }
+//         else if (keyboard.x < 0){
+//             keyboard.x = Math.max(keyboard.x, -1);
+//         }
+//         if (keyboard.y > 0){
+//             keyboard.y = Math.min(keyboard.y, 1);
+//         }
+//         else if (keyboard.y < 0){
+//             keyboard.y = Math.max(keyboard.y, -1);
+//         }
+//     } 
+// )
 
 let Chained_Keys = [
     {w:0},
@@ -633,6 +633,37 @@ const tick = () =>
     if (BallCreator.cameraFixed & Cameras.length === 2){
         // gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
         // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
+
+        if ( Chained_Keys.w === 1) {
+            keyboard.y += 0.01;
+            // return ;
+        }
+        else if (Chained_Keys.s === 1){
+            keyboard.y -= 0.01;
+            // return ;
+        }
+        else if (Chained_Keys.d === 1){
+            keyboard.x -= 0.01;
+            // return ;
+        }
+        else if (Chained_Keys.a === 1){
+            keyboard.x += 0.01; 
+            // return ;       
+        }
+
+        if (keyboard.x > 0){
+            keyboard.x = Math.min(keyboard.x, 1);
+        }
+        else if (keyboard.x < 0){
+            keyboard.x = Math.max(keyboard.x, -1);
+        }
+        if (keyboard.y > 0){
+            keyboard.y = Math.min(keyboard.y, 1);
+        }
+        else if (keyboard.y < 0){
+            keyboard.y = Math.max(keyboard.y, -1);
+        }
+        
         Cameras[0].position.x = 0;
         Cameras[0].position.y = 7.8;
         Cameras[0].position.z = 12.8;
@@ -686,35 +717,7 @@ const tick = () =>
         }
         
 
-        if ( Chained_Keys.w === 1) {
-            keyboard.y += 1;
-            // return ;
-        }
-        else if (Chained_Keys.s === 1){
-            keyboard.y -= 1;
-            // return ;
-        }
-        else if (Chained_Keys.d === 1){
-            keyboard.x -= 1;
-            // return ;
-        }
-        else if (Chained_Keys.d === 1){
-            keyboard.x += 1; 
-            // return ;       
-        }
 
-        if (keyboard.x > 0){
-            keyboard.x = Math.min(keyboard.x, 1);
-        }
-        else if (keyboard.x < 0){
-            keyboard.x = Math.max(keyboard.x, -1);
-        }
-        if (keyboard.y > 0){
-            keyboard.y = Math.min(keyboard.y, 1);
-        }
-        else if (keyboard.y < 0){
-            keyboard.y = Math.max(keyboard.y, -1);
-        }
         // if (paddleBodyAi.position.x >0){
         //     gsap.to(paddleBodyAi.rotation, {
         //         x: 2.81,
