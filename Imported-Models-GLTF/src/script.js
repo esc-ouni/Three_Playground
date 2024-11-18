@@ -520,20 +520,64 @@ document.addEventListener(
     } 
 )
 
+let Chained_Keys = [
+    {w:0},
+    {d:0},
+    {s:0},
+    {a:0},
+]
 
 
-//enviroment map
-// const rgbeLoader = new RGBELoader();
-// rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
-//     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
-//     scene.background  = enviroment_map;
-//     scene.environment = enviroment_map;
+document.addEventListener(
+    "keydown",
+    (event) => {
+      const keyName = event.key;
 
-//     scene.backgroundBlurriness = 0.5; // Adjust this value between 0 (sharp) and 1 (very blurry)
+    //   console.log(keyboard.x, keyboard.y);
 
-//     // Optionally, adjust the background intensity
-//     scene.backgroundIntensity = 0.007; // Adjust the brightne
-// })
+    
+
+    if ( keyName === "w") {
+        Chained_Keys.w = 1;
+        return ;
+    }
+    else if (keyName === "s"){
+        Chained_Keys.s = 1;
+        return ;
+    }
+    else if (keyName === "d"){
+        Chained_Keys.d = 1;
+        return ;
+    }
+    else if (keyName === "a"){
+        Chained_Keys.a = 1;
+        return ;       
+    }}
+)
+
+document.addEventListener(
+    "keyup",
+    (event) => {
+      const keyName = event.key;
+
+    //   console.log(keyboard.x, keyboard.y);
+    if ( keyName === "w") {
+        Chained_Keys.w = 0;
+        return ;
+    }
+    else if (keyName === "s"){
+        Chained_Keys.s = 0;
+        return ;
+    }
+    else if (keyName === "d"){
+        Chained_Keys.d = 0;
+        return ;
+    }
+    else if (keyName === "a"){
+        Chained_Keys.a = 0;
+        return ;       
+    }}
+)
 
 
 scene.add(new THREE.AxesHelper(15))
@@ -641,6 +685,36 @@ const tick = () =>
             });
         }
         
+
+        if ( Chained_Keys.w === 1) {
+            keyboard.y += 1;
+            // return ;
+        }
+        else if (Chained_Keys.s === 1){
+            keyboard.y -= 1;
+            // return ;
+        }
+        else if (Chained_Keys.d === 1){
+            keyboard.x -= 1;
+            // return ;
+        }
+        else if (Chained_Keys.d === 1){
+            keyboard.x += 1; 
+            // return ;       
+        }
+
+        if (keyboard.x > 0){
+            keyboard.x = Math.min(keyboard.x, 1);
+        }
+        else if (keyboard.x < 0){
+            keyboard.x = Math.max(keyboard.x, -1);
+        }
+        if (keyboard.y > 0){
+            keyboard.y = Math.min(keyboard.y, 1);
+        }
+        else if (keyboard.y < 0){
+            keyboard.y = Math.max(keyboard.y, -1);
+        }
         // if (paddleBodyAi.position.x >0){
         //     gsap.to(paddleBodyAi.rotation, {
         //         x: 2.81,
