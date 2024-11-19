@@ -501,18 +501,19 @@ function checkCollision() {
             console.log('paddle and ball!');
 
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
-            const forceX = 0.4 * hitDirection;
+            let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
+            // forceX = (Math.random() - 0.5);
             
             // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
         
-            const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
-            gsap.to(paddle.position, {
-                x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
-                duration: 0.1,
-                ease: "power1.out"
-            });
+            // const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
+            // gsap.to(paddle.position, {
+            //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
+            //     duration: 0.1,
+            //     ease: "power1.out"
+            // });
 
         }
         else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
@@ -520,7 +521,8 @@ function checkCollision() {
             console.log('paddleAi and ball!');
             
             const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
-            const forceX = 0.4 * hitDirection;
+            let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
+            // forceX = (Math.random() - 0.5);
 
             // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
