@@ -506,6 +506,14 @@ function checkCollision() {
             // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
+        
+            const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
+            gsap.to(paddle.position, {
+                x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
+                duration: 0.1,
+                ease: "power1.out"
+            });
+
         }
         else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
             Pong_Ball_colide(0.7);
@@ -518,6 +526,12 @@ function checkCollision() {
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
             
+            const paddlePushbackDistance = 0.3; // How much the AI paddle moves back upon impact
+            gsap.to(paddleAi.position, {
+                x: paddleAi.position.x + (hitDirection * -paddlePushbackDistance),
+                duration: 0.1,
+                ease: "power1.out"
+            });
         }
         else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
             console.log('ball collided with the Net!');
@@ -545,22 +559,22 @@ const tick = () =>
     previousTime = elapsedTime
     
     // Synchronize the physics body with the paddle mesh
-    if (paddleBody != null && paddle != null) {
-        // Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
+    // if (paddleBody != null && paddle != null) {
+    //     // Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
 
-        paddleBody.position.copy(paddle.position);
+    //     paddleBody.position.copy(paddle.position);
         
-        paddleQuat.copy(paddle.quaternion);
+    //     paddleQuat.copy(paddle.quaternion);
         
-        paddleQuat = paddleQuat.mult(rotationOffset);
+    //     paddleQuat = paddleQuat.mult(rotationOffset);
         
-        paddleBody.quaternion.copy(paddleQuat);
+    //     paddleBody.quaternion.copy(paddleQuat);
         
 
-        // paddleBodyAi.position.copy(paddleAi.position);
+    //     // paddleBodyAi.position.copy(paddleAi.position);
         
-        paddleBodyAi.quaternion.copy(rotationOffset);
-    }
+    //     paddleBodyAi.quaternion.copy(rotationOffset);
+    // }
     
     // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
