@@ -51,11 +51,11 @@ scene.add(ambientLight)
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far    = 300
-directionalLight.shadow.camera.left   = - 20
-directionalLight.shadow.camera.top    = 20
-directionalLight.shadow.camera.right  = 20
-directionalLight.shadow.camera.bottom = - 20
+// directionalLight.shadow.camera.far    = 300
+// directionalLight.shadow.camera.left   = - 20
+// directionalLight.shadow.camera.top    = 20
+// directionalLight.shadow.camera.right  = 20
+// directionalLight.shadow.camera.bottom = - 20
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
 
@@ -80,21 +80,6 @@ window.addEventListener('resize', () =>
     // camera.position.set(0, 5.81, 11.77)
     // {x: -0.006796629480714592, y: 5.816349904903697, z: 11.774813465294566}
     scene.add(camera)
-
-// const camera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
-// camera.position.set(-15, 4, 0)
-
-// window.addEventListener('resize', () =>
-// {
-//     sizes.width = window.innerWidth
-//     sizes.height = window.innerHeight
-//     camera.aspect = sizes.width / (sizes.height)
-//     camera.updateProjectionMatrix()
-//     renderer.setSize(sizes.width, sizes.height)
-//     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-// })
-
-
 
 const topControls = new OrbitControls(camera, canvas)
 topControls.enableDamping = true
@@ -133,8 +118,8 @@ const geometries = []
 
 let paddle = null;
 let paddleAi = null;
-let paddleBody = null;
-let paddleBodyAi = null;
+
+
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
     paddle = model;
@@ -152,41 +137,9 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         }
     })
 
-    const sphereRadius = 0.8;
-    const paddleShape = new cannon.Sphere(sphereRadius);
-
-
-    paddleBody  = new cannon.Body({
-        mass: 0,
-        position: new cannon.Vec3().copy(paddle.position),
-        shape: paddleShape,
-        material:PaddleMaterial,
-        linearDamping: 0.05,
-        angularDamping:0.05
-    })
-    
     paddleAi = paddle.clone();
+
     paddleAi.position.z = -10;
-    
-    paddleBodyAi  = new cannon.Body({
-        mass: 0,
-        position: new cannon.Vec3().copy(paddleAi.position),
-        shape: paddleShape,
-        material:PaddleMaterial,
-        linearDamping: 0.05,
-        angularDamping:0.05
-    })
-    
-    // paddleBodyAi = paddleBody.clone();
-    
-    // PhysicWorld.addBody(paddleBody);
-    
-    paddleBodyAi.position.z = -10;
-    // PhysicWorld.addBody(paddleBodyAi);
-    
-    // gui.add(paddleAi.rotation, 'x', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddleAi.rotation, 'y', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddleAi.rotation, 'z', 0, 2 * Math.PI).step(0.005)
     
     paddleAi.rotation.set(0, 0, 0);
 
@@ -202,14 +155,6 @@ const Pong_Ball_colide = (impact) => {
     hit_sound.currentTime = 0;
     hit_sound.play();
 }
-
-// const hit__sound = new Audio("/sounds/hit.mp3");
-// const Hit__ = (Collision) => {
-    
-//     hit__sound.volume = Math.min(strength, 1);
-//     hit__sound.currentTime = 0;
-//     hit__sound.play();
-// }
 
 const TextureLoader = new THREE.TextureLoader();
 const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
@@ -246,7 +191,7 @@ const createSphere = (position, px, py, pz) => {
         
         sphereBody.addEventListener('collide', () => {Pong_Ball_colide(0.5)});
         sphereBody.position.copy(sphere.position);
-        // sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
+
         sphereBody.applyForce(new cannon.Vec3(0, 0.4, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
@@ -256,10 +201,6 @@ const createSphere = (position, px, py, pz) => {
 const PhysicWorld = new cannon.World();
 
 
-PhysicWorld.solver.iterations = 10; // Default is 10
-PhysicWorld.solver.tolerance = 0.001; // Default is 0.001
-
-//Allow objects sleep => icrease performance
 PhysicWorld.allowSleep = true;
 
 //Collision detction better than Naive
@@ -313,16 +254,16 @@ const PaddleBallContact = new cannon.ContactMaterial(
     plasticMaterial,
     PaddleMaterial,
     {
-        friction: 0,   
-        restitution: 0
+        friction: 0.5,   
+        restitution: 0.7
     }
 );
 
 PhysicWorld.addContactMaterial(BallTableMaterial) // ball table
 PhysicWorld.addContactMaterial(ContactMaterial) // floor
-PhysicWorld.addContactMaterial(BallContactMaterial)
+// PhysicWorld.addContactMaterial(BallContactMaterial)
 PhysicWorld.addContactMaterial(PaddleBallContact)
-PhysicWorld.addContactMaterial(BallNetMaterial)
+// PhysicWorld.addContactMaterial(BallNetMaterial)
 
 //plane
 const planeShape = new cannon.Plane();
@@ -518,20 +459,19 @@ function checkCollision() {
             console.log('paddle and ball!');
 
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
-            let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
-            // forceX = (Math.random() - 0.5);
+            let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
             
             // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
-        
+            
             // const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
             // gsap.to(paddle.position, {
             //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
             //     duration: 0.1,
             //     ease: "power1.out"
-            // });
-
+            // }); // to be added in latter
+            
         }
         else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
             Pong_Ball_colide(0.7);
@@ -539,35 +479,21 @@ function checkCollision() {
             
             const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
-            // forceX = (Math.random() - 0.5);
 
             // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
             
-            const paddlePushbackDistance = 0.3; // How much the AI paddle moves back upon impact
-            gsap.to(paddleAi.position, {
-                x: paddleAi.position.x + (hitDirection * -paddlePushbackDistance),
-                duration: 0.1,
-                ease: "power1.out"
-            });
         }
         else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
             console.log('ball collided with the Net!');
-
-            // Objects[Objects.length - 1].sphereBody.torque.setZero();
-            // console.log(Objects[Objects.length - 1].sphereBody.velocity.x);
-            // console.log(Objects[Objects.length - 1].sphereBody.velocity.z);
-            // console.log(Objects[Objects.length - 1].sphereBody.velocity.y);
-            // setTimeout(()=>{}, 999999)
-
             // Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z))); //to be rechecked !
         }
     }
 }
 
-
-scene.add(new THREE.AxesHelper(15))
+// scene.add(new THREE.GridHelper( 50, 50 ))
+// scene.add(new THREE.AxesHelper(15))
 
 gui.add(BallCreator, 'cameraFixed');
 
@@ -576,26 +502,7 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
-    
-    // Synchronize the physics body with the paddle mesh
-    // if (paddleBody != null && paddle != null) {
-    //     // Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
 
-    //     paddleBody.position.copy(paddle.position);
-        
-    //     paddleQuat.copy(paddle.quaternion);
-        
-    //     paddleQuat = paddleQuat.mult(rotationOffset);
-        
-    //     paddleBody.quaternion.copy(paddleQuat);
-        
-
-    //     // paddleBodyAi.position.copy(paddleAi.position);
-        
-    //     paddleBodyAi.quaternion.copy(rotationOffset);
-    // }
-    
-    // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
     
 
@@ -616,17 +523,13 @@ const tick = () =>
     }
     
     if (Objects.length && paddleAi){
-        // paddleAi.position.copy(paddleBodyAi.position);
-        // paddleAi.quaternion.copy(paddleBodyAi.quaternion);
         paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
         paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
     }
     
     if (BallCreator.cameraFixed){
         checkCollision();
-        // updateHelper();
-        // gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
-        // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
+
         camera.position.x = 0;
         camera.position.y = 7.8;
         camera.position.z = 12.8;
@@ -643,11 +546,8 @@ const tick = () =>
         // paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
         // paddleAi.position.y = 5.03 + (2 * keyboard.y);
         
-        paddleBodyAi.position.copy(paddle.position);
+        // paddleBodyAi.position.copy(paddle.position);
         
-
-
-
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
                 x: 2.81,
@@ -669,27 +569,11 @@ const tick = () =>
         
     }
     
-    // Update controls
     topControls.update()
     
-    // Update debugger
-    // cannonDebugger.update();
-    
-    // Render
     renderer.render(scene, camera)
 
-
-
-    // console.log(camera.position);
-
-    // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
 
 tick()
-
-
-// -0.0394104840668026 5.451454332183686
-
-// 3.9495296465566594 5.224859320767735
-// -4.253731684360619 5.80444415426392
