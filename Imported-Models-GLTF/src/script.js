@@ -7,6 +7,24 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
+
+
+
+
+
+const loadingScreen = document.getElementById('loading-screen');
+
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onLoad = function () {
+    gsap.to(loadingScreen, { opacity: 0, duration: 1, onComplete: () => {
+        loadingScreen.style.display = 'none';
+    }});
+};
+
+
+
+
 const gui = new GUI()
 
 const canvas = document.querySelector('canvas.webgl')
@@ -93,7 +111,7 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 //GLTF Loading
-const GLTFLoaderr = new GLTFLoader(); 
+const GLTFLoaderr = new GLTFLoader(loadingManager); 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.5, 1.5, 1.5)
