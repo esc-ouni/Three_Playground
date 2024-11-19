@@ -524,7 +524,7 @@ const tick = () =>
     
     if (Objects.length && paddleAi){
         paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
-        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y;
+        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y - 0.4;
     }
     
     if (BallCreator.cameraFixed){
@@ -540,8 +540,7 @@ const tick = () =>
         paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 5.03 + (2 * mouse.y);
-        
-        
+          
         // paddleAi.position.x = 5.5 * keyboard.x;
         // paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
         // paddleAi.position.y = 5.03 + (2 * keyboard.y);
@@ -559,6 +558,25 @@ const tick = () =>
         }
         else{
             gsap.to(paddle.rotation, {
+                x: 2.81,
+                y: 6.28,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+
+        if (paddleAi.position.x > 0){
+            gsap.to(paddleAi.rotation, {
+                x: 2.81,
+                y: 2.96,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddleAi.rotation, {
                 x: 2.81,
                 y: 6.28,
                 z: 2.81,
