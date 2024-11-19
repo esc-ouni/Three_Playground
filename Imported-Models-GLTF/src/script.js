@@ -499,17 +499,24 @@ function checkCollision() {
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
             Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
-            paddle.position.x -= 0.5;
-            Objects[Objects.length - 1].sphereBody.torque.setZero();
+
+            const hitDirection = paddle.position.x > 0  ? -1 : 1;
+            const forceX = 0.4 * hitDirection;
+            
+            // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
         }
         else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
             Pong_Ball_colide(0.7);
             console.log('paddleAi and ball!');
-            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            
+            const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
+            const forceX = 0.4 * hitDirection;
+
+            // Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(0, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
             
         }
         else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
