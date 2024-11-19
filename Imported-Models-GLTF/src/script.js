@@ -11,7 +11,6 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 
 
-
 const loadingScreen = document.getElementById('loading-screen');
 
 const loadingManager = new THREE.LoadingManager();
