@@ -497,6 +497,9 @@ function checkCollision() {
 
 gui.add(BallCreator, 'cameraFixed');
 
+// scene.backgroundBlurriness = 0.8
+// gui.add(scene, 'backgroundBlurriness', 0, 1);
+
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
@@ -510,14 +513,22 @@ const tick = () =>
     TableBody.position.y = Table.position.y;
     TableBody.position.z = Table.position.z;
 
+
+    
     floor.position.copy(planeBody.position);
 
     floor.quaternion.copy(planeBody.quaternion);
-    
+
+
+
+    camera.position.y += 0.02;
+    camera.position.z -= 0.02;
+    camera.position.x += 0.02;
     // Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
     
     for (const object of Objects){
+        
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
@@ -529,18 +540,18 @@ const tick = () =>
     
     if (BallCreator.cameraFixed){
         checkCollision();
-
+        
         camera.position.x = 0;
         camera.position.y = 7.8;
         camera.position.z = 12.8;
         camera.position.x = 4 * mouse.x;
         camera.position.y = 6.8 + ( 1 * mouse.y);
         
-
+        
         paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 5.03 + (2 * mouse.y);
-          
+        
         // paddleAi.position.x = 5.5 * keyboard.x;
         // paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
         // paddleAi.position.y = 5.03 + (2 * keyboard.y);
@@ -586,7 +597,7 @@ const tick = () =>
         }
         
     }
-    
+
     topControls.update()
     
     renderer.render(scene, camera)
