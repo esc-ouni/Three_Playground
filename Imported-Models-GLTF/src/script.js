@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import * as cannon from 'cannon'
+import * as cannon from 'cannon-es'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import CannonDebugger from 'cannon-es-debugger';
@@ -455,7 +455,7 @@ function checkCollision() {
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
             
-            // Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
             
@@ -474,7 +474,7 @@ function checkCollision() {
             const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
 
-            // Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
             
