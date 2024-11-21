@@ -8,8 +8,11 @@ import CannonDebugger from 'cannon-es-debugger';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 
+import stats from 'stats.js'
 
-
+const stat = new stats()
+stat.showPanel(0)
+document.body.appendChild(stat.dom)
 
 const loadingScreen = document.getElementById('loading-screen');
 
@@ -20,9 +23,6 @@ loadingManager.onLoad = function () {
         loadingScreen.style.display = 'none';
     }});
 };
-
-
-
 
 const gui = new GUI()
 
@@ -144,6 +144,7 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddleAi.rotation.set(0, 0, 0);
 
     scene.add(paddle);
+
     scene.add(paddleAi);
 })
 
@@ -363,14 +364,7 @@ Net.position.y = 4.66;
 Net.position.z = -0.02;
 Net.scale.set(10.29, 1, 0.05)
 
-// gui.add(Net.position, 'y', 3, 10).step(0.01)
-// gui.add(Net.position, 'z', -10, 10).step(0.01)
-// gui.add(Net.scale, 'x', 3, 20).step(0.01)
-// gui.add(Net.scale, 'y', 0, 20).step(0.01)
-// gui.add(Net.scale, 'z', 3, 20).step(0.01)
-
 // scene.add(Net);
-
 
 const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
     color: 0xff0000, // Optional: Color of the debug visuals
@@ -502,6 +496,7 @@ gui.add(BallCreator, 'cameraFixed');
 
 const tick = () =>
 {
+    // stat.begin()
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
@@ -601,6 +596,8 @@ const tick = () =>
     topControls.update()
     
     renderer.render(scene, camera)
+    // stat.end()
+    stat.update()
 
     window.requestAnimationFrame(tick)
 }
