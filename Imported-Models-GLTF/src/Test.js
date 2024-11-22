@@ -4,10 +4,25 @@ import GUI from 'lil-gui'
 import * as cannon from 'cannon'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-import CannonDebugger from 'cannon-es-debugger';
-import { threeToCannon, ShapeType } from 'three-to-cannon';
-import * as BufferGeometryUtils  from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+// import CannonDebugger from 'cannon-es-debugger';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+
+
+import stats from 'stats.js'
+
+const stat = new stats()
+stat.showPanel(0)
+document.body.appendChild(stat.dom)
+
+const loadingScreen = document.getElementById('loading-screen');
+
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onLoad = function () {
+    gsap.to(loadingScreen, { opacity: 0, duration: 1, onComplete: () => {
+        loadingScreen.style.display = 'none';
+    }});
+};
 
 const gui = new GUI()
 
@@ -27,22 +42,20 @@ floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
 
-
 // scene.add(floor)
-
-let Cameras = []
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.14)
 scene.add(ambientLight)
 
+
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far    = 300
-directionalLight.shadow.camera.left   = - 20
-directionalLight.shadow.camera.top    = 20
-directionalLight.shadow.camera.right  = 20
-directionalLight.shadow.camera.bottom = - 20
+// directionalLight.shadow.camera.far    = 300
+// directionalLight.shadow.camera.left   = - 20
+// directionalLight.shadow.camera.top    = 20
+// directionalLight.shadow.camera.right  = 20
+// directionalLight.shadow.camera.bottom = - 20
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
 
@@ -50,6 +63,8 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
+
+let Cameras = []
 
 window.addEventListener('resize', () =>
 {
@@ -92,7 +107,7 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 //GLTF Loading
-const GLTFLoaderr = new GLTFLoader(); 
+const GLTFLoaderr = new GLTFLoader(loadingManager); 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.5, 1.5, 1.5)
@@ -115,8 +130,8 @@ const geometries = []
 
 let paddle = null;
 let paddleAi = null;
-let paddleBody = null;
-let paddleBodyAi = null;
+
+
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
     paddle = model;
@@ -134,50 +149,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         }
     })
 
-    const mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, true);
-    const mergedMesh = new THREE.Mesh(mergedGeometry, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    mergedMesh.scale.copy(model.scale);
-    // scene.add(mergedMesh);
-
-    
-    paddle.rotation.x = 3.04;
-    paddle.rotation.y = 3.19;
-    paddle.rotation.z = 2.03;
-
-
-    
-    
-    paddleBody  = new cannon.Body({
-        mass: 0,
-        position: new cannon.Vec3().copy(paddle.position),
-        shape: threeToCannon(mergedMesh,{type: ShapeType.HULL}).shape,
-        material:PaddleMaterial,
-        linearDamping: 0.05,
-        angularDamping:0.05
-    })
-    
-    paddleAi = paddle.clone();
-    paddleAi.position.z = -10;
-    
-    paddleBodyAi  = new cannon.Body({
-        mass: 0,
-        position: new cannon.Vec3().copy(paddleAi.position),
-        shape: threeToCannon(mergedMesh,{type: ShapeType.HULL}).shape,
-        material:PaddleMaterial,
-        linearDamping: 0.05,
-        angularDamping:0.05
-    })
-    
-    // paddleBodyAi = paddleBody.clone();
-    
-    paddleBodyAi.position.z = -10;
-    
-    // gui.add(paddleAi.rotation, 'x', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddleAi.rotation, 'y', 0, 2 * Math.PI).step(0.005)
-    // gui.add(paddleAi.rotation, 'z', 0, 2 * Math.PI).step(0.005)
-    
-    paddleAi.rotation.set(0, 0, 0);
-
     paddleAi = paddle.clone();
 
     paddleAi.position.z = -10;
@@ -185,26 +156,17 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
     paddleAi.rotation.set(0, 0, 0);
 
     scene.add(paddle);
+
     scene.add(paddleAi);
 })
 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
-const Pong_Ball_colide = (Collision) => {
-    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
+const Pong_Ball_colide = (impact) => {
     
-    hit_sound.volume = Math.min(strength, 1);
+    hit_sound.volume = Math.min(impact, 1);
     hit_sound.currentTime = 0;
     hit_sound.play();
-}
-
-const hit__sound = new Audio("/sounds/hit.mp3");
-const Hit__ = (Collision) => {
-    let strength = Math.max(Collision.contact.getImpactVelocityAlongNormal(), 0);
-    
-    hit__sound.volume = Math.min(strength, 1);
-    hit__sound.currentTime = 0;
-    hit__sound.play();
 }
 
 const TextureLoader = new THREE.TextureLoader();
@@ -238,25 +200,12 @@ const createSphere = (position, px, py, pz) => {
             linearDamping: 0.05,
             angularDamping:0.05
         });
+    
         
-        sphereBody.addEventListener('collide', (event) => {
-            if (event.body === paddleBody) {
-                    console.log('contacted!');
-                    sphereBody.velocity.set(0, 0, 0);
-                    sphereBody.applyForce(new cannon.Vec3(0, -0.8, -2.3), sphereBody.position)
-            }
-            else if (event.body === paddleBodyAi) {
-                console.log('contacted!');
-                sphereBody.velocity.set(0, 0, 0);
-                sphereBody.applyForce(new cannon.Vec3(0, -0.8, 2.3), sphereBody.position)
-            }
-        }
-        );
-        
-        
-        sphereBody.addEventListener('collide', Pong_Ball_colide);
+        sphereBody.addEventListener('collide', () => {Pong_Ball_colide(0.5)});
         sphereBody.position.copy(sphere.position);
-        sphereBody.applyForce(new cannon.Vec3(0, -0.9, 2.2), sphereBody.position)
+
+        sphereBody.applyForce(new cannon.Vec3(0, 0.4, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
     Objects.push({sphere, sphereBody})
@@ -265,10 +214,6 @@ const createSphere = (position, px, py, pz) => {
 const PhysicWorld = new cannon.World();
 
 
-PhysicWorld.solver.iterations = 10; // Default is 10
-PhysicWorld.solver.tolerance = 0.001; // Default is 0.001
-
-//Allow objects sleep => icrease performance
 PhysicWorld.allowSleep = true;
 
 //Collision detction better than Naive
@@ -322,16 +267,16 @@ const PaddleBallContact = new cannon.ContactMaterial(
     plasticMaterial,
     PaddleMaterial,
     {
-        friction: 0.1,   
-        restitution: 0.9
+        friction: 0.5,   
+        restitution: 0.7
     }
 );
 
-PhysicWorld.addContactMaterial(BallContactMaterial)
-PhysicWorld.addContactMaterial(BallTableMaterial)
+PhysicWorld.addContactMaterial(BallTableMaterial) // ball table
+PhysicWorld.addContactMaterial(ContactMaterial) // floor
+// PhysicWorld.addContactMaterial(BallContactMaterial)
 PhysicWorld.addContactMaterial(PaddleBallContact)
-PhysicWorld.addContactMaterial(ContactMaterial)
-PhysicWorld.addContactMaterial(BallNetMaterial)
+// PhysicWorld.addContactMaterial(BallNetMaterial)
 
 //plane
 const planeShape = new cannon.Plane();
@@ -358,8 +303,7 @@ const BallCreator = {
     px: 0,
     py: 0.5,
     pz: 2 ,
-    cameraFixed: false,
-    PADDLE_SPEED:0.01,
+    cameraFixed: false 
 }
 
 BallCreator.reset = () => {
@@ -428,38 +372,15 @@ PhysicWorld.addBody(TableBody);
 //Net
 const Net = new THREE.Mesh( geometry, material ); 
 Net.position.x = 0;
-Net.position.y = 4.25;
-Net.position.z = 0.53;
-Net.scale.set(10.2, 1, 0.05)
-
-// gui.add(Net.position, 'y', 3, 10).step(0.01)
-// gui.add(Net.position, 'z', -10, 10).step(0.01)
-// gui.add(Net.scale, 'x', 3, 20).step(0.01)
-// gui.add(Net.scale, 'y', 0, 20).step(0.01)
-// gui.add(Net.scale, 'z', 3, 20).step(0.01)
+Net.position.y = 4.66;
+Net.position.z = -0.02;
+Net.scale.set(10.29, 1, 0.05)
 
 // scene.add(Net);
 
-
-const NetShape = new cannon.Box(new cannon.Vec3(Net.scale.x / 2, Net.scale.y / 2, Net.scale.z / 2));
-const NetBody  = new cannon.Body({
-    mass: 0,
-    position: new cannon.Vec3().copy(Net.position),
-    shape: NetShape,
-    material:NetMaterial,
-    quaternion:Net.quaternion,
-    linearDamping: 0.05, // Simulate air resistance
-    angularDamping:0.05 // Simulate rotational resistance
-})
-NetBody.position.x = Net.position.x;
-NetBody.position.y = Net.position.y;
-NetBody.position.z = Net.position.z;
-
-// PhysicWorld.addBody(NetBody);
-
-const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-    color: 0xff0000, // Optional: Color of the debug visuals
-});
+// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+//     color: 0xff0000, // Optional: Color of the debug visuals
+// });
 
 //  Animate
 const clock = new THREE.Clock()
@@ -485,215 +406,166 @@ window.addEventListener('mousemove', function (info) {
     // console.log(mouse.x, mouse.y);
 }
 )
-// document.addEventListener(
-//     "keypress",
-//     (event) => {
-//       const keyName = event.key;
-
-//     //   console.log(keyboard.x, keyboard.y);
-
-//         if ( keyName === "w") {
-//             keyboard.y += 0.075;
-//             // return ;
-//         }
-//         else if (keyName === "s"){
-//             keyboard.y -= 0.075;
-//             // return ;
-//         }
-//         else if (keyName === "d"){
-//             keyboard.x -= 0.075;
-//             // return ;
-//         }
-//         else if (keyName === "a"){
-//             keyboard.x += 0.075; 
-//             // return ;       
-//         }
-
-//         if (keyboard.x > 0){
-//             keyboard.x = Math.min(keyboard.x, 1);
-//         }
-//         else if (keyboard.x < 0){
-//             keyboard.x = Math.max(keyboard.x, -1);
-//         }
-//         if (keyboard.y > 0){
-//             keyboard.y = Math.min(keyboard.y, 1);
-//         }
-//         else if (keyboard.y < 0){
-//             keyboard.y = Math.max(keyboard.y, -1);
-//         }
-//     } 
-// )
-
-let Chained_Keys = [
-    {w:0},
-    {d:0},
-    {s:0},
-    {a:0},
-]
 
 
-document.addEventListener(
-    "keydown",
-    (event) => {
-      const keyName = event.key;
 
-    //   console.log(keyboard.x, keyboard.y);
 
+// enviroment map
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
+    enviroment_map.mapping = THREE.EquirectangularReflectionMapping
+    scene.background  = enviroment_map;
+    scene.environment = enviroment_map;
+
+    scene.backgroundBlurriness = 0.5; // Adjust this value between 0 (sharp) and 1 (very blurry)
+    scene.environmentIntensity = 0.01;
+
+
+    // Optionally, adjust the background intensity
+    scene.backgroundIntensity = 0.007; // Adjust the brightne
+})
+
+const paddleBoundingBox   = new THREE.Box3();
+const paddleBoundingAiBox = new THREE.Box3();
+const ballBoundingBox     = new THREE.Box3();
+const NetBoundingBox      = new THREE.Box3();
+
+const paddleBoxHelper1 = new THREE.Box3Helper(paddleBoundingBox, 0xff0000);
+const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
+const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
+const NetHelper3       = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
+
+
+// scene.add(paddleBoxHelper1);
+// scene.add(paddleBoxHelper2);
+// scene.add(paddleBoxHelper3);
+// scene.add(NetHelper3);
+
+
+
+// Function to update BoxHelper every frame
+const updateHelper = () => {
     
+    paddleBoxHelper1.update(); // Update the BoxHelper to match the object's bounding box
+    paddleBoxHelper2.update(); // Update the BoxHelper to match the object's bounding box
+    paddleBoxHelper3.update(); // Update the BoxHelper to match the object's bounding box
+};
 
-    if ( keyName === "w") {
-        Chained_Keys.w = 1;
-        // return ;
-    }
-    if (keyName === "s"){
-        Chained_Keys.s = 1;
-        // return ;
-    }
-    if (keyName === "d"){
-        Chained_Keys.d = 1;
-        // return ;
-    }
-    if (keyName === "a"){
-        Chained_Keys.a = 1;
-        // return ;       
-    }}
-)
+function checkCollision() {
+    if (Objects.length){
+        // Update bounding boxes with the current positions of the models
+        paddleBoundingBox.setFromObject(paddle);
+        paddleBoundingAiBox.setFromObject(paddleAi);
+        ballBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
+        NetBoundingBox.setFromObject(Net)
+        
+        // Check for intersection between paddle and ball
+        if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
+            Pong_Ball_colide(0.7);
+            console.log('paddle and ball!');
 
-document.addEventListener(
-    "keyup",
-    (event) => {
-      const keyName = event.key;
+            const hitDirection = paddle.position.x > 0  ? -1 : 1;
+            let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
+            
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
+            
+            // const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
+            // gsap.to(paddle.position, {
+            //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
+            //     duration: 0.1,
+            //     ease: "power1.out"
+            // }); // to be added in latter
+            
+        }
+        else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
+            Pong_Ball_colide(0.7);
+            console.log('paddleAi and ball!');
+            
+            const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
+            let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
 
-    //   console.log(keyboard.x, keyboard.y);
-    if ( keyName === "w") {
-        Chained_Keys.w = 0;
-        // return ;
+            Objects[Objects.length - 1].sphereBody.torque.setZero();
+            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
+            
+        }
+        else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
+            console.log('ball collided with the Net!');
+            // Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z))); //to be rechecked !
+        }
     }
-    if (keyName === "s"){
-        Chained_Keys.s = 0;
-        // return ;
-    }
-    if (keyName === "d"){
-        Chained_Keys.d = 0;
-        // return ;
-    }
-    if (keyName === "a"){
-        Chained_Keys.a = 0;
-        // return ;       
-    }}
-)
+}
 
-
+// scene.add(new THREE.GridHelper( 50, 50 ))
 // scene.add(new THREE.AxesHelper(15))
 
 gui.add(BallCreator, 'cameraFixed');
-gui.add(BallCreator, 'PADDLE_SPEED',0.01 , 0.4).step(0.1)
 
+// scene.backgroundBlurriness = 0.8
+// gui.add(scene, 'backgroundBlurriness', 0, 1);
 
 const tick = () =>
 {
+    // stat.begin()
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
-    
-    // Synchronize the physics body with the paddle mesh
-    if (paddleBody != null && paddle != null) {
-        // Raycaster.set(paddle.position, new THREE.Vector3(0, 0, -1));
 
-        paddleBody.position.copy(paddle.position);
-        
-        paddleQuat.copy(paddle.quaternion);
-        
-        paddleQuat = paddleQuat.mult(rotationOffset);
-        
-        paddleBody.quaternion.copy(paddleQuat);
-        
-
-        // paddleBodyAi.position.copy(paddleAi.position);
-        
-        paddleBodyAi.quaternion.copy(rotationOffset);
-    }
-    
-    // update physic world
     PhysicWorld.step(1/60, deltaTime, 3)
     
-    // floor.position.copy(planeBody.position);
+
+    TableBody.position.x = Table.position.x;
+    TableBody.position.y = Table.position.y;
+    TableBody.position.z = Table.position.z;
+
+
+    
+    floor.position.copy(planeBody.position);
 
     floor.quaternion.copy(planeBody.quaternion);
-    
+
+
+
+    // camera.position.y += 0.02;
+    // camera.position.z -= 0.02;
+    // camera.position.x += 0.02;
+
     // Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
     
     for (const object of Objects){
+        
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
     
-    if (BallCreator.cameraFixed & Cameras.length === 2){
-        // gui.add(Tablerrr.position.z, 'z', -10, 10).step(0.01)
-        // gui.add(Table.position, 'z', 3, 10).step(0.01).name('hello')
-
-        if ( Chained_Keys.w === 1) {
-            keyboard.y += BallCreator.PADDLE_SPEED;
-            // return ;
-        }
-        else if (Chained_Keys.s === 1){
-            keyboard.y -= BallCreator.PADDLE_SPEED;
-            // return ;
-        }
-        else if (Chained_Keys.d === 1){
-            keyboard.x -= BallCreator.PADDLE_SPEED;
-            // return ;
-        }
-        else if (Chained_Keys.a === 1){
-            keyboard.x += BallCreator.PADDLE_SPEED; 
-            // return ;       
-        }
-
-        if (keyboard.x > 0){
-            keyboard.x = Math.min(keyboard.x, 1);
-        }
-        else if (keyboard.x < 0){
-            keyboard.x = Math.max(keyboard.x, -1);
-        }
-        if (keyboard.y > 0){
-            keyboard.y = Math.min(keyboard.y, 1);
-        }
-        else if (keyboard.y < 0){
-            keyboard.y = Math.max(keyboard.y, -1);
-        }
+    if (Objects.length && paddleAi){
+        paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
+        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y - 0.4;
+    }
+    
+    if (BallCreator.cameraFixed){
+        checkCollision();
         
-        Cameras[0].position.x = 0;
-        Cameras[0].position.y = 7.8;
-        Cameras[0].position.z = 12.8;
+        camera.position.x = 0;
+        camera.position.y = 7.8;
+        camera.position.z = 12.8;
+        camera.position.x = 4 * mouse.x;
+        camera.position.y = 6.8 + ( 1 * mouse.y);
         
         
-        Cameras[0].position.x = 4 * mouse.x;
-        Cameras[0].position.y = 6.8 + ( 1 * mouse.y);
-        
-        // Cameras[0].lookAt(paddleAi.position);
-        // console.log(paddle.position);
-        
-        Cameras[1].position.x = 0;
-        Cameras[1].position.y = 7.8;
-        Cameras[1].position.z = -12.8;
-        
-        
-        Cameras[1].position.x = 5.5 * keyboard.x;
-        Cameras[1].position.y = 6.8 + ( 1 * keyboard.y);
-
         paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 5.03 + (2 * mouse.y);
         
+        // paddleAi.position.x = 5.5 * keyboard.x;
+        // paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
+        // paddleAi.position.y = 5.03 + (2 * keyboard.y);
         
-        paddleAi.position.x = 5.5 * keyboard.x;
-        paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
-        paddleAi.position.y = 5.03 + (2 * keyboard.y);
-            
-
-
-
+        // paddleBodyAi.position.copy(paddle.position);
+        
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
                 x: 2.81,
@@ -712,10 +584,8 @@ const tick = () =>
                 ease: "power2.inOut",
             });
         }
-        
 
-
-        if (paddleAi.position.x >0){
+        if (paddleAi.position.x > 0){
             gsap.to(paddleAi.rotation, {
                 x: 2.81,
                 y: 2.96,
@@ -733,18 +603,12 @@ const tick = () =>
                 ease: "power2.inOut",
             });
         }
-
+        
     }
-    
-    // Update controls
+
     topControls.update()
     bottomControls.update()
     
-    // Update debugger
-    // cannonDebugger.update();
-    
-    // Render
-    // renderer.render(scene, camera)
 
     renderer.setScissorTest(true);
 
@@ -759,18 +623,9 @@ const tick = () =>
     renderer.render(scene, bottomCamera);
 
     renderer.setScissorTest(false);
+    stat.update()
 
-
-    // console.log(camera.position);
-
-    // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
 
 tick()
-
-
-// -0.0394104840668026 5.451454332183686
-
-// 3.9495296465566594 5.224859320767735
-// -4.253731684360619 5.80444415426392
