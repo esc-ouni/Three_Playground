@@ -4,7 +4,7 @@ import GUI from 'lil-gui'
 import * as cannon from 'cannon'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-import CannonDebugger from 'cannon-es-debugger';
+// import CannonDebugger from 'cannon-es-debugger';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 
@@ -366,9 +366,9 @@ Net.scale.set(10.29, 1, 0.05)
 
 // scene.add(Net);
 
-const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-    color: 0xff0000, // Optional: Color of the debug visuals
-});
+// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
+//     color: 0xff0000, // Optional: Color of the debug visuals
+// });
 
 //  Animate
 const clock = new THREE.Clock()
