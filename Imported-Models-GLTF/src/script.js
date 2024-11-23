@@ -157,7 +157,7 @@ const Pong_Ball_colide = (impact) => {
     hit_sound.play();
 }
 
-const TextureLoader = new THREE.TextureLoader();
+const TextureLoader = new THREE.TextureLoader(loadingManager);
 const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
 let Objects  = [];
@@ -399,7 +399,7 @@ window.addEventListener('mousemove', function (info) {
 
 
 // enviroment map
-const rgbeLoader = new RGBELoader();
+const rgbeLoader = new RGBELoader(loadingManager);
 rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
     scene.background  = enviroment_map;
