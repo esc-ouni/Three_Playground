@@ -1,12 +1,10 @@
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
 import * as cannon from 'cannon'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-// import CannonDebugger from 'cannon-es-debugger';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
-
+import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import stats from 'stats.js'
 
@@ -42,20 +40,17 @@ floor.receiveShadow = true
 floor.rotation.x = - Math.PI * 0.5
 floor.material.side = THREE.DoubleSide;
 
-// scene.add(floor)
-
 const ambientLight = new THREE.AmbientLight(0xffffff, 1.14)
 scene.add(ambientLight)
-
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
-// directionalLight.shadow.camera.far    = 300
-// directionalLight.shadow.camera.left   = - 20
-// directionalLight.shadow.camera.top    = 20
-// directionalLight.shadow.camera.right  = 20
-// directionalLight.shadow.camera.bottom = - 20
+directionalLight.shadow.camera.far    = 300
+directionalLight.shadow.camera.left   = - 20
+directionalLight.shadow.camera.top    = 20
+directionalLight.shadow.camera.right  = 20
+directionalLight.shadow.camera.bottom = - 20
 directionalLight.position.set(5, 5, 5)
 scene.add(directionalLight)
 
@@ -63,7 +58,6 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
-
 
 window.addEventListener('resize', () =>
     {
@@ -77,14 +71,10 @@ window.addEventListener('resize', () =>
     
     const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
     camera.position.set(-15, 4, 0)
-    // camera.position.set(0, 5.81, 11.77)
-    // {x: -0.006796629480714592, y: 5.816349904903697, z: 11.774813465294566}
     scene.add(camera)
 
 const topControls = new OrbitControls(camera, canvas)
 topControls.enableDamping = true
-
-
 
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
@@ -94,14 +84,12 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-//GLTF Loading
 const GLTFLoaderr = new GLTFLoader(loadingManager); 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gltf){
     const model = gltf.scene;
     model.scale.set(1.5, 1.5, 1.5)
     model.position.y += 1.7;
     model.position.z = -1.94;
-
     
     model.traverse(function (node) {
         if (node.isMesh) {
@@ -113,12 +101,8 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
     scene.add(model);
 })
 
-//paddle
-const geometries = []
-
 let paddle = null;
 let paddleAi = null;
-
 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
@@ -132,19 +116,14 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
             node.castShadow = true;
             node.receiveShadow = true;
             // node.material.wireframe = true;
-            
-            geometries.push(node.geometry.clone());
         }
     })
 
     paddleAi = paddle.clone();
-
     paddleAi.position.z = -10;
-    
     paddleAi.rotation.set(0, 0, 0);
 
     scene.add(paddle);
-
     scene.add(paddleAi);
 })
 
@@ -189,10 +168,11 @@ const createSphere = (position, px, py, pz) => {
             angularDamping:0.05
         });
     
-        
         sphereBody.addEventListener('collide', () => {Pong_Ball_colide(0.5)});
         sphereBody.position.copy(sphere.position);
 
+        sphereBody.torque.setZero()
+        sphereBody.velocity.setZero();
         sphereBody.applyForce(new cannon.Vec3(0, 0.4, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
@@ -201,10 +181,7 @@ const createSphere = (position, px, py, pz) => {
 
 const PhysicWorld = new cannon.World();
 
-
 PhysicWorld.allowSleep = true;
-
-//Collision detction better than Naive
 PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
 
 PhysicWorld.gravity.set(0, -8.92, 0);
@@ -262,11 +239,10 @@ const PaddleBallContact = new cannon.ContactMaterial(
 
 PhysicWorld.addContactMaterial(BallTableMaterial) // ball table
 PhysicWorld.addContactMaterial(ContactMaterial) // floor
-// PhysicWorld.addContactMaterial(BallContactMaterial)
 PhysicWorld.addContactMaterial(PaddleBallContact)
+// PhysicWorld.addContactMaterial(BallContactMaterial)
 // PhysicWorld.addContactMaterial(BallNetMaterial)
 
-//plane
 const planeShape = new cannon.Plane();
 const planeBody  = new cannon.Body({
     mass: 0,
@@ -284,9 +260,7 @@ planeBody.quaternion.setFromAxisAngle(
 planeBody.position.y = -0.137;
 
 PhysicWorld.addBody(planeBody);
-//
 
-//To Add it To Dat Gui It has to be inside of an Object
 const BallCreator = {
     px: 0,
     py: 0.5,
@@ -304,7 +278,6 @@ BallCreator.reset = () => {
     Objects.splice(0, Objects.length)
 }
 
-
 BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 4
     let y = 5.0387;
@@ -312,36 +285,23 @@ BallCreator.createBall = () => {
     
     createSphere(new THREE.Vector3(x, y, z), BallCreator.px, BallCreator.py, BallCreator.pz)
 }
-// gui.add(BallCreator, 'px', -5, 5).step(0.1)
-// gui.add(BallCreator, 'py', -5, 5).step(0.1)
-// gui.add(BallCreator, 'pz', -5, 5).step(0.1)
 
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
-//
 
-//Table Plane
+//Table 
 const geometry       = new THREE.BoxGeometry( 1, 1, 1 ); 
 const material       = new THREE.MeshBasicMaterial( {color: 0xffffff} );
 material.transparent = true; 
 const Table          = new THREE.Mesh( geometry, material ); 
-Table.scale.set(3.3, 0.1, 3.3)
 
 Table.position.x = -0.01;
 Table.position.y = 4.15;
 Table.position.z = -0.06;
 
-Table.scale.x    = 8.28;
-Table.scale.y    = 0.3;
-Table.scale.z    = 18.51;
+Table.scale.set(8.28, 0.3, 18.51)
 
-// gui.add(Table.position, 'x', -10, 20).step(0.01)
-// gui.add(Table.position, 'y', -10, 20).step(0.01)
-// gui.add(Table.position, 'z', -10, 20).step(0.01)
-
-// scene.add(Table);
-
-// add the table to Physic world 
+//Table Physic
 const TableShape = new cannon.Box(new cannon.Vec3(Table.scale.x / 2, Table.scale.y / 2, Table.scale.z / 2));
 const TableBody  = new cannon.Body({
     mass: 0,
@@ -364,39 +324,17 @@ Net.position.y = 4.66;
 Net.position.z = -0.02;
 Net.scale.set(10.29, 1, 0.05)
 
-// scene.add(Net);
-
 // const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
 //     color: 0xff0000, // Optional: Color of the debug visuals
 // });
 
-//  Animate
-const clock = new THREE.Clock()
-let previousTime = 0
-
-var rotationOffset = new cannon.Quaternion();
-   rotationOffset.setFromEuler(-(Math.PI / 2), 0, 0);
-
-let paddleQuat = new cannon.Quaternion();
-
-
-//mouse event listener
+// mouse event listener
 const mouse = new THREE.Vector2();
-const keyboard = new THREE.Vector2();
-keyboard.x = 0;
-keyboard.y = 0;
-
-
 window.addEventListener('mousemove', function (info) {
-    // console.log('Mouse Moved', (info.clientX/window.innerWidth)*2-1 , -((info.clientY/window.innerHeight)*2-1));
     mouse.x = (info.clientX/window.innerWidth)*2-1;
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
-    // console.log(mouse.x, mouse.y);
 }
 )
-
-
-
 
 // enviroment map
 const rgbeLoader = new RGBELoader(loadingManager);
@@ -404,13 +342,10 @@ rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
     scene.background  = enviroment_map;
     scene.environment = enviroment_map;
-
-    scene.backgroundBlurriness = 0.5; // Adjust this value between 0 (sharp) and 1 (very blurry)
-    scene.environmentIntensity = 0.01;
-
-
-    // Optionally, adjust the background intensity
-    scene.backgroundIntensity = 0.007; // Adjust the brightne
+    
+    scene.backgroundBlurriness = 0.5; 
+    scene.environmentIntensity = 0.01; 
+    scene.backgroundIntensity  = 0.007;
 })
 
 const paddleBoundingBox   = new THREE.Box3();
@@ -423,21 +358,10 @@ const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
 const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
 const NetHelper3       = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
 
-
 // scene.add(paddleBoxHelper1);
 // scene.add(paddleBoxHelper2);
 // scene.add(paddleBoxHelper3);
 // scene.add(NetHelper3);
-
-
-
-// Function to update BoxHelper every frame
-const updateHelper = () => {
-    
-    paddleBoxHelper1.update(); // Update the BoxHelper to match the object's bounding box
-    paddleBoxHelper2.update(); // Update the BoxHelper to match the object's bounding box
-    paddleBoxHelper3.update(); // Update the BoxHelper to match the object's bounding box
-};
 
 function checkCollision() {
     if (Objects.length){
@@ -447,35 +371,34 @@ function checkCollision() {
         ballBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
         NetBoundingBox.setFromObject(Net)
         
-        // Check for intersection between paddle and ball
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
             Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
-
+            
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
-            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
+            Objects[Objects.length - 1].sphereBody.velocity.setZero();
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
             
             // const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
             // gsap.to(paddle.position, {
-            //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
-            //     duration: 0.1,
-            //     ease: "power1.out"
-            // }); // to be added in latter
-            
-        }
-        else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
-            Pong_Ball_colide(0.7);
+                //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
+                //     duration: 0.1,
+                //     ease: "power1.out"
+                // }); // to be added in latter
+                
+            }
+            else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
+                Pong_Ball_colide(0.7);
             console.log('paddleAi and ball!');
             
             const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
-
+            
             Objects[Objects.length - 1].sphereBody.torque.setZero();
-            Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, 0);
+            Objects[Objects.length - 1].sphereBody.velocity.setZero();
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
             
         }
@@ -491,39 +414,33 @@ function checkCollision() {
 
 gui.add(BallCreator, 'cameraFixed');
 
-// scene.backgroundBlurriness = 0.8
-// gui.add(scene, 'backgroundBlurriness', 0, 1);
+//  Animate
+const clock = new THREE.Clock()
+let previousTime = 0
 
 const tick = () =>
-{
-    // stat.begin()
+    {
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
-
+    
     PhysicWorld.step(1/60, deltaTime, 3)
     
-
     TableBody.position.x = Table.position.x;
     TableBody.position.y = Table.position.y;
     TableBody.position.z = Table.position.z;
-
-
     
     floor.position.copy(planeBody.position);
-
     floor.quaternion.copy(planeBody.quaternion);
-
-
 
     camera.position.y += 0.02;
     camera.position.z -= 0.02;
     camera.position.x += 0.02;
-    // Table.position.copy(TableBody.position);
+
+    Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
     
     for (const object of Objects){
-        
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
@@ -542,16 +459,9 @@ const tick = () =>
         camera.position.x = 4 * mouse.x;
         camera.position.y = 6.8 + ( 1 * mouse.y);
         
-        
         paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 5.03 + (2 * mouse.y);
-        
-        // paddleAi.position.x = 5.5 * keyboard.x;
-        // paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
-        // paddleAi.position.y = 5.03 + (2 * keyboard.y);
-        
-        // paddleBodyAi.position.copy(paddle.position);
         
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
@@ -594,10 +504,9 @@ const tick = () =>
     }
 
     topControls.update()
+    stat.update()
     
     renderer.render(scene, camera)
-    // stat.end()
-    stat.update()
 
     window.requestAnimationFrame(tick)
 }
