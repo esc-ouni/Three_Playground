@@ -130,7 +130,6 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
 const Pong_Ball_colide = (impact) => {
-    
     hit_sound.volume = Math.min(impact, 1);
     hit_sound.currentTime = 0;
     hit_sound.play();
