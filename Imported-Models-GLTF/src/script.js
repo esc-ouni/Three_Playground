@@ -334,6 +334,20 @@ window.addEventListener('mousemove', function (info) {
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
 }
 )
+document.addEventListener(
+    "keydown",
+    (event) => {
+      const keyName = event.key;
+
+    if (keyName === "r"){
+        // BallCreator.reset()
+        BallCreator.createBall()
+    }
+    if (keyName === "t"){
+        BallCreator.reset()
+    }
+}
+)
 
 // enviroment map
 const rgbeLoader = new RGBELoader(loadingManager);
