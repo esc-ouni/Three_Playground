@@ -334,6 +334,7 @@ window.addEventListener('mousemove', function (info) {
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
 }
 )
+
 document.addEventListener(
     "keydown",
     (event) => {
@@ -345,6 +346,14 @@ document.addEventListener(
     }
     if (keyName === "t"){
         BallCreator.reset()
+    }
+    if (keyName === "s"){
+        console.log('hiting Sumilation !');
+        gsap.to(paddle.rotation, {
+            x: paddle.rotation.x - 1.5,
+            duration: 0.1,
+            ease: "power3.out"
+        }); 
     }
 }
 )
@@ -385,30 +394,43 @@ function checkCollision() {
         NetBoundingBox.setFromObject(Net)
         
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
-            Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
-            
+                        
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
+            
+            //for push Sumilation
+            gsap.to(paddle.rotation, {
+                x: paddle.rotation.x - 0.5,
+                y: paddle.rotation.y + (hitDirection * 0.3),
+                z: paddle.rotation.z + (hitDirection * 0.3),
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.7);
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
-            
-            // const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
-            // gsap.to(paddle.position, {
-                //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
-                //     duration: 0.1,
-                //     ease: "power1.out"
-                // }); // to be added in latter
-                
+                            
             }
             else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
                 Pong_Ball_colide(0.7);
             console.log('paddleAi and ball!');
             
+            
             const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
+ 
+            //for push Sumilation
+            gsap.to(paddle.rotation, {
+                x: paddle.rotation.x + 0.5,
+                y: paddle.rotation.y + (hitDirection * 0.3),
+                z: paddle.rotation.z + (hitDirection * 0.3),
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.7);
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
@@ -476,6 +498,7 @@ const tick = () =>
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 5.03 + (2 * mouse.y);
         
+
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
                 x: 2.81,
