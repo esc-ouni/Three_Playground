@@ -172,6 +172,7 @@ const createSphere = (position, px, py, pz) => {
 
         sphereBody.torque.setZero()
         sphereBody.velocity.setZero();
+        sphereBody.angularVelocity.setZero()
         sphereBody.applyForce(new cannon.Vec3(0, 0.4, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
@@ -411,22 +412,23 @@ function checkCollision() {
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
+            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
-                            
-            }
-            else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
+            
+        }
+        else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
                 Pong_Ball_colide(0.7);
-            console.log('paddleAi and ball!');
-            
-            
-            const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
-            let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
- 
-            //for push Sumilation
-            gsap.to(paddle.rotation, {
-                x: paddle.rotation.x + 0.5,
-                y: paddle.rotation.y + (hitDirection * 0.3),
-                z: paddle.rotation.z + (hitDirection * 0.3),
+                console.log('paddleAi and ball!');
+                
+                
+                const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
+                let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
+                
+                //for push Sumilation
+                gsap.to(paddle.rotation, {
+                    x: paddle.rotation.x + 0.5,
+                    y: paddle.rotation.y + (hitDirection * 0.3),
+                    z: paddle.rotation.z + (hitDirection * 0.3),
                 duration: 0.1,
                 ease: "power3.out"
             })
@@ -434,6 +436,7 @@ function checkCollision() {
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
+            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
             
         }
