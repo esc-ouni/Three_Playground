@@ -59,8 +59,6 @@ const sizes = {
     height: window.innerHeight
 }
 
-let Cameras = []
-
 window.addEventListener('resize', () =>
 {
     sizes.width = window.innerWidth
@@ -136,11 +134,11 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
 
     paddleAi = paddle.clone();
     paddleAi.position.z = -10;
+    paddleAi.rotation.set(0, 0, 0);
 
     scene.add(paddle);
     scene.add(paddleAi);
 })
-
 
 const hit_sound = new Audio("/sounds/ping_pong.mp3");
 
@@ -279,8 +277,7 @@ const BallCreator = {
     px: 0,
     py: 0.5,
     pz: 2 ,
-    cameraFixed: false,
-    PADDLE_SPEED: 0.04
+    cameraFixed: false 
 }
 
 BallCreator.reset = () => {
@@ -345,14 +342,13 @@ Net.scale.set(10.29, 1, 0.05)
 
 // mouse event listener
 const mouse = new THREE.Vector2();
-    window.addEventListener('mousemove', function (info) {
-        mouse.x = (info.clientX/window.innerWidth)*2-1;
-        mouse.y = -((info.clientY/window.innerHeight)*2-1);
-    }
+window.addEventListener('mousemove', function (info) {
+    mouse.x = (info.clientX/window.innerWidth)*2-1;
+    mouse.y = -((info.clientY/window.innerHeight)*2-1);
+}
 )
 
 // keyboard event listener
-const keyboard = new THREE.Vector2();
 let Chained_Keys = [
     {w:0},
     {d:0},
@@ -364,7 +360,6 @@ document.addEventListener(
     "keydown",
     (event) => {
       const keyName = event.key;
-      console.log(keyName);
 
     if ( keyName === "w") {
         Chained_Keys.w = 1;
@@ -377,9 +372,6 @@ document.addEventListener(
     }
     if (keyName === "a"){
         Chained_Keys.a = 1;
-    }
-    if (keyName === "r"){
-        BallCreator.createBall()
     }}
 )
 
@@ -501,13 +493,9 @@ const tick = () =>
     floor.position.copy(planeBody.position);
     floor.quaternion.copy(planeBody.quaternion);
 
-    Cameras[0].position.y += 0.02;
-    Cameras[0].position.z -= 0.02;
-    Cameras[0].position.x += 0.02;
-
-    Cameras[1].position.y += 0.02;
-    Cameras[1].position.z -= 0.02;
-    Cameras[1].position.x += 0.02;
+    camera.position.y += 0.02;
+    camera.position.z -= 0.02;
+    camera.position.x += 0.02;
 
     Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
@@ -516,7 +504,12 @@ const tick = () =>
         object.sphere.position.copy(object.sphereBody.position);
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
-
+    
+    if (Objects.length && paddleAi){
+        paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
+        paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y - 0.4;
+    }
+    
     if (BallCreator.cameraFixed & Cameras.length === 2){
         checkCollision();
         
@@ -588,7 +581,7 @@ const tick = () =>
 
         if (paddleAi.position.x > 0){
             gsap.to(paddleAi.rotation, {
-                x: 3.25,
+                x: 2.81,
                 y: 2.96,
                 z: 2.81,
                 duration: 0.095,
@@ -597,7 +590,7 @@ const tick = () =>
         }
         else{
             gsap.to(paddleAi.rotation, {
-                x: 3.25,
+                x: 2.81,
                 y: 6.28,
                 z: 2.81,
                 duration: 0.095,
