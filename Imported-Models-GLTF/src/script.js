@@ -187,7 +187,8 @@ const createSphere = (position, px, py, pz) => {
 
         sphereBody.torque.setZero()
         sphereBody.velocity.setZero();
-        sphereBody.applyForce(new cannon.Vec3(0, 0.4, 3), sphereBody.position)
+        sphereBody.angularVelocity.setZero()
+        sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
     Objects.push({sphere, sphereBody})
@@ -280,7 +281,7 @@ const BallCreator = {
     py: 0.5,
     pz: 2 ,
     cameraFixed: false,
-    PADDLE_SPEED: 0.04
+    PADDLE_SPEED: 0.02
 }
 
 BallCreator.reset = () => {
@@ -439,39 +440,53 @@ function checkCollision() {
         NetBoundingBox.setFromObject(Net)
         
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
-            Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
             
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
+
+            //for push Sumilation
+            gsap.to(paddle.rotation, {
+                x: paddle.rotation.x - 0.5,
+                y: paddle.rotation.y + (hitDirection * 0.3),
+                z: paddle.rotation.z + (hitDirection * 0.3),
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.7);
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
-            
-            // const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
-            // gsap.to(paddle.position, {
-                //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
-                //     duration: 0.1,
-                //     ease: "power1.out"
-                // }); // to be added in latter
+            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.4), Objects[Objects.length - 1].sphereBody.position)
                 
             }
             else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
-                Pong_Ball_colide(0.7);
             console.log('paddleAi and ball!');
             
             const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
             
+            //for push Sumilation
+            gsap.to(paddle.rotation, {
+                x: paddle.rotation.x + 0.5,
+                y: paddle.rotation.y + (hitDirection * 0.3),
+                z: paddle.rotation.z + (hitDirection * 0.3),
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.7);
+            
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.4), Objects[Objects.length - 1].sphereBody.position)
             
         }
         else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
             console.log('ball collided with the Net!');
-            // Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z))); //to be rechecked !
+            // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
+            // Good just need to get the best velocity values
         }
     }
 }
@@ -480,7 +495,7 @@ function checkCollision() {
 // scene.add(new THREE.AxesHelper(15))
 
 gui.add(BallCreator, 'cameraFixed');
-gui.add(BallCreator, 'PADDLE_SPEED', 0.01 , 0.2).step(0.04)
+gui.add(BallCreator, 'PADDLE_SPEED', 0.01 , 0.2).step(0.01)
 
 //  Animate
 const clock = new THREE.Clock()

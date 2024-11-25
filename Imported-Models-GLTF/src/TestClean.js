@@ -60,34 +60,21 @@ const sizes = {
 }
 
 window.addEventListener('resize', () =>
-{
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-    topCamera.aspect = sizes.width / (sizes.height / 2)
-    bottomCamera.aspect = sizes.width / (sizes.height / 2)
-    topCamera.updateProjectionMatrix()
-    bottomCamera.updateProjectionMatrix()
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
+    {
+        sizes.width = window.innerWidth
+        sizes.height = window.innerHeight
+        camera.aspect = sizes.width / sizes.height
+        camera.updateProjectionMatrix()
+        renderer.setSize(sizes.width, sizes.height)
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    })
+    
+    const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+    camera.position.set(-15, 4, 0)
+    scene.add(camera)
 
-const topCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
-topCamera.position.set(-15, 4, 0)
-scene.add(topCamera)
-
-Cameras.push(topCamera)
-
-const bottomCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
-bottomCamera.position.set(15, 4, 0)
-scene.add(bottomCamera)
-
-Cameras.push(bottomCamera)
-
-const topControls = new OrbitControls(topCamera, canvas)
+const topControls = new OrbitControls(camera, canvas)
 topControls.enableDamping = true
-
-const bottomControls = new OrbitControls(bottomCamera, canvas)
-bottomControls.enableDamping = true
 
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
@@ -185,7 +172,8 @@ const createSphere = (position, px, py, pz) => {
 
         sphereBody.torque.setZero()
         sphereBody.velocity.setZero();
-        sphereBody.applyForce(new cannon.Vec3(0, 0.4, 3), sphereBody.position)
+        sphereBody.angularVelocity.setZero()
+        sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
     Objects.push({sphere, sphereBody})
@@ -348,52 +336,28 @@ window.addEventListener('mousemove', function (info) {
 }
 )
 
-// keyboard event listener
-let Chained_Keys = [
-    {w:0},
-    {d:0},
-    {s:0},
-    {a:0},
-]
-
 document.addEventListener(
     "keydown",
     (event) => {
       const keyName = event.key;
 
-    if ( keyName === "w") {
-        Chained_Keys.w = 1;
+    if (keyName === "r"){
+        // BallCreator.reset()
+        BallCreator.createBall()
+    }
+    if (keyName === "t"){
+        BallCreator.reset()
     }
     if (keyName === "s"){
-        Chained_Keys.s = 1;
+        console.log('hiting Sumilation !');
+        gsap.to(paddle.rotation, {
+            x: paddle.rotation.x - 1.5,
+            duration: 0.1,
+            ease: "power3.out"
+        }); 
     }
-    if (keyName === "d"){
-        Chained_Keys.d = 1;
-    }
-    if (keyName === "a"){
-        Chained_Keys.a = 1;
-    }}
+}
 )
-
-document.addEventListener(
-    "keyup",
-    (event) => {
-      const keyName = event.key;
-
-    if ( keyName === "w") {
-        Chained_Keys.w = 0;
-    }
-    if (keyName === "s"){
-        Chained_Keys.s = 0;
-    }
-    if (keyName === "d"){
-        Chained_Keys.d = 0;
-    }
-    if (keyName === "a"){
-        Chained_Keys.a = 0;
-    }}
-)
-
 
 // enviroment map
 const rgbeLoader = new RGBELoader(loadingManager);
@@ -431,39 +395,56 @@ function checkCollision() {
         NetBoundingBox.setFromObject(Net)
         
         if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
-            Pong_Ball_colide(0.7);
             console.log('paddle and ball!');
-            
+                        
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
             
+            //for push Sumilation
+            gsap.to(paddle.rotation, {
+                x: paddle.rotation.x - 0.5,
+                y: paddle.rotation.y + (hitDirection * 0.3),
+                z: paddle.rotation.z + (hitDirection * 0.3),
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.7);
+            
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.5), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.4), Objects[Objects.length - 1].sphereBody.position)
             
-            // const paddlePushbackDistance = 0.3; // How much the paddle moves back upon impact
-            // gsap.to(paddle.position, {
-                //     x: paddle.position.x + (hitDirection * -paddlePushbackDistance),
-                //     duration: 0.1,
-                //     ease: "power1.out"
-                // }); // to be added in latter
-                
-            }
-            else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
+        }
+        else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
                 Pong_Ball_colide(0.7);
-            console.log('paddleAi and ball!');
-            
-            const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
-            let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
+                console.log('paddleAi and ball!');
+                
+                
+                const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
+                let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
+                
+                //for push Sumilation
+                gsap.to(paddle.rotation, {
+                    x: paddle.rotation.x + 0.5,
+                    y: paddle.rotation.y + (hitDirection * 0.3),
+                    z: paddle.rotation.z + (hitDirection * 0.3),
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.7);
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.5), Objects[Objects.length - 1].sphereBody.position)
+            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
+            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.4), Objects[Objects.length - 1].sphereBody.position)
             
         }
         else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
             console.log('ball collided with the Net!');
-            // Objects[Objects.length - 1].sphereBody.velocity.set(0, 0, -((Objects[Objects.length - 1].sphereBody.velocity.z))); //to be rechecked !
+            
+            // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
+            // Good just need to get the best velocity values
         }
     }
 }
@@ -472,7 +453,6 @@ function checkCollision() {
 // scene.add(new THREE.AxesHelper(15))
 
 gui.add(BallCreator, 'cameraFixed');
-gui.add(BallCreator, 'PADDLE_SPEED', 0.01 , 0.2).step(0.04)
 
 //  Animate
 const clock = new THREE.Clock()
@@ -510,55 +490,19 @@ const tick = () =>
         paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y - 0.4;
     }
     
-    if (BallCreator.cameraFixed & Cameras.length === 2){
+    if (BallCreator.cameraFixed){
         checkCollision();
         
-        if ( Chained_Keys.w === 1) {
-            keyboard.y += BallCreator.PADDLE_SPEED;
-        }
-        if (Chained_Keys.s === 1){
-            keyboard.y -= BallCreator.PADDLE_SPEED;
-        }
-        if (Chained_Keys.d === 1){
-            keyboard.x -= BallCreator.PADDLE_SPEED;
-        }
-        if (Chained_Keys.a === 1){
-            keyboard.x += BallCreator.PADDLE_SPEED; 
-        }
-
-        if (keyboard.x > 0){
-            keyboard.x = Math.min(keyboard.x, 1);
-        }
-        if (keyboard.x < 0){
-            keyboard.x = Math.max(keyboard.x, -1);
-        }
-        if (keyboard.y > 0){
-            keyboard.y = Math.min(keyboard.y, 1);
-        }
-        if (keyboard.y < 0){
-            keyboard.y = Math.max(keyboard.y, -1);
-        }
-
-        Cameras[0].position.x = 0;
-        Cameras[0].position.y = 7.8;
-        Cameras[0].position.z = 12.8;
-        Cameras[0].position.x = 4 * mouse.x;
-        Cameras[0].position.y = 6.8 + ( 1 * mouse.y);
-
-
-        Cameras[1].position.x = 0;
-        Cameras[1].position.y = 7.8;
-        Cameras[1].position.z = -12.8;
-        Cameras[1].position.x = 5.5 * keyboard.x;
-        Cameras[1].position.y = 6.8 + ( 1 * keyboard.y);
-
+        camera.position.x = 0;
+        camera.position.y = 7.8;
+        camera.position.z = 12.8;
+        camera.position.x = 4 * mouse.x;
+        camera.position.y = 6.8 + ( 1 * mouse.y);
+        
         paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 5.03 + (2 * mouse.y);
-
-        paddleAi.position.x = 5.5 * keyboard.x;
-        paddleAi.position.z = -( 11 - Math.abs((2 * keyboard.x)));
-        paddleAi.position.y = 5.03 + (2 * keyboard.y);
+        
 
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
@@ -601,24 +545,10 @@ const tick = () =>
     }
 
     topControls.update()
-    bottomControls.update()
-
-    //renderer
-    renderer.setScissorTest(true);
-
-    // Top half
-    renderer.setViewport(0, sizes.height / 2, sizes.width, sizes.height / 2);
-    renderer.setScissor(0, sizes.height / 2, sizes.width, sizes.height / 2);
-    renderer.render(scene, topCamera);
-    
-    // Bottom half
-    renderer.setViewport(0, 0, sizes.width, sizes.height / 2);
-    renderer.setScissor(0, 0, sizes.width, sizes.height / 2);
-    renderer.render(scene, bottomCamera);
-    
-    renderer.setScissorTest(false);
-    
     stat.update()
+    
+    renderer.render(scene, camera)
+
     window.requestAnimationFrame(tick)
 }
 
