@@ -10,8 +10,23 @@
 <body>
     <div id="loading-screen">
         <div id="loading-spinner"></div>
-        <!-- <div id="loader"></div> -->
     </div>
+    <div id="scoreBoard" style="
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 10px 20px;
+        font-size: 20px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        z-index: 100;
+    ">
+        Player : 0 - AI_bot : 0
+    </div>
+
     
     <canvas class="webgl"></canvas>
     <script type="module" src="./script.js"></script>

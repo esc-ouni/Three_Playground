@@ -177,6 +177,7 @@ const createSphere = (position, px, py, pz) => {
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
     Objects.push({sphere, sphereBody})
+    New_ball_launched = true;
 }
 
 const PhysicWorld = new cannon.World();
@@ -458,8 +459,18 @@ gui.add(BallCreator, 'cameraFixed');
 const clock = new THREE.Clock()
 let previousTime = 0
 
+
+//Scoring System
+let PlayerScore = 0;
+let AiScore     = 0;
+let New_ball_launched = false;
+
+function updateScoreboard() {
+    scoreBoard.innerText = `Player : ${PlayerScore} - AI_bot : ${AiScore}`;
+}
+
 const tick = () =>
-    {
+{
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
@@ -488,7 +499,28 @@ const tick = () =>
     if (Objects.length && paddleAi){
         paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
         paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y - 0.4;
+        //Scoring System
+        if (New_ball_launched){
+            if (Objects[Objects.length - 1].sphere.position.z > paddle.position.z) {
+                AiScore += 1;
+                New_ball_launched = false;
+                updateScoreboard()
+            } else if (Objects[Objects.length - 1].sphere.position.z < paddleAi.position.z) {
+                PlayerScore += 1;
+                New_ball_launched = false;
+                updateScoreboard()
+            }
+        }
+    
+        if (PlayerScore === 7 || AiScore === 7) {
+            alert(`${PlayerScore === 10 ? 'Player' : 'Ai'} Wins!`);
+            PlayerScore = 0;
+            AiScore = 0;
+            updateScoreboard()
+        }
+        //
     }
+    console.log("Player Score :", PlayerScore, " Ai Score :", AiScore);
     
     if (BallCreator.cameraFixed){
         checkCollision();
@@ -503,7 +535,6 @@ const tick = () =>
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
         paddle.position.y = 5.03 + (2 * mouse.y);
         
-
         if (paddle.position.x >0){
             gsap.to(paddle.rotation, {
                 x: 2.81,
