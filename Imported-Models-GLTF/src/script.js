@@ -344,6 +344,7 @@ function checkCollision() {
 }
 
 scene.add(new THREE.GridHelper( 50, 50 ))
+scene.add(new THREE.AxesHelper( 50 ))
 
 gui.add(BallCreator, 'cameraFixed');
 
@@ -361,17 +362,23 @@ const clock = new THREE.Clock()
 let   elapsedTime, previousTime = clock.getElapsedTime();
 let   deltaTime = 0;
 
+
+let angle = 0; // Start angle for rotation
+const radius = 18; // Distance from the center of the object
+const target = new THREE.Vector3(0, 0, 0);
+
 const tick = () =>
 {
-    elapsedTime = clock.getElapsedTime();
-    deltaTime = elapsedTime - previousTime
-    previousTime = elapsedTime
+    elapsedTime   = clock.getElapsedTime();
+    deltaTime     = elapsedTime - previousTime
+    previousTime  = elapsedTime
 
     console.log(deltaTime);
 
-    camera.position.y += 0.02;
-    camera.position.z -= 0.02;
-    camera.position.x += 0.02;
+    angle += 0.005;
+    camera.position.x = (target.x + radius * Math.cos(angle));
+    camera.position.z = (target.z + radius * Math.sin(angle));
+    camera.position.y = 9;
 
     
     for (const obj of Objects) {
@@ -384,7 +391,7 @@ const tick = () =>
         // Update position
         obj.sphere.position.add(obj.velocity.clone().multiplyScalar(deltaTime));
 
-        // obj.sphere.position.z = deltaTime * 1.5
+        obj.sphere.position.z = elapsedTime * 1.5
 
         // Collision with the floor
         if (obj.sphere.position.y <= 0.5) {
