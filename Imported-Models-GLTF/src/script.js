@@ -1,12 +1,17 @@
 import * as THREE from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
-import * as cannon from 'cannon'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import stats from 'stats.js'
+
+// Physics properties
+const gravity = -9.8;
+const friction = 0.98;
+const restitution = 0.8;
+
 
 const stat = new stats()
 stat.showPanel(0)
@@ -140,127 +145,35 @@ const Texture = TextureLoader.load("/textures/Models/ball.jpeg");
 
 let Objects  = [];
 
-let ball = null;
-
 const STDGeometry = new THREE.SphereGeometry(0.1, 32, 32);
 const STDMaterial = new THREE.MeshStandardMaterial;
 STDMaterial.metalness = 0.1;
 STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
-const sphereShape = new cannon.Sphere(0.1);
 
 const createSphere = (position, px, py, pz) => {
     const sphere = new THREE.Mesh(
         STDGeometry,
         STDMaterial)
+
         sphere.castShadow = true
         sphere.position.copy(position);
         
         scene.add(sphere)
         
-        const sphereBody  = new cannon.Body({
-            mass: 0.0027,
-            shape: sphereShape,
-            material: plasticMaterial,
-            linearDamping: 0.05,
-            angularDamping:0.05
+        // sphereBody.torque.setZero()
+        // sphereBody.velocity.setZero();
+        // sphereBody.angularVelocity.setZero()
+        // sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
+        Objects.push({
+            sphere: sphere,
+            velocity: new THREE.Vector3(2, 5, 0), // Initial velocity
+            acceleration: new THREE.Vector3(0, gravity, 0), // Gravity applied
+            mass: 1
         });
-    
-        sphereBody.addEventListener('collide', () => {Pong_Ball_colide(0.5)});
-        sphereBody.position.copy(sphere.position);
-
-        sphereBody.torque.setZero()
-        sphereBody.velocity.setZero();
-        sphereBody.angularVelocity.setZero()
-        sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
-        PhysicWorld.addBody(sphereBody);
-    ball = sphere;
-    Objects.push({sphere, sphereBody})
     New_ball_launched = true;
 }
-
-const PhysicWorld = new cannon.World();
-
-PhysicWorld.allowSleep = true;
-PhysicWorld.broadphase = new cannon.SAPBroadphase(PhysicWorld);
-
-PhysicWorld.gravity.set(0, -8.92, 0);
-
-const concreteMaterial = new cannon.Material('concrete');
-const plasticMaterial  = new cannon.Material('plastic');
-const PaddleMaterial   = new cannon.Material('paddle');
-const TableMaterial    = new cannon.Material('table');
-const NetMaterial      = new cannon.Material('net');
-
-const ContactMaterial = new cannon.ContactMaterial(
-    plasticMaterial,
-    concreteMaterial,
-    {
-        friction: 0.7,   
-        restitution: 0.5
-    }
-);
-
-const BallContactMaterial = new cannon.ContactMaterial(
-    plasticMaterial,
-    plasticMaterial,
-    {
-        friction: 0.2,   
-        restitution: 0.9, 
-    }
-);
-
-const BallTableMaterial = new cannon.ContactMaterial(
-    plasticMaterial,
-    TableMaterial,
-    {
-        friction: 0.3,   
-        restitution: 0.9
-    }
-);
-
-const BallNetMaterial = new cannon.ContactMaterial(
-    plasticMaterial,
-    NetMaterial,
-    {
-        friction: 0.1,   
-        restitution: 0.2
-    }
-);
-
-const PaddleBallContact = new cannon.ContactMaterial(
-    plasticMaterial,
-    PaddleMaterial,
-    {
-        friction: 0.5,   
-        restitution: 0.7
-    }
-);
-
-PhysicWorld.addContactMaterial(BallTableMaterial) // ball table
-PhysicWorld.addContactMaterial(ContactMaterial) // floor
-PhysicWorld.addContactMaterial(PaddleBallContact)
-// PhysicWorld.addContactMaterial(BallContactMaterial)
-// PhysicWorld.addContactMaterial(BallNetMaterial)
-
-const planeShape = new cannon.Plane();
-const planeBody  = new cannon.Body({
-    mass: 0,
-    position: new cannon.Vec3().copy(floor.position),
-    shape: planeShape,
-    material:concreteMaterial,
-    linearDamping: 0.05, // Simulate air resistance
-    angularDamping:0.05 // Simulate rotational resistance
-})
-planeBody.quaternion.setFromAxisAngle(
-    new cannon.Vec3(-1, 0, 0),
-    Math.PI * 0.5
-)
-
-planeBody.position.y = -0.137;
-
-PhysicWorld.addBody(planeBody);
 
 const BallCreator = {
     px: 0,
@@ -271,9 +184,6 @@ const BallCreator = {
 
 BallCreator.reset = () => {
     for (const object of Objects){
-        object.sphereBody.removeEventListener('collide', Pong_Ball_colide);
-        PhysicWorld.removeBody(object.sphereBody);
-        
         scene.remove(object.sphere);
     }
     Objects.splice(0, Objects.length)
@@ -302,32 +212,12 @@ Table.position.z = -0.06;
 
 Table.scale.set(8.28, 0.3, 18.51)
 
-//Table Physic
-const TableShape = new cannon.Box(new cannon.Vec3(Table.scale.x / 2, Table.scale.y / 2, Table.scale.z / 2));
-const TableBody  = new cannon.Body({
-    mass: 0,
-    position: new cannon.Vec3().copy(Table.position),
-    shape: TableShape,
-    material:TableMaterial,
-    quaternion:Table.quaternion,
-    linearDamping: 0.05, // Simulate air resistance
-    angularDamping:0.05 // Simulate rotational resistance
-})
-TableBody.position.x = Table.position.x;
-TableBody.position.y = Table.position.y;
-TableBody.position.z = Table.position.z;
-PhysicWorld.addBody(TableBody);
-
 //Net
 const Net = new THREE.Mesh( geometry, material ); 
 Net.position.x = 0;
 Net.position.y = 4.66;
 Net.position.z = -0.02;
 Net.scale.set(10.29, 1, 0.05)
-
-// const cannonDebugger = new CannonDebugger(scene, PhysicWorld, {
-//     color: 0xff0000, // Optional: Color of the debug visuals
-// });
 
 // mouse event listener
 const mouse = new THREE.Vector2();
@@ -343,7 +233,6 @@ document.addEventListener(
       const keyName = event.key;
 
     if (keyName === "r"){
-        // BallCreator.reset()
         BallCreator.createBall()
     }
     if (keyName === "t"){
@@ -372,34 +261,38 @@ rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
     scene.backgroundIntensity  = 0.007;
 })
 
-const paddleBoundingBox   = new THREE.Box3();
-const paddleBoundingAiBox = new THREE.Box3();
-const ballBoundingBox     = new THREE.Box3();
+const BallBoundingBox     = new THREE.Box3();
+const PaddleBoundingBox   = new THREE.Box3();
+const PaddleBoundingAiBox = new THREE.Box3();
+const TableBoundingBox    = new THREE.Box3();
 const NetBoundingBox      = new THREE.Box3();
 
-const paddleBoxHelper1 = new THREE.Box3Helper(paddleBoundingBox, 0xff0000);
-const paddleBoxHelper2 = new THREE.Box3Helper(paddleBoundingAiBox, 0xff0000);
-const paddleBoxHelper3 = new THREE.Box3Helper(ballBoundingBox, 0xff0000);
-const NetHelper3       = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
+const PaddleBoxHelper   = new THREE.Box3Helper(PaddleBoundingBox, 0xff0000);
+const PaddleAiBoxHelper = new THREE.Box3Helper(PaddleBoundingAiBox, 0xff0000);
+const BallBoxHelper     = new THREE.Box3Helper(BallBoundingBox, 0xff0000);
+const TableBoxHelper    = new THREE.Box3Helper(TableBoundingBox, 0xff0000);
+const NetHelper         = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
 
-// scene.add(paddleBoxHelper1);
-// scene.add(paddleBoxHelper2);
-// scene.add(paddleBoxHelper3);
-// scene.add(NetHelper3);
+scene.add(PaddleBoxHelper);
+scene.add(PaddleAiBoxHelper);
+scene.add(BallBoxHelper);
+scene.add(TableBoxHelper);
+scene.add(NetHelper);
 
 function checkCollision() {
     if (Objects.length){
         // Update bounding boxes with the current positions of the models
-        paddleBoundingBox.setFromObject(paddle);
-        paddleBoundingAiBox.setFromObject(paddleAi);
-        ballBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
+        PaddleBoundingBox.setFromObject(paddle);
+        PaddleBoundingAiBox.setFromObject(paddleAi);
+        BallBoundingBox.setFromObject(Objects[Objects.length - 1].sphere);
         NetBoundingBox.setFromObject(Net)
+        TableBoundingBox.setFromObject(Table)
         
-        if (paddleBoundingBox.intersectsBox(ballBoundingBox)) {
+        if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
             console.log('paddle and ball!');
                         
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
-            let forceX = (0.3 * hitDirection)// + (Math.random() - 0.5);
+            let forceX = (0.3 * hitDirection)// to be updated about the direction where it get sends
             
             //for push Sumilation
             gsap.to(paddle.rotation, {
@@ -411,13 +304,13 @@ function checkCollision() {
             })
             Pong_Ball_colide(0.7);
             
-            Objects[Objects.length - 1].sphereBody.torque.setZero();
-            Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.4), Objects[Objects.length - 1].sphereBody.position)
+            // Objects[Objects.length - 1].sphereBody.torque.setZero();
+            // Objects[Objects.length - 1].sphereBody.velocity.setZero();
+            // Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
+            // Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.68, -3.4), Objects[Objects.length - 1].sphereBody.position)
             
         }
-        else if (paddleBoundingAiBox.intersectsBox(ballBoundingBox)){
+        else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
                 Pong_Ball_colide(0.7);
                 console.log('paddleAi and ball!');
                 
@@ -435,30 +328,24 @@ function checkCollision() {
             })
             Pong_Ball_colide(0.7);
             
-            Objects[Objects.length - 1].sphereBody.torque.setZero();
-            Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
-            Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.4), Objects[Objects.length - 1].sphereBody.position)
+            // Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.68, 3.4), Objects[Objects.length - 1].sphereBody.position)
             
         }
-        else if (NetBoundingBox.intersectsBox(ballBoundingBox)) {
+        else if (NetBoundingBox.intersectsBox(BallBoundingBox)) {
             console.log('ball collided with the Net!');
-            
             // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
             // Good just need to get the best velocity values
+        }
+        else if (TableBoundingBox.intersectsBox(BallBoundingBox)) {
+            console.log('ball collided with the Table!');
+            // Collision with the table (restitution + friction) tobeadded
         }
     }
 }
 
-// scene.add(new THREE.GridHelper( 50, 50 ))
-// scene.add(new THREE.AxesHelper(15))
+scene.add(new THREE.GridHelper( 50, 50 ))
 
 gui.add(BallCreator, 'cameraFixed');
-
-//  Animate
-const clock = new THREE.Clock()
-let previousTime = 0
-
 
 //Scoring System
 let PlayerScore = 0;
@@ -469,43 +356,54 @@ function updateScoreboard() {
     scoreBoard.innerText = `Player : ${PlayerScore} - AI_bot : ${AiScore}`;
 }
 
+//  Animate
+const clock = new THREE.Clock()
+let   elapsedTime, previousTime = clock.getElapsedTime();
+let   deltaTime = 0;
+
 const tick = () =>
 {
-    const elapsedTime = clock.getElapsedTime()
-    const deltaTime = elapsedTime - previousTime
+    elapsedTime = clock.getElapsedTime();
+    deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
-    
-    PhysicWorld.step(1/60, deltaTime, 3)
-    
-    TableBody.position.x = Table.position.x;
-    TableBody.position.y = Table.position.y;
-    TableBody.position.z = Table.position.z;
-    
-    floor.position.copy(planeBody.position);
-    floor.quaternion.copy(planeBody.quaternion);
+
+    console.log(deltaTime);
 
     camera.position.y += 0.02;
     camera.position.z -= 0.02;
     camera.position.x += 0.02;
 
-    Table.position.copy(TableBody.position);
-    Table.quaternion.copy(TableBody.quaternion);
     
-    for (const object of Objects){
-        object.sphere.position.copy(object.sphereBody.position);
-        object.sphere.quaternion.copy(object.sphereBody.quaternion);
+    for (const obj of Objects) {
+        // Update velocity
+        obj.velocity.add(obj.acceleration.clone().multiplyScalar(deltaTime));
+        
+        // Apply friction
+        obj.velocity.multiplyScalar(friction);
+
+        // Update position
+        obj.sphere.position.add(obj.velocity.clone().multiplyScalar(deltaTime));
+
+        // obj.sphere.position.z = deltaTime * 1.5
+
+        // Collision with the floor
+        if (obj.sphere.position.y <= 0.5) {
+            obj.sphere.position.y = 0.5; // Reset position
+            obj.velocity.y *= -restitution; // Reverse and reduce velocity due to bounce
+        }
     }
     
     if (Objects.length && paddleAi){
         paddleAi.position.x = Objects[Objects.length - 1].sphere.position.x; 
         paddleAi.position.y = Objects[Objects.length - 1].sphere.position.y - 0.4;
+        
         //Scoring System
         if (New_ball_launched){
-            if (Objects[Objects.length - 1].sphere.position.z > paddle.position.z) {
+            if (Objects[Objects.length - 1].sphere.position.z > (paddle.position.z + 3)) {
                 AiScore += 1;
                 New_ball_launched = false;
                 updateScoreboard()
-            } else if (Objects[Objects.length - 1].sphere.position.z < paddleAi.position.z) {
+            } else if (Objects[Objects.length - 1].sphere.position.z < (paddleAi.position.z - 3)) {
                 PlayerScore += 1;
                 New_ball_launched = false;
                 updateScoreboard()
@@ -513,7 +411,8 @@ const tick = () =>
         }
     
         if (PlayerScore === 7 || AiScore === 7) {
-            alert(`${PlayerScore === 10 ? 'Player' : 'Ai'} Wins!`);
+            updateScoreboard()
+            alert(`${PlayerScore === 7 ? 'Player' : 'Ai'} Wins!`);
             PlayerScore = 0;
             AiScore = 0;
             updateScoreboard()
