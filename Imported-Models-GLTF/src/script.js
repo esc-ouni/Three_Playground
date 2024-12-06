@@ -168,8 +168,8 @@ const createSphere = (position, px, py, pz) => {
         // sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
         Objects.push({
             sphere: sphere,
-            velocity: new THREE.Vector3(2, 5, 0), // Initial velocity
-            acceleration: new THREE.Vector3(0, gravity, 0), // Gravity applied
+            velocity: new THREE.Vector3(2, 2, 0), // Initial velocity
+            acceleration: new THREE.Vector3(0, gravity, 10), // Gravity applied
             mass: 1
         });
     New_ball_launched = true;
@@ -335,16 +335,46 @@ function checkCollision() {
             console.log('ball collided with the Net!');
             // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
             // Good just need to get the best velocity values
+
+            // Reverse the Z velocity for bounce and apply restitution
+            const normalAxis = new THREE.Vector3(0, 0, 1); // Assuming the net is along the Z-axis
+            const normalVelocity = Objects[Objects.length - 1].velocity.dot(normalAxis); // Extract velocity along the normal
+            Objects[Objects.length - 1].velocity.z = -normalVelocity * restitution;
+
+            // Apply friction to X and Y velocity components
+            Objects[Objects.length - 1].velocity.x *= friction;
+            Objects[Objects.length - 1].velocity.y *= friction;
+
+            // Prevent sinking into the net by repositioning the ball
+            const ballDepth = BallBoundingBox.max.z - BallBoundingBox.min.z;
+            if (Objects[Objects.length - 1].sphere.position.z > NetBoundingBox.max.z) {
+                Objects[Objects.length - 1].sphere.position.z = NetBoundingBox.max.z + ballDepth / 2; // Ball is on one side of the net
+            } else {
+                Objects[Objects.length - 1].sphere.position.z = NetBoundingBox.min.z - ballDepth / 2; // Ball is on the other side of the net
+            }
         }
         else if (TableBoundingBox.intersectsBox(BallBoundingBox)) {
             console.log('ball collided with the Table!');
             // Collision with the table (restitution + friction) tobeadded
+
+            // Reverse the Y velocity for bounce and apply restitution
+            const normalAxis = new THREE.Vector3(0, 1, 0); // Assuming the table is horizontal
+            const normalVelocity = Objects[Objects.length - 1].velocity.dot(normalAxis); // Extract velocity along the normal
+            Objects[Objects.length - 1].velocity.y = -normalVelocity * restitution;
+
+            // Apply friction to X and Z velocity components
+            Objects[Objects.length - 1].velocity.x *= friction;
+            Objects[Objects.length - 1].velocity.z *= friction;
+
+            // Prevent sinking into the table by repositioning the ball
+            const ballHeight = BallBoundingBox.max.y - BallBoundingBox.min.y;
+            Objects[Objects.length - 1].sphere.position.y = TableBoundingBox.max.y + ballHeight / 2; // Place the ball on the table
         }
     }
 }
 
 scene.add(new THREE.GridHelper( 50, 50 ))
-scene.add(new THREE.AxesHelper( 50 ))
+// scene.add(new THREE.AxesHelper( 50 ))
 
 gui.add(BallCreator, 'cameraFixed');
 
@@ -390,8 +420,6 @@ const tick = () =>
 
         // Update position
         obj.sphere.position.add(obj.velocity.clone().multiplyScalar(deltaTime));
-
-        obj.sphere.position.z = elapsedTime * 1.5
 
         // Collision with the floor
         if (obj.sphere.position.y <= 0.5) {
