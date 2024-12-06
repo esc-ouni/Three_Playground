@@ -168,7 +168,7 @@ const createSphere = (position, px, py, pz) => {
         // sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
         Objects.push({
             sphere: sphere,
-            velocity: new THREE.Vector3(2, 2, 0), // Initial velocity
+            velocity: new THREE.Vector3(0, 2, 20), // Initial velocity
             acceleration: new THREE.Vector3(0, gravity, 10), // Gravity applied
             mass: 1
         });
@@ -413,13 +413,14 @@ const tick = () =>
     
     for (const obj of Objects) {
         // Update velocity
-        obj.velocity.add(obj.acceleration.clone().multiplyScalar(deltaTime));
+        // obj.velocity.add(obj.acceleration.clone().multiplyScalar(deltaTime));
         
         // Apply friction
         obj.velocity.multiplyScalar(friction);
 
         // Update position
         obj.sphere.position.add(obj.velocity.clone().multiplyScalar(deltaTime));
+        // obj.sphere.position.y += gravity;
 
         // Collision with the floor
         if (obj.sphere.position.y <= 0.5) {
