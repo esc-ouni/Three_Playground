@@ -239,7 +239,7 @@ document.addEventListener(
         BallCreator.reset()
     }
     if (keyName === "s"){
-        console.log('hiting Sumilation !');
+        // console.log('hiting Sumilation !');
         gsap.to(paddle.rotation, {
             x: paddle.rotation.x - 1.5,
             duration: 0.1,
@@ -289,7 +289,7 @@ function checkCollision() {
         TableBoundingBox.setFromObject(Table)
         
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
-            console.log('paddle and ball!');
+            // console.log('paddle and ball!');
                         
             const hitDirection = paddle.position.x > 0  ? -1 : 1;
             let forceX = (0.3 * hitDirection)// to be updated about the direction where it get sends
@@ -312,7 +312,7 @@ function checkCollision() {
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
                 Pong_Ball_colide(0.7);
-                console.log('paddleAi and ball!');
+                // console.log('paddleAi and ball!');
                 
                 
                 const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
@@ -332,7 +332,7 @@ function checkCollision() {
             
         }
         else if (NetBoundingBox.intersectsBox(BallBoundingBox)) {
-            console.log('ball collided with the Net!');
+            // console.log('ball collided with the Net!');
             // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
             // Good just need to get the best velocity values
 
@@ -354,7 +354,7 @@ function checkCollision() {
             }
         }
         else if (TableBoundingBox.intersectsBox(BallBoundingBox)) {
-            console.log('ball collided with the Table!');
+            // console.log('ball collided with the Table!');
             // Collision with the table (restitution + friction) tobeadded
 
             // Reverse the Y velocity for bounce and apply restitution
@@ -389,8 +389,8 @@ function updateScoreboard() {
 
 //  Animate
 const clock = new THREE.Clock()
-let   elapsedTime, previousTime = clock.getElapsedTime();
-let   deltaTime = 0;
+let   deltaTime    = 0;
+
 
 
 let angle = 0; // Start angle for rotation
@@ -399,9 +399,7 @@ const target = new THREE.Vector3(0, 0, 0);
 
 const tick = () =>
 {
-    elapsedTime   = clock.getElapsedTime();
-    deltaTime     = elapsedTime - previousTime
-    previousTime  = elapsedTime
+    deltaTime = clock.getDelta();
 
     console.log(deltaTime);
 
@@ -455,7 +453,7 @@ const tick = () =>
         }
         //
     }
-    console.log("Player Score :", PlayerScore, " Ai Score :", AiScore);
+    // console.log("Player Score :", PlayerScore, " Ai Score :", AiScore);
     
     if (BallCreator.cameraFixed){
         checkCollision();
