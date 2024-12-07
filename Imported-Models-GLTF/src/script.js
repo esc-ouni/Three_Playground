@@ -10,7 +10,7 @@ import stats from 'stats.js'
 // Physics properties
 const gravity = -9.8;
 const friction = 0.98;
-const restitution = 0.8;
+const restitution = 0.92;
 
 
 const stat = new stats()
@@ -152,6 +152,10 @@ STDMaterial.roughness = 0.1;
 STDMaterial.map       = Texture;
 
 
+function applyForce(obj, Velocity){
+    obj.velocity.copy(Velocity)
+}
+
 const createSphere = (position, px, py, pz) => {
     const sphere = new THREE.Mesh(
         STDGeometry,
@@ -162,23 +166,29 @@ const createSphere = (position, px, py, pz) => {
         
         scene.add(sphere)
         
-        // sphereBody.torque.setZero()
-        // sphereBody.velocity.setZero();
-        // sphereBody.angularVelocity.setZero()
-        // sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
+        BallCreator.reset()
         Objects.push({
             sphere: sphere,
-            velocity: new THREE.Vector3(0, 2, 20), // Initial velocity
-            acceleration: new THREE.Vector3(0, gravity, 10), // Gravity applied
+            velocity: new THREE.Vector3(1, 1, 1), // Initial velocity
             mass: 1
         });
+
+        // serve 
+        Objects[Objects.length - 1].velocity.set(BallCreator.px, BallCreator.py, BallCreator.pz); 
+
     New_ball_launched = true;
 }
 
 const BallCreator = {
+    // px: 0,
+    // py: 3.7,
+    // pz: 29,
+
     px: 0,
-    py: 0.5,
-    pz: 2 ,
+    py: -4.65,
+    pz: 26.5,
+
+    rest:1.245,
     cameraFixed: false 
 }
 
@@ -199,6 +209,11 @@ BallCreator.createBall = () => {
 
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
+
+gui.add(BallCreator, 'px', 0, 50).step(0.05)
+gui.add(BallCreator, 'py', -20, 20).step(0.05)
+gui.add(BallCreator, 'pz', 0, 50).step(0.05)
+gui.add(BallCreator, 'rest', 0, 4).step(0.005)
 
 //Table 
 const geometry       = new THREE.BoxGeometry( 1, 1, 1 ); 
@@ -289,10 +304,10 @@ function checkCollision() {
         TableBoundingBox.setFromObject(Table)
         
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
-            // console.log('paddle and ball!');
-                        
-            const hitDirection = paddle.position.x > 0  ? -1 : 1;
-            let forceX = (0.3 * hitDirection)// to be updated about the direction where it get sends
+            // console.log('paddle and ball!');                        
+            // const hitDirection = paddle.position.x > 0  ? -1 : 1;
+            // let forceX = (0.3 * hitDirection)// to be updated about the direction where it get sends
+            const hitDirection = 0;
             
             //for push Sumilation
             gsap.to(paddle.rotation, {
@@ -304,63 +319,56 @@ function checkCollision() {
             })
             Pong_Ball_colide(0.7);
             
-            // Objects[Objects.length - 1].sphereBody.torque.setZero();
-            // Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            // Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
-            // Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.68, -3.4), Objects[Objects.length - 1].sphereBody.position)
+            // Objects[Objects.length - 1].velocity.setZero();
+            Objects[Objects.length - 1].velocity.set(0, 3.7, -29);
             
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
-                Pong_Ball_colide(0.7);
-                // console.log('paddleAi and ball!');
-                
-                
-                const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
-                let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
-                
-                //for push Sumilation
-                gsap.to(paddle.rotation, {
-                    x: paddle.rotation.x + 0.5,
-                    y: paddle.rotation.y + (hitDirection * 0.3),
-                    z: paddle.rotation.z + (hitDirection * 0.3),
+            Pong_Ball_colide(0.7);
+            // console.log('paddleAi and ball!');
+            // const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
+            // let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
+            const hitDirection = 0;
+            
+            //for push Sumilation
+            gsap.to(paddle.rotation, {
+                x: paddle.rotation.x + 0.5,
+                y: paddle.rotation.y + (hitDirection * 0.3),
+                z: paddle.rotation.z + (hitDirection * 0.3),
                 duration: 0.1,
                 ease: "power3.out"
             })
-            Pong_Ball_colide(0.7);
-            
-            // Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.68, 3.4), Objects[Objects.length - 1].sphereBody.position)
-            
+                Pong_Ball_colide(0.7);
+                
+            Objects[Objects.length - 1].velocity.set(0, 3.7, 29);
+                
         }
         else if (NetBoundingBox.intersectsBox(BallBoundingBox)) {
-            // console.log('ball collided with the Net!');
+            console.log('ball collided with the Net!');
             // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
             // Good just need to get the best velocity values
 
-            // Reverse the Z velocity for bounce and apply restitution
-            const normalAxis = new THREE.Vector3(0, 0, 1); // Assuming the net is along the Z-axis
-            const normalVelocity = Objects[Objects.length - 1].velocity.dot(normalAxis); // Extract velocity along the normal
-            Objects[Objects.length - 1].velocity.z = -normalVelocity * restitution;
+            // const normalVelocity = Objects[Objects.length - 1].velocity.dot(new THREE.Vector3(0, 0, 1)); // Extract velocity along the normal
+            // Objects[Objects.length - 1].velocity.z = ((Objects[Objects.length - 1].velocity.y) > 0 ? 1 : -1 ) * restitution;
 
-            // Apply friction to X and Y velocity components
-            Objects[Objects.length - 1].velocity.x *= friction;
-            Objects[Objects.length - 1].velocity.y *= friction;
+            // // Apply friction to X and Y velocity components
+            // Objects[Objects.length - 1].velocity.x *= friction;
+            // Objects[Objects.length - 1].velocity.y *= friction;
 
-            // Prevent sinking into the net by repositioning the ball
-            const ballDepth = BallBoundingBox.max.z - BallBoundingBox.min.z;
-            if (Objects[Objects.length - 1].sphere.position.z > NetBoundingBox.max.z) {
-                Objects[Objects.length - 1].sphere.position.z = NetBoundingBox.max.z + ballDepth / 2; // Ball is on one side of the net
-            } else {
-                Objects[Objects.length - 1].sphere.position.z = NetBoundingBox.min.z - ballDepth / 2; // Ball is on the other side of the net
-            }
+            // // Prevent sinking into the net by repositioning the ball
+            // const ballDepth = BallBoundingBox.max.z - BallBoundingBox.min.z;
+            // if (Objects[Objects.length - 1].sphere.position.z > NetBoundingBox.max.z) {
+            //     Objects[Objects.length - 1].sphere.position.z = NetBoundingBox.max.z + ballDepth / 2; // Ball is on one side of the net
+            // } else {
+            //     Objects[Objects.length - 1].sphere.position.z = NetBoundingBox.min.z - ballDepth / 2; // Ball is on the other side of the net
+            // }
         }
         else if (TableBoundingBox.intersectsBox(BallBoundingBox)) {
             // console.log('ball collided with the Table!');
             // Collision with the table (restitution + friction) tobeadded
 
             // Reverse the Y velocity for bounce and apply restitution
-            const normalAxis = new THREE.Vector3(0, 1, 0); // Assuming the table is horizontal
-            const normalVelocity = Objects[Objects.length - 1].velocity.dot(normalAxis); // Extract velocity along the normal
-            Objects[Objects.length - 1].velocity.y = -normalVelocity * restitution;
+            Objects[Objects.length - 1].velocity.y *= - (BallCreator.rest);
 
             // Apply friction to X and Z velocity components
             Objects[Objects.length - 1].velocity.x *= friction;
@@ -401,29 +409,28 @@ const tick = () =>
 {
     deltaTime = clock.getDelta();
 
-    console.log(deltaTime);
-
     angle += 0.005;
-    camera.position.x = (target.x + radius * Math.cos(angle));
-    camera.position.z = (target.z + radius * Math.sin(angle));
-    camera.position.y = 9;
+    camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
+    camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
+    camera.position.y += deltaTime/10 * 9;
 
     
-    for (const obj of Objects) {
-        // Update velocity
-        // obj.velocity.add(obj.acceleration.clone().multiplyScalar(deltaTime));
+    for (const obj of Objects) {        
+        // Apply Gravity
+        obj.velocity.y += gravity * deltaTime;
         
         // Apply friction
         obj.velocity.multiplyScalar(friction);
 
         // Update position
-        obj.sphere.position.add(obj.velocity.clone().multiplyScalar(deltaTime));
-        // obj.sphere.position.y += gravity;
+        obj.sphere.position.x += obj.velocity.x * deltaTime;
+        obj.sphere.position.y += obj.velocity.y * deltaTime;
+        obj.sphere.position.z += obj.velocity.z * deltaTime;
 
         // Collision with the floor
         if (obj.sphere.position.y <= 0.5) {
             obj.sphere.position.y = 0.5; // Reset position
-            obj.velocity.y *= -restitution; // Reverse and reduce velocity due to bounce
+            obj.velocity.y *= -restitution * deltaTime; // Reverse and reduce velocity due to bounce
         }
     }
     
@@ -451,62 +458,62 @@ const tick = () =>
             AiScore = 0;
             updateScoreboard()
         }
-        //
     }
     // console.log("Player Score :", PlayerScore, " Ai Score :", AiScore);
     
     if (BallCreator.cameraFixed){
-        checkCollision();
-        
+
         camera.position.x = 0;
         camera.position.y = 7.8;
         camera.position.z = 12.8;
-        camera.position.x = 4 * mouse.x;
-        camera.position.y = 6.8 + ( 1 * mouse.y);
+        camera.position.x = (4 * mouse.x);
+        camera.position.y = (6.8 + ( 1 * mouse.y));
         
-        paddle.position.x = 5.5 * mouse.x;
-        paddle.position.z = 11 - Math.abs((2 * mouse.x));
-        paddle.position.y = 5.03 + (2 * mouse.y);
+        paddle.position.x = (5.5 * mouse.x);
+        paddle.position.z = (11 - Math.abs((2 * mouse.x)));
+        paddle.position.y = (5.03 + (2 * mouse.y));
         
-        if (paddle.position.x >0){
-            gsap.to(paddle.rotation, {
-                x: 2.81,
-                y: 2.96,
-                z: 2.81,
-                duration: 0.095,
-                ease: "power2.inOut",
-            });
-        }
-        else{
-            gsap.to(paddle.rotation, {
-                x: 2.81,
-                y: 6.28,
-                z: 2.81,
-                duration: 0.095,
-                ease: "power2.inOut",
-            });
-        }
+        // if (paddle.position.x >0){
+        //     gsap.to(paddle.rotation, {
+        //         x: 2.81,
+        //         y: 2.96,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }
+        // else{
+        //     gsap.to(paddle.rotation, {
+        //         x: 2.81,
+        //         y: 6.28,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }
 
-        if (paddleAi.position.x > 0){
-            gsap.to(paddleAi.rotation, {
-                x: 2.81,
-                y: 2.96,
-                z: 2.81,
-                duration: 0.095,
-                ease: "power2.inOut",
-            });
-        }
-        else{
-            gsap.to(paddleAi.rotation, {
-                x: 2.81,
-                y: 6.28,
-                z: 2.81,
-                duration: 0.095,
-                ease: "power2.inOut",
-            });
-        }
+        // if (paddleAi.position.x > 0){
+        //     gsap.to(paddleAi.rotation, {
+        //         x: 2.81,
+        //         y: 2.96,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }
+        // else{
+        //     gsap.to(paddleAi.rotation, {
+        //         x: 2.81,
+        //         y: 6.28,
+        //         z: 2.81,
+        //         duration: 0.095,
+        //         ease: "power2.inOut",
+        //     });
+        // }
         
     }
+
+    checkCollision();
 
     topControls.update()
     stat.update()
