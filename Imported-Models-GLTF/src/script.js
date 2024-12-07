@@ -304,6 +304,9 @@ function checkCollision() {
         TableBoundingBox.setFromObject(Table)
         
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
+
+            // console.log(PaddleBoundingBox.distanceToPoint(paddleAi.position));
+
             // console.log('paddle and ball!');                        
             // const hitDirection = paddle.position.x > 0  ? -1 : 1;
             // let forceX = (0.3 * hitDirection)// to be updated about the direction where it get sends
