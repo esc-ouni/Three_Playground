@@ -515,7 +515,8 @@ const tick = () =>
     
     renderer.render(scene, camera)
 
-    window.requestAnimationFrame(tick)
+    // window.requestAnimationFrame(tick)
+    renderer.setAnimationLoop(tick);
 }
 
 tick()
