@@ -235,10 +235,17 @@ Net.position.z = -0.02;
 Net.scale.set(10.29, 1, 0.05)
 
 // mouse event listener
+
+let mouseDirection = 0;
+let prevMouseX = 0;
+
 const mouse = new THREE.Vector2();
 window.addEventListener('mousemove', function (info) {
     mouse.x = (info.clientX/window.innerWidth)*2-1;
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
+    
+    mouseDirection = mouse.x > prevMouseX ? 1 : -1;
+    prevMouseX = mouse.x;
 }
 )
 
@@ -288,11 +295,27 @@ const BallBoxHelper     = new THREE.Box3Helper(BallBoundingBox, 0xff0000);
 const TableBoxHelper    = new THREE.Box3Helper(TableBoundingBox, 0xff0000);
 const NetHelper         = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
 
-scene.add(PaddleBoxHelper);
-scene.add(PaddleAiBoxHelper);
-scene.add(BallBoxHelper);
-scene.add(TableBoxHelper);
-scene.add(NetHelper);
+// scene.add(PaddleBoxHelper);
+// scene.add(PaddleAiBoxHelper);
+// scene.add(BallBoxHelper);
+// scene.add(TableBoxHelper);
+// scene.add(NetHelper);
+
+const BALL_SPEED = 30; // Adjust this base speed as needed
+
+function calculateBallVelocity(fromPaddleZ) {
+    // Determine direction based on paddle position
+    const direction = fromPaddleZ > 0 ? -1 : 1;
+    
+    // Create a velocity vector
+    const velocity = new THREE.Vector3(
+        (Math.random() - 0.5) * 0.5,  // Small random x-axis variation
+        3.7,  // Slight upward trajectory
+        direction * BALL_SPEED  // Primary z-axis movement
+    );
+    
+    return velocity;
+}
 
 function checkCollision() {
     if (Objects.length){
@@ -305,47 +328,51 @@ function checkCollision() {
         
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
 
-            // console.log(PaddleBoundingBox.distanceToPoint(paddleAi.position));
+            // console.log('paddle and ball!');
+            let intensity = Math.min( Math.max((5.5 / Math.abs(paddle.position.x)), 0), 3);                       
+            let forceX = (intensity * mouseDirection)
 
-            // console.log('paddle and ball!');                        
-            // const hitDirection = paddle.position.x > 0  ? -1 : 1;
-            // let forceX = (0.3 * hitDirection)// to be updated about the direction where it get sends
-            const hitDirection = 0;
+            console.log(forceX > 0 ? "right" : "left");
             
             //for push Sumilation
             gsap.to(paddle.rotation, {
                 x: paddle.rotation.x - 0.5,
-                y: paddle.rotation.y + (hitDirection * 0.3),
-                z: paddle.rotation.z + (hitDirection * 0.3),
+                // y: paddle.rotation.y + (mouseDirection * 0.3),
+                // z: paddle.rotation.z + (mouseDirection * 0.3),
                 duration: 0.1,
                 ease: "power3.out"
             })
-            Pong_Ball_colide(0.7);
+            Pong_Ball_colide(0.54);
             
-            // Objects[Objects.length - 1].velocity.setZero();
-            Objects[Objects.length - 1].velocity.set(0, 3.7, -29);
-            
+            Objects[Objects.length - 1].velocity.copy(
+                calculateBallVelocity(paddle.position.z)
+            );
+            Objects[Objects.length - 1].velocity.x = forceX;
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
-            Pong_Ball_colide(0.7);
-            // console.log('paddleAi and ball!');
-            // const hitDirection = paddleAi.position.x > 0  ? -1 : 1;
-            // let forceX = (0.3 * hitDirection) + (Math.random() - 0.5);
-            const hitDirection = 0;
+            
+            // console.log('paddleAi and ball!');                        
+            // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);                       
+            // let forceX = (intensity * mouseDirection)
+
+            // console.log(forceX > 0 ? "right" : "left");
             
             //for push Sumilation
-            gsap.to(paddle.rotation, {
-                x: paddle.rotation.x + 0.5,
-                y: paddle.rotation.y + (hitDirection * 0.3),
-                z: paddle.rotation.z + (hitDirection * 0.3),
+            gsap.to(paddleAi.rotation, {
+                x: paddleAi.rotation.x + 0.5,
+                // y: paddleAi.rotation.y + (mouseDirection * 0.3),
+                // z: paddleAi.rotation.z + (mouseDirection * 0.3),
                 duration: 0.1,
                 ease: "power3.out"
             })
-                Pong_Ball_colide(0.7);
-                
-            Objects[Objects.length - 1].velocity.set(0, 3.7, 29);
-                
+            Pong_Ball_colide(0.54);
+            
+            Objects[Objects.length - 1].velocity.copy(
+                calculateBallVelocity(paddleAi.position.z)
+            );
+            // Objects[Objects.length - 1].velocity.x = forceX;
         }
+        
         else if (NetBoundingBox.intersectsBox(BallBoundingBox)) {
             console.log('ball collided with the Net!');
             // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
@@ -369,6 +396,7 @@ function checkCollision() {
         else if (TableBoundingBox.intersectsBox(BallBoundingBox)) {
             // console.log('ball collided with the Table!');
             // Collision with the table (restitution + friction) tobeadded
+            Pong_Ball_colide(0.85);
 
             // Reverse the Y velocity for bounce and apply restitution
             Objects[Objects.length - 1].velocity.y *= - (BallCreator.rest);
@@ -476,43 +504,43 @@ const tick = () =>
         paddle.position.z = (11 - Math.abs((2 * mouse.x)));
         paddle.position.y = (5.03 + (2 * mouse.y));
         
-        // if (paddle.position.x >0){
-        //     gsap.to(paddle.rotation, {
-        //         x: 2.81,
-        //         y: 2.96,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-        // else{
-        //     gsap.to(paddle.rotation, {
-        //         x: 2.81,
-        //         y: 6.28,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
+        if (paddle.position.x >0){
+            gsap.to(paddle.rotation, {
+                x: 2.81,
+                y: 2.96,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddle.rotation, {
+                x: 2.81,
+                y: 6.28,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
 
-        // if (paddleAi.position.x > 0){
-        //     gsap.to(paddleAi.rotation, {
-        //         x: 2.81,
-        //         y: 2.96,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-        // else{
-        //     gsap.to(paddleAi.rotation, {
-        //         x: 2.81,
-        //         y: 6.28,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
+        if (paddleAi.position.x > 0){
+            gsap.to(paddleAi.rotation, {
+                x: 2.81,
+                y: 2.96,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddleAi.rotation, {
+                x: 2.81,
+                y: 6.28,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
         
     }
 
