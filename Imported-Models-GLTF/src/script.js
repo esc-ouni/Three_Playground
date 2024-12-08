@@ -328,11 +328,11 @@ function checkCollision() {
         
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
 
-            // console.log('paddle and ball!');
-            let intensity = Math.min( Math.max((5.5 / Math.abs(paddle.position.x)), 0), 3);                       
+            console.log('paddle and ball!');
+            let intensity = 3 - (Math.abs(Objects[Objects.length - 1].sphere.position.x) * 2/5);                       
             let forceX = (intensity * mouseDirection)
 
-            console.log(forceX > 0 ? "right" : "left");
+            // console.log(forceX > 0 ? "right" : "left");
             
             //for push Sumilation
             gsap.to(paddle.rotation, {
@@ -351,7 +351,7 @@ function checkCollision() {
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
             
-            // console.log('paddleAi and ball!');                        
+            console.log('paddleAi and ball!');                        
             // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);                       
             // let forceX = (intensity * mouseDirection)
 
