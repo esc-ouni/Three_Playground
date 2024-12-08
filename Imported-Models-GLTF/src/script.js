@@ -301,7 +301,7 @@ const NetHelper         = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
 // scene.add(TableBoxHelper);
 // scene.add(NetHelper);
 
-const BALL_SPEED = 30; // Adjust this base speed as needed
+const BALL_SPEED = 35; // Adjust this base speed as needed
 
 function calculateBallVelocity(fromPaddleZ) {
     // Determine direction based on paddle position
@@ -337,8 +337,6 @@ function checkCollision() {
             //for push Sumilation
             gsap.to(paddle.rotation, {
                 x: paddle.rotation.x - 0.5,
-                // y: paddle.rotation.y + (mouseDirection * 0.3),
-                // z: paddle.rotation.z + (mouseDirection * 0.3),
                 duration: 0.1,
                 ease: "power3.out"
             })
@@ -360,8 +358,6 @@ function checkCollision() {
             //for push Sumilation
             gsap.to(paddleAi.rotation, {
                 x: paddleAi.rotation.x + 0.5,
-                // y: paddleAi.rotation.y + (mouseDirection * 0.3),
-                // z: paddleAi.rotation.z + (mouseDirection * 0.3),
                 duration: 0.1,
                 ease: "power3.out"
             })
