@@ -8,8 +8,8 @@ import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 import stats from 'stats.js'
 
 // Physics properties
-const gravity = -9.8;
-const friction = 0.98;
+const gravity     = -9.8;
+const friction    = 0.98;
 const restitution = 0.92;
 
 
@@ -180,10 +180,6 @@ const createSphere = (position, px, py, pz) => {
 }
 
 const BallCreator = {
-    // px: 0,
-    // py: 3.7,
-    // pz: 29,
-
     px: 0,
     py: -4.65,
     pz: 26.5,
