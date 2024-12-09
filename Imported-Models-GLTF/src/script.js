@@ -197,10 +197,10 @@ BallCreator.reset = () => {
 
 BallCreator.createBall = () => {
     let x = (Math.random() - 0.5) * 4
-    let y = 5.0387;
-    let z = -8;
+    let y = 4.92;
+    let z = -10.1;
     
-    createSphere(new THREE.Vector3(x, y, z), BallCreator.px, BallCreator.py, BallCreator.pz)
+    createSphere(new THREE.Vector3(paddle.position.x, y, -paddle.position.z), BallCreator.px, BallCreator.py, BallCreator.pz)
 }
 
 gui.add(BallCreator, 'createBall')
@@ -485,6 +485,7 @@ const tick = () =>
     // console.log("Player Score :", PlayerScore, " Ai Score :", AiScore);
     
     if (BallCreator.cameraFixed){
+        // console.log(paddle.position);
 
         camera.position.x = 0;
         camera.position.y = 7.8;
