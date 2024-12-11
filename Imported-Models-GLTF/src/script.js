@@ -256,14 +256,6 @@ document.addEventListener(
     if (keyName === "t"){
         BallCreator.reset()
     }
-    if (keyName === "s"){
-        // console.log('hiting Sumilation !');
-        gsap.to(paddle.rotation, {
-            x: paddle.rotation.x - 1.5,
-            duration: 0.1,
-            ease: "power3.out"
-        }); 
-    }
 }
 )
 
@@ -324,7 +316,7 @@ function checkCollision() {
         
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
 
-            console.log('paddle and ball!');
+            // console.log('paddle and ball!');
             let intensity = 3 - (Math.abs(Objects[Objects.length - 1].sphere.position.x) * 2/5);                       
             let forceX = (intensity * mouseDirection)
 
@@ -345,7 +337,7 @@ function checkCollision() {
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
             
-            console.log('paddleAi and ball!');                        
+            // console.log('paddleAi and ball!');                        
             // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);                       
             // let forceX = (intensity * mouseDirection)
 
@@ -366,7 +358,7 @@ function checkCollision() {
         }
         
         else if (NetBoundingBox.intersectsBox(BallBoundingBox)) {
-            console.log('ball collided with the Net!');
+            // console.log('ball collided with the Net!');
             // Objects[Objects.length - 1].sphereBody.velocity.z = -(Objects[Objects.length - 1].sphereBody.velocity.z) * 0.5; //Good !
             // Good just need to get the best velocity values
 
@@ -422,8 +414,6 @@ function updateScoreboard() {
 const clock = new THREE.Clock()
 let   deltaTime    = 0;
 
-
-
 let angle = 0; // Start angle for rotation
 const radius = 18; // Distance from the center of the object
 const target = new THREE.Vector3(0, 0, 0);
@@ -463,11 +453,11 @@ const tick = () =>
         
         //Scoring System
         if (New_ball_launched){
-            if (Objects[Objects.length - 1].sphere.position.z > (paddle.position.z + 3)) {
+            if (Objects[Objects.length - 1].sphere.position.z > (paddle.position.z + 1)) {
                 AiScore += 1;
                 New_ball_launched = false;
                 updateScoreboard()
-            } else if (Objects[Objects.length - 1].sphere.position.z < (paddleAi.position.z - 3)) {
+            } else if (Objects[Objects.length - 1].sphere.position.z < (paddleAi.position.z - 1)) {
                 PlayerScore += 1;
                 New_ball_launched = false;
                 updateScoreboard()
@@ -482,10 +472,8 @@ const tick = () =>
             updateScoreboard()
         }
     }
-    // console.log("Player Score :", PlayerScore, " Ai Score :", AiScore);
     
     if (BallCreator.cameraFixed){
-        // console.log(paddle.position);
 
         camera.position.x = 0;
         camera.position.y = 7.8;
@@ -544,7 +532,6 @@ const tick = () =>
     
     renderer.render(scene, camera)
 
-    // window.requestAnimationFrame(tick)
     renderer.setAnimationLoop(tick);
 }
 
