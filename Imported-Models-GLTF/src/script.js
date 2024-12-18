@@ -482,7 +482,7 @@ const tick = () =>
         camera.position.y = (6.8 + ( 1 * mouse.y));
         
         paddle.position.x = (5.5 * mouse.x);
-        paddle.position.z = (11 - Math.abs((2 * mouse.x)));
+        // paddle.position.z = (11 - Math.abs((2 * mouse.x))); // edge effect
         paddle.position.y = (5.03 + (2 * mouse.y));
         
         if (paddle.position.x >0){
