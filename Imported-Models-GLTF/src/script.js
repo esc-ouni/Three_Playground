@@ -7,10 +7,10 @@ import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import stats from 'stats.js'
 
-// Physics properties
+// Physics properties (perfect values)
 const gravity     = -9.8;
-const friction    = 0.98;
-const restitution = 0.92;
+const friction    = 0.25;
+const restitution = 0.89;
 
 
 const stat = new stats()
@@ -184,7 +184,12 @@ const BallCreator = {
     py: -4.65,
     pz: 26.5,
 
-    rest:1.245,
+    ppx: 0,
+    ppy: -4.65,
+    ppz: 26.5,
+
+    BALL_SPEED:35,
+
     cameraFixed: false 
 }
 
@@ -206,10 +211,15 @@ BallCreator.createBall = () => {
 gui.add(BallCreator, 'createBall')
 gui.add(BallCreator, 'reset')
 
-gui.add(BallCreator, 'px', 0, 50).step(0.05)
-gui.add(BallCreator, 'py', -20, 20).step(0.05)
-gui.add(BallCreator, 'pz', 0, 50).step(0.05)
-gui.add(BallCreator, 'rest', 0, 4).step(0.005)
+gui.add(BallCreator, 'px',  -20,  70).step(0.05)
+gui.add(BallCreator, 'py',  -20,  70).step(0.05)
+gui.add(BallCreator, 'pz',  -20,  70).step(0.05)
+
+gui.add(BallCreator, 'ppx', -20,  70).step(0.05)
+gui.add(BallCreator, 'ppy', -20,  70).step(0.05)
+gui.add(BallCreator, 'ppz', -20,  70).step(0.05)
+
+gui.add(BallCreator, 'BALL_SPEED', 0,  70).step(0.05)
 
 //Table 
 const geometry       = new THREE.BoxGeometry( 1, 1, 1 ); 
@@ -256,6 +266,12 @@ document.addEventListener(
     if (keyName === "t"){
         BallCreator.reset()
     }
+    if (keyName === "v"){
+        BallCreator.cameraFixed = true;
+    }
+    if (keyName === "b"){
+        BallCreator.cameraFixed = false;
+    }
 }
 )
 
@@ -289,22 +305,6 @@ const NetHelper         = new THREE.Box3Helper(NetBoundingBox, 0xff0000);
 // scene.add(TableBoxHelper);
 // scene.add(NetHelper);
 
-const BALL_SPEED = 35; // Adjust this base speed as needed
-
-function calculateBallVelocity(fromPaddleZ) {
-    // Determine direction based on paddle position
-    const direction = fromPaddleZ > 0 ? -1 : 1;
-    
-    // Create a velocity vector
-    const velocity = new THREE.Vector3(
-        (Math.random() - 0.5) * 0.5,  // Small random x-axis variation
-        3.7,  // Slight upward trajectory
-        direction * BALL_SPEED  // Primary z-axis movement
-    );
-    
-    return velocity;
-}
-
 function checkCollision() {
     if (Objects.length){
         // Update bounding boxes with the current positions of the models
@@ -317,11 +317,11 @@ function checkCollision() {
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
 
             // console.log('paddle and ball!');
-            let intensity = 3 - (Math.abs(Objects[Objects.length - 1].sphere.position.x) * 2/5);                       
-            let forceX = (intensity * mouseDirection)
+            // let intensity = 3 - (Math.abs(Objects[Objects.length - 1].sphere.position.x) * 2/5);                       
+            // let forceX = (intensity * mouseDirection)
 
             // console.log(forceX > 0 ? "right" : "left");
-            
+
             //for push Sumilation
             gsap.to(paddle.rotation, {
                 x: paddle.rotation.x - 0.5,
@@ -330,10 +330,10 @@ function checkCollision() {
             })
             Pong_Ball_colide(0.54);
             
-            Objects[Objects.length - 1].velocity.copy(
-                calculateBallVelocity(paddle.position.z)
-            );
-            Objects[Objects.length - 1].velocity.x = forceX;
+            Objects[Objects.length - 1].velocity.set( BallCreator.ppx,        
+                                                      BallCreator.ppy,        
+                                                      -BallCreator.BALL_SPEED
+            )
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
             
@@ -351,10 +351,10 @@ function checkCollision() {
             })
             Pong_Ball_colide(0.54);
             
-            Objects[Objects.length - 1].velocity.copy(
-                calculateBallVelocity(paddleAi.position.z)
-            );
-            // Objects[Objects.length - 1].velocity.x = forceX;
+            Objects[Objects.length - 1].velocity.set( BallCreator.ppx,        
+                                                      BallCreator.ppy,        
+                                                      BallCreator.BALL_SPEED
+            )
         }
         
         else if (NetBoundingBox.intersectsBox(BallBoundingBox)) {
@@ -381,13 +381,13 @@ function checkCollision() {
             // console.log('ball collided with the Table!');
             // Collision with the table (restitution + friction) tobeadded
             Pong_Ball_colide(0.85);
-
-            // Reverse the Y velocity for bounce and apply restitution
-            Objects[Objects.length - 1].velocity.y *= - (BallCreator.rest);
-
+            
             // Apply friction to X and Z velocity components
             Objects[Objects.length - 1].velocity.x *= friction;
             Objects[Objects.length - 1].velocity.z *= friction;
+
+            // Reverse the Y velocity for bounce and apply restitution
+            Objects[Objects.length - 1].velocity.y *= -restitution;
 
             // Prevent sinking into the table by repositioning the ball
             const ballHeight = BallBoundingBox.max.y - BallBoundingBox.min.y;
@@ -414,7 +414,7 @@ function updateScoreboard() {
 const clock = new THREE.Clock()
 let   deltaTime    = 0;
 
-let angle = 0; // Start angle for rotation
+let   angle = 0; // Start angle for rotation
 const radius = 18; // Distance from the center of the object
 const target = new THREE.Vector3(0, 0, 0);
 
@@ -432,19 +432,11 @@ const tick = () =>
         // Apply Gravity
         obj.velocity.y += gravity * deltaTime;
         
-        // Apply friction
-        obj.velocity.multiplyScalar(friction);
-
         // Update position
         obj.sphere.position.x += obj.velocity.x * deltaTime;
         obj.sphere.position.y += obj.velocity.y * deltaTime;
         obj.sphere.position.z += obj.velocity.z * deltaTime;
 
-        // Collision with the floor
-        if (obj.sphere.position.y <= 0.5) {
-            obj.sphere.position.y = 0.5; // Reset position
-            obj.velocity.y *= -restitution * deltaTime; // Reverse and reduce velocity due to bounce
-        }
     }
     
     if (Objects.length && paddleAi){
