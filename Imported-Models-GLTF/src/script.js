@@ -324,7 +324,7 @@ function checkCollision() {
         NetBoundingBox.setFromObject(Net)
         TableBoundingBox.setFromObject(Table)
         
-        if (PaddleBoundingBox.intersectsBox(BallBoundingBox)) {
+        if (PaddleBoundingBox.intersectsBox(BallBoundingBox) && Objects[Objects.length - 1].velocity.z > 0) {
             
 
             // console.log(PaddleBoundingBox.distanceToPoint(paddleAi.position));
@@ -347,7 +347,7 @@ function checkCollision() {
                                                       -BallCreator.BALL_SPEED
             )
         }
-        else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox)){
+        else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox) && Objects[Objects.length - 1].velocity.z < 0){
             
             // console.log('paddleAi and ball!');                        
             // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);                       
