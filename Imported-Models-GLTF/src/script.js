@@ -5,7 +5,7 @@ import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
-import stats from 'stats.js'
+// import stats from 'stats.js'
 
 
 // Physics properties (perfect values)
@@ -15,9 +15,9 @@ const restitution = 0.89;
 
 
 
-const stat = new stats()
-stat.showPanel(0)
-document.body.appendChild(stat.dom)
+// const stat = new stats()
+// stat.showPanel(0)
+// document.body.appendChild(stat.dom)
 
 const loadingScreen = document.getElementById('loading-screen');
 
@@ -79,7 +79,7 @@ const handleResize = () => {
 window.addEventListener('resize', handleResize)
 
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(-15, 4, 0)
+camera.position.set(-22, 6, 0)
 scene.add(camera)
 
 const topControls = new OrbitControls(camera, canvas)
@@ -435,7 +435,7 @@ const clock = new THREE.Clock()
 let   deltaTime    = 0;
 
 let   angle = 0; // Start angle for rotation
-const radius = 18; // Distance from the center of the object
+const radius = 22; // Distance from the center of the object
 const target = new THREE.Vector3(0, 0, 0);
 
 const tick = () =>
@@ -443,9 +443,9 @@ const tick = () =>
     deltaTime = clock.getDelta();
 
     angle += 0.005;
-    // camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
-    // camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
-    // camera.position.y += deltaTime/10 * 9;
+    camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
+    camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
+    // camera.position.y += deltaTime/10 * 9;e
 
     
     for (const obj of Objects) {        
@@ -540,7 +540,7 @@ const tick = () =>
     checkCollision();
 
     topControls.update()
-    stat.update()
+    // stat.update()
     
     renderer.render(scene, camera)
 
