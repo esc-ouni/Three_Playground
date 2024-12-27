@@ -7,6 +7,7 @@ import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import stats from 'stats.js'
 
+
 // Physics properties (perfect values)
 const gravity     = -9.8;
 const friction    = 0.25;
@@ -65,19 +66,21 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-    {
-        sizes.width = window.innerWidth
-        sizes.height = window.innerHeight
-        camera.aspect = sizes.width / sizes.height
-        camera.updateProjectionMatrix()
-        renderer.setSize(sizes.width, sizes.height)
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    })
-    
-    const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-    camera.position.set(-15, 4, 0)
-    scene.add(camera)
+//event listeners
+const handleResize = () => {
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+};
+
+window.addEventListener('resize', handleResize)
+
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+camera.position.set(-15, 4, 0)
+scene.add(camera)
 
 const topControls = new OrbitControls(camera, canvas)
 topControls.enableDamping = true
@@ -255,35 +258,40 @@ Net.scale.set(10.29, 1, 0.05)
 let mouseDirection = 0;
 let prevMouseX = 0;
 
-const mouse = new THREE.Vector2();
-window.addEventListener('mousemove', function (info) {
+
+//event listeners
+
+const handleMouseMove = (info) => {
     mouse.x = (info.clientX/window.innerWidth)*2-1;
     mouse.y = -((info.clientY/window.innerHeight)*2-1);
     
     mouseDirection = mouse.x > prevMouseX ? 1 : -1;
     prevMouseX = mouse.x;
-}
-)
+};
 
-document.addEventListener(
-    "keydown",
-    (event) => {
-      const keyName = event.key;
+const handleKeyDown = (event) => {
+    const keyName = event.key;
+  
+      if (keyName === "r"){
+          BallCreator.createBall()
+      }
+      if (keyName === "t"){
+          BallCreator.reset()
+      }
+      if (keyName === "v"){
+          BallCreator.cameraFixed = true;
+      }
+      if (keyName === "b"){
+          BallCreator.cameraFixed = false;
+      }
+};
+//
 
-    if (keyName === "r"){
-        BallCreator.createBall()
-    }
-    if (keyName === "t"){
-        BallCreator.reset()
-    }
-    if (keyName === "v"){
-        BallCreator.cameraFixed = true;
-    }
-    if (keyName === "b"){
-        BallCreator.cameraFixed = false;
-    }
-}
-)
+
+const mouse = new THREE.Vector2();
+window.addEventListener('mousemove', handleMouseMove)
+
+document.addEventListener("keydown", handleKeyDown)
 
 // enviroment map
 const rgbeLoader = new RGBELoader(loadingManager);
