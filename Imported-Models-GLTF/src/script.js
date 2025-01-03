@@ -172,7 +172,7 @@ const createSphere = (position, px, py, pz) => {
 
         sphereBody.torque.setZero()
         sphereBody.velocity.setZero();
-        sphereBody.angularVelocity.setZero()
+        // sphereBody.angularVelocity.setZero()
         sphereBody.applyForce(new cannon.Vec3(0, 0.5, 3), sphereBody.position)
         PhysicWorld.addBody(sphereBody);
     ball = sphere;
@@ -413,7 +413,7 @@ function checkCollision() {
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
+            // Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, -3.4), Objects[Objects.length - 1].sphereBody.position)
             
         }
@@ -437,7 +437,7 @@ function checkCollision() {
             
             Objects[Objects.length - 1].sphereBody.torque.setZero();
             Objects[Objects.length - 1].sphereBody.velocity.setZero();
-            Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
+            // Objects[Objects.length - 1].sphereBody.angularVelocity.setZero()
             Objects[Objects.length - 1].sphereBody.applyForce(new cannon.Vec3(forceX, 0.55, 3.4), Objects[Objects.length - 1].sphereBody.position)
             
         }
