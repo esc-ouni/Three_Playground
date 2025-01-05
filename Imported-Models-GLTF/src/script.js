@@ -192,19 +192,17 @@ const BallCreator = {
     hit_y  : -4.65,
     hit_z  : 26.5,
 
-    BALL_SPEED:35,
-
     cameraFixed: false 
 }
 
 
 BallCreator.serve_x = 0;
-BallCreator.serve_y = -1.4;
-BallCreator.serve_z = 9.5;
+BallCreator.serve_y = 3.4;
+BallCreator.serve_z = 21.5;
 
 BallCreator.hit_x   = 0;
-BallCreator.hit_y   = 1.8;
-BallCreator.hit_z   = 16;
+BallCreator.hit_y   = 3.2;
+BallCreator.hit_z   = 22;
 
 BallCreator.reset = () => {
     for (const object of Objects){
@@ -231,8 +229,6 @@ gui.add(BallCreator, 'serve_z',  -20,  70).step(0.05)
 gui.add(BallCreator, 'hit_x', -20,  70).step(0.05)
 gui.add(BallCreator, 'hit_y', -20,  70).step(0.05)
 gui.add(BallCreator, 'hit_z', -20,  70).step(0.05)
-
-gui.add(BallCreator, 'BALL_SPEED', 0,  70).step(0.05)
 
 //Table 
 const geometry       = new THREE.BoxGeometry( 1, 1, 1 ); 
@@ -335,45 +331,53 @@ function checkCollision() {
         if (PaddleBoundingBox.intersectsBox(BallBoundingBox) && Objects[Objects.length - 1].velocity.z > 0) {
             
 
-            // console.log(PaddleBoundingBox.distanceToPoint(paddleAi.position));
             // console.log('paddle and ball!');
-            // let intensity = 3 - (Math.abs(Objects[Objects.length - 1].sphere.position.x) * 2/5);                       
-            // let forceX = (intensity * mouseDirection)
+            // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);  
+            let intensity = Math.max((3 - (Math.abs(paddle.position.x))), 0);
+            if (paddle.position.x > 0 && mouseDirection < 0){
+                intensity = Math.abs(paddle.position.x) * 0.5;
+            }
+            if (paddle.position.x < 0 && mouseDirection > 0){
+                intensity = Math.abs(paddle.position.x) * 0.5;
+            }    
+            let forceX = (intensity * mouseDirection)
 
             // console.log(forceX > 0 ? "right" : "left");
 
             //for push Sumilation
-            // gsap.to(paddle.rotation, {
-            //     x: paddle.rotation.x - 0.5,
-            //     duration: 0.1,
-            //     ease: "power3.out"
-            // })
-            // Pong_Ball_colide(0.54);
+            gsap.to(paddle.rotation, {
+                x: paddle.rotation.x - 0.5,
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.54);
             
-            Objects[Objects.length - 1].velocity.set( BallCreator.hit_x,        
+            Objects[Objects.length - 1].velocity.set( forceX,//BallCreator.hit_x,        
                                                       BallCreator.hit_y,        
-                                                      -BallCreator.BALL_SPEED
+                                                      -BallCreator.hit_z
             )
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox) && Objects[Objects.length - 1].velocity.z < 0){
             
             // console.log('paddleAi and ball!');                        
-            // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);                       
+            // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);  
+            // let intensity = 3 - (Math.abs(Objects[Objects.length - 1].sphere.position.x) * 2/5);                
             // let forceX = (intensity * mouseDirection)
 
             // console.log(forceX > 0 ? "right" : "left");
             
             //for push Sumilation
-            // gsap.to(paddleAi.rotation, {
-            //     x: paddleAi.rotation.x + 0.5,
-            //     duration: 0.1,
-            //     ease: "power3.out"
-            // })
-            // Pong_Ball_colide(0.54);
+            gsap.to(paddleAi.rotation, {
+                x: paddleAi.rotation.x + 0.5,
+                duration: 0.1,
+                ease: "power3.out"
+            })
+            Pong_Ball_colide(0.54);
             
+            // Objects[Objects.length - 1].velocity.set( forceX,//BallCreator.hit_x,        
             Objects[Objects.length - 1].velocity.set( BallCreator.hit_x,        
                                                       BallCreator.hit_y,        
-                                                      BallCreator.BALL_SPEED
+                                                      BallCreator.hit_z
             )
         }
         
@@ -443,8 +447,9 @@ const tick = () =>
     deltaTime = clock.getDelta();
 
     angle += 0.005;
-    camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
-    camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
+
+    // camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
+    // camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
     // camera.position.y += deltaTime/10 * 9;e
 
     
@@ -486,6 +491,7 @@ const tick = () =>
     }
     
     if (BallCreator.cameraFixed){
+        console.log(paddle.position);
 
         camera.position.x = 0;
         camera.position.y = 7.8;
@@ -497,43 +503,43 @@ const tick = () =>
         // paddle.position.z = (11 - Math.abs((2 * mouse.x))); // edge effect
         paddle.position.y = (5.03 + (2 * mouse.y));
         
-        // if (paddle.position.x >0){
-        //     gsap.to(paddle.rotation, {
-        //         x: 2.81,
-        //         y: 2.96,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-        // else{
-        //     gsap.to(paddle.rotation, {
-        //         x: 2.81,
-        //         y: 6.28,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
+        if (paddle.position.x >0){
+            gsap.to(paddle.rotation, {
+                x: 2.81,
+                y: 2.96,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddle.rotation, {
+                x: 2.81,
+                y: 6.28,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
 
-        // if (paddleAi.position.x > 0){
-        //     gsap.to(paddleAi.rotation, {
-        //         x: 2.81,
-        //         y: 2.96,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
-        // else{
-        //     gsap.to(paddleAi.rotation, {
-        //         x: 2.81,
-        //         y: 6.28,
-        //         z: 2.81,
-        //         duration: 0.095,
-        //         ease: "power2.inOut",
-        //     });
-        // }
+        if (paddleAi.position.x > 0){
+            gsap.to(paddleAi.rotation, {
+                x: 2.81,
+                y: 2.96,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
+        else{
+            gsap.to(paddleAi.rotation, {
+                x: 2.81,
+                y: 6.28,
+                z: 2.81,
+                duration: 0.095,
+                ease: "power2.inOut",
+            });
+        }
         
     }
 
