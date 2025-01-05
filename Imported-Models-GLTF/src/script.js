@@ -333,12 +333,15 @@ function checkCollision() {
 
             // console.log('paddle and ball!');
             // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);  
+            console.log(mouseDirection > 0 ? "right" : "left");
             let intensity = Math.max((3 - (Math.abs(paddle.position.x))), 0);
-            if (paddle.position.x > 0 && mouseDirection < 0){
-                intensity = Math.abs(paddle.position.x) * 0.5;
+            if ((paddle.position.x > 2) && (mouseDirection < 0)){
+                console.log("from right to left !");
+                intensity = (Math.abs(paddle.position.x) * 0.5) ;
             }
-            if (paddle.position.x < 0 && mouseDirection > 0){
-                intensity = Math.abs(paddle.position.x) * 0.5;
+            if ((paddle.position.x < -2) && (mouseDirection > 0)){
+                console.log("from left to right !");
+                intensity = (Math.abs(paddle.position.x) * 0.5);
             }    
             let forceX = (intensity * mouseDirection)
 
@@ -491,7 +494,7 @@ const tick = () =>
     }
     
     if (BallCreator.cameraFixed){
-        console.log(paddle.position);
+        // console.log(paddle.position);
 
         camera.position.x = 0;
         camera.position.y = 7.8;
