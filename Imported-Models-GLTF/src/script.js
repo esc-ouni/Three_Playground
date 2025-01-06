@@ -496,7 +496,6 @@ const tick = () =>
     }
     
     if (BallCreator.cameraFixed){
-        // console.log(paddle.position);
 
         camera.position.x = 0;
         camera.position.y = 7.8;
