@@ -444,7 +444,7 @@ const clock = new THREE.Clock()
 let   deltaTime    = 0;
 
 let   angle = 0; // Start angle for rotation
-const radius = 22; // Distance from the center of the object
+const radius = 20; // Distance from the center of the object
 const target = new THREE.Vector3(0, 0, 0);
 
 const tick = () =>
@@ -455,7 +455,7 @@ const tick = () =>
 
     camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
     camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
-    // camera.position.y += deltaTime/10 * 9;e
+    camera.position.y = 9;
 
     
     for (const obj of Objects) {        
