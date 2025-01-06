@@ -59,41 +59,43 @@ const sizes = {
     height: window.innerHeight
 }
 
-let Cameras = []
+// Create four cameras
+const cameras = [
+    new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000),
+    new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000),
+    new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000),
+    new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+];
 
-window.addEventListener('resize', () =>
-{
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-    topCamera.aspect = sizes.width / (sizes.height / 2)
-    bottomCamera.aspect = sizes.width / (sizes.height / 2)
-    topCamera.updateProjectionMatrix()
-    bottomCamera.updateProjectionMatrix()
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
+// Position the cameras for different views
+cameras[0].position.set(0, 5, 5);
+cameras[1].position.set(0, -5, 5);
+cameras[2].position.set(5, 0, 5);
+cameras[3].position.set(-5, 0, 5);
 
-const topCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
-topCamera.position.set(-15, 4, 0)
-scene.add(topCamera)
-
-Cameras.push(topCamera)
-
-const bottomCamera = new THREE.PerspectiveCamera(75, sizes.width / (sizes.height / 2), 0.1, 100)
-bottomCamera.position.set(15, 4, 0)
-scene.add(bottomCamera)
-
-Cameras.push(bottomCamera)
-
-const topControls = new OrbitControls(topCamera, canvas)
-topControls.enableDamping = true
-
-const bottomControls = new OrbitControls(bottomCamera, canvas)
-bottomControls.enableDamping = true
-
+// Set up renderer
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
-})
+});
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+
+// OrbitControls for each camera
+const controls = cameras.map(camera => new OrbitControls(camera, renderer.domElement));
+
+// Resize handler to adjust viewports and camera aspect ratios
+window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    cameras.forEach(camera => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+});
+
+// bottomControls.enableDamping = true
+
+
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
@@ -118,6 +120,8 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/tabla_v2.gltf', function (gl
 
 let paddle = null;
 let paddleAi = null;
+let paddle2 = null;
+let paddleAi2 = null;
 
 GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function (gltf){
     const model = gltf.scene;
@@ -134,11 +138,24 @@ GLTFLoaderr.load('/models/chinese_tea_table_4k.gltf/paddle_test.gltf', function 
         }
     })
 
+    paddle2 = paddle.clone();
     paddleAi = paddle.clone();
+    paddleAi2 = paddle.clone();
+
     paddleAi.position.z = -10;
+    paddleAi.position.x = 1.5;
+
+    paddleAi2.position.z = -10;
+    paddleAi2.position.x = -1.5;
+
+    paddle.position.x = 1.5;
+
+    paddle2.position.x = -1.5;
 
     scene.add(paddle);
+    scene.add(paddle2);
     scene.add(paddleAi);
+    scene.add(paddleAi2);
 })
 
 
@@ -516,13 +533,13 @@ const tick = () =>
     floor.position.copy(planeBody.position);
     floor.quaternion.copy(planeBody.quaternion);
 
-    Cameras[0].position.y += 0.02;
-    Cameras[0].position.z -= 0.02;
-    Cameras[0].position.x += 0.02;
+    // Cameras[0].position.y += 0.02;
+    // Cameras[0].position.z -= 0.02;
+    // Cameras[0].position.x += 0.02;
 
-    Cameras[1].position.y += 0.02;
-    Cameras[1].position.z -= 0.02;
-    Cameras[1].position.x += 0.02;
+    // Cameras[1].position.y += 0.02;
+    // Cameras[1].position.z -= 0.02;
+    // Cameras[1].position.x += 0.02;
 
     Table.position.copy(TableBody.position);
     Table.quaternion.copy(TableBody.quaternion);
@@ -532,7 +549,7 @@ const tick = () =>
         object.sphere.quaternion.copy(object.sphereBody.quaternion);
     }
 
-    if (BallCreator.cameraFixed & Cameras.length === 2){
+    if (BallCreator.cameraFixed ){
         checkCollision();
         
         if ( Chained_Keys.w === 1) {
@@ -561,18 +578,18 @@ const tick = () =>
             keyboard.y = Math.max(keyboard.y, -1);
         }
 
-        Cameras[0].position.x = 0;
-        Cameras[0].position.y = 7.8;
-        Cameras[0].position.z = 12.8;
-        Cameras[0].position.x = 4 * mouse.x;
-        Cameras[0].position.y = 6.8 + ( 1 * mouse.y);
+        // Cameras[0].position.x = 0;
+        // Cameras[0].position.y = 7.8;
+        // Cameras[0].position.z = 12.8;
+        // Cameras[0].position.x = 4 * mouse.x;
+        // Cameras[0].position.y = 6.8 + ( 1 * mouse.y);
 
 
-        Cameras[1].position.x = 0;
-        Cameras[1].position.y = 7.8;
-        Cameras[1].position.z = -12.8;
-        Cameras[1].position.x = 5.5 * keyboard.x;
-        Cameras[1].position.y = 6.8 + ( 1 * keyboard.y);
+        // Cameras[1].position.x = 0;
+        // Cameras[1].position.y = 7.8;
+        // Cameras[1].position.z = -12.8;
+        // Cameras[1].position.x = 5.5 * keyboard.x;
+        // Cameras[1].position.y = 6.8 + ( 1 * keyboard.y);
 
         paddle.position.x = 5.5 * mouse.x;
         paddle.position.z = 11 - Math.abs((2 * mouse.x));
@@ -622,21 +639,39 @@ const tick = () =>
         
     }
 
-    topControls.update()
-    bottomControls.update()
+    // controls.update()
 
     //renderer
     renderer.setScissorTest(true);
 
-    // Top half
-    renderer.setViewport(0, sizes.height / 2, sizes.width, sizes.height / 2);
-    renderer.setScissor(0, sizes.height / 2, sizes.width, sizes.height / 2);
-    renderer.render(scene, topCamera);
-    
-    // Bottom half
-    renderer.setViewport(0, 0, sizes.width, sizes.height / 2);
-    renderer.setScissor(0, 0, sizes.width, sizes.height / 2);
-    renderer.render(scene, bottomCamera);
+    // Define viewports and render each camera to its respective viewport
+    const width = window.innerWidth / 2;
+    const height = window.innerHeight / 2;
+
+    // Top-left viewport
+    renderer.setViewport(0, height, width, height);
+    renderer.setScissor(0, height, width, height);
+    renderer.setScissorTest(true);
+    renderer.render(scene, cameras[0]);
+
+    // Top-right viewport
+    renderer.setViewport(width, height, width, height);
+    renderer.setScissor(width, height, width, height);
+    renderer.setScissorTest(true);
+    renderer.render(scene, cameras[1]);
+
+    // Bottom-left viewport
+    renderer.setViewport(0, 0, width, height);
+    renderer.setScissor(0, 0, width, height);
+    renderer.setScissorTest(true);
+    renderer.render(scene, cameras[2]);
+
+    // Bottom-right viewport
+    renderer.setViewport(width, 0, width, height);
+    renderer.setScissor(width, 0, width, height);
+    renderer.setScissorTest(true);
+    renderer.render(scene, cameras[3]);
+    // renderer.render(scene, bottomCamera);
     
     renderer.setScissorTest(false);
     
