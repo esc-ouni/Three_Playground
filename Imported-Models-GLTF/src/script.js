@@ -6,11 +6,11 @@ import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
-import stats from 'stats.js'
+// import stats from 'stats.js'
 
-const stat = new stats()
-stat.showPanel(0)
-document.body.appendChild(stat.dom)
+// const stat = new stats()
+// stat.showPanel(0)
+// document.body.appendChild(stat.dom)
 
 const loadingScreen = document.getElementById('loading-screen');
 
@@ -640,7 +640,7 @@ const tick = () =>
     
     renderer.setScissorTest(false);
     
-    stat.update()
+    // stat.update()
     window.requestAnimationFrame(tick)
 }
 
