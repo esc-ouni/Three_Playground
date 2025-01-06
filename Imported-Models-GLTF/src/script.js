@@ -4,6 +4,7 @@ import GUI from 'lil-gui'
 import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
+// import { sheen } from 'three/webgpu'
 
 // import stats from 'stats.js'
 
@@ -167,6 +168,7 @@ const createSphere = (position, px, py, pz) => {
 
         sphere.castShadow = true
         sphere.position.copy(position);
+        sphere.position.x = ((Math.random() - 0.5) * 5);
         
         scene.add(sphere)
         
@@ -198,7 +200,7 @@ const BallCreator = {
 
 BallCreator.serve_x = 0;
 BallCreator.serve_y = 3.4;
-BallCreator.serve_z = 21.5;
+BallCreator.serve_z = 22;
 
 BallCreator.hit_x   = 0;
 BallCreator.hit_y   = 3.2;
@@ -332,15 +334,11 @@ function checkCollision() {
             
 
             // console.log('paddle and ball!');
-            // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);  
-            console.log(mouseDirection > 0 ? "right" : "left");
             let intensity = Math.max((3 - (Math.abs(paddle.position.x))), 0);
             if ((paddle.position.x > 2) && (mouseDirection < 0)){
-                console.log("from right to left !");
                 intensity = (Math.abs(paddle.position.x) * 0.5) ;
             }
             if ((paddle.position.x < -2) && (mouseDirection > 0)){
-                console.log("from left to right !");
                 intensity = (Math.abs(paddle.position.x) * 0.5);
             }    
             let forceX = (intensity * mouseDirection)
@@ -362,11 +360,16 @@ function checkCollision() {
         }
         else if (PaddleBoundingAiBox.intersectsBox(BallBoundingBox) && Objects[Objects.length - 1].velocity.z < 0){
             
-            // console.log('paddleAi and ball!');                        
-            // let intensity = Math.max( Math.min((5.5 / Math.abs(paddle.position.x)), 0), 3);  
-            // let intensity = 3 - (Math.abs(Objects[Objects.length - 1].sphere.position.x) * 2/5);                
-            // let forceX = (intensity * mouseDirection)
-
+            // console.log('paddleAi and ball!');
+            let Aidecision = (Math.random() - 0.5) > 0 ? 1:-1;                   
+            let intensity = Math.max((3 - (Math.abs(paddleAi.position.x))), 0);
+            if ((paddleAi.position.x > 2) && (Aidecision < 0)){
+                intensity = (Math.abs(paddleAi.position.x) * 0.5) ;
+            }
+            if ((paddleAi.position.x < -2) && (Aidecision > 0)){
+                intensity = (Math.abs(paddleAi.position.x) * 0.5);
+            }    
+            let forceX = (intensity * Aidecision)
             // console.log(forceX > 0 ? "right" : "left");
             
             //for push Sumilation
@@ -377,8 +380,7 @@ function checkCollision() {
             })
             Pong_Ball_colide(0.54);
             
-            // Objects[Objects.length - 1].velocity.set( forceX,//BallCreator.hit_x,        
-            Objects[Objects.length - 1].velocity.set( BallCreator.hit_x,        
+            Objects[Objects.length - 1].velocity.set( forceX,//BallCreator.hit_x,        
                                                       BallCreator.hit_y,        
                                                       BallCreator.hit_z
             )
@@ -451,8 +453,8 @@ const tick = () =>
 
     angle += 0.005;
 
-    // camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
-    // camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
+    camera.position.x += deltaTime/10 * (target.x + radius * Math.cos(angle));
+    camera.position.z += deltaTime/10 * (target.z + radius * Math.sin(angle));
     // camera.position.y += deltaTime/10 * 9;e
 
     
