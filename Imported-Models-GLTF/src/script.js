@@ -423,7 +423,7 @@ function checkCollision() {
     }
 }
 
-scene.add(new THREE.GridHelper( 50, 50 ))
+// scene.add(new THREE.GridHelper( 50, 50 ))
 // scene.add(new THREE.AxesHelper( 50 ))
 
 gui.add(BallCreator, 'cameraFixed');
