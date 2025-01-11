@@ -212,7 +212,7 @@ controls2 = new DragControls( objects, camera, canvas );
 const MAX_HEIGHT = 1.03; // Set your desired maximum height
 
 controls2.addEventListener('drag', function (event) {
-    console.log( event.object.name , ' : hello, I\'m being draged');
+    console.log( event.object.name , ' : hello, I\'m being draged !');
     // Clamp the y position to not exceed MAX_HEIGHT
     if (event.object.position.y > MAX_HEIGHT) {
         event.object.position.y = MAX_HEIGHT;
@@ -229,12 +229,11 @@ controls2.addEventListener( 'dragstart', function ( event ) {
 } );
 
 controls2.addEventListener( 'dragend', function ( event ) {
-    
     controls.enabled = true
     event.object.material.emissive.set( 0x000000 );
     event.object.position.y = 1.0215;
-    // 1.004 
-
+    console.log(Math.round(event.object.position.x * 19.74) , Math.round(event.object.position.z * 19.74));
+    // console.log(event.object.position.x , event.object.position.z);
 } );
 
 
@@ -243,10 +242,11 @@ controls2.addEventListener( 'dragend', function ( event ) {
 let cameraAngle = 0;
 let cameraHeight = 0.9;
 let cameraRadius = 2; // Adjust based on your scene scale
-let cinematicPhase = 0;
-const CINEMATIC_DURATION = 8; // Duration of each phase in seconds
 //
 
+let ah = new THREE.AxesHelper(15);
+ah.position.y = 1.022;
+scene.add(ah)
 const clock = new THREE.Clock()
 let previousTime = 0
 
