@@ -1,10 +1,25 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
+import gsap from 'gsap'
+
 
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
+
+
+
+const loadingScreen = document.getElementById('loading-screen');
+
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onLoad = function () {
+    gsap.to(loadingScreen, { opacity: 0, duration: 1, onComplete: () => {
+        loadingScreen.style.display = 'none';
+    }});
+};
+
 
 const gui = new GUI()
 
@@ -83,13 +98,13 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 
 //GLTF Loading
-const GLTFLoaderr = new GLTFLoader();
+const GLTFLoaderr = new GLTFLoader(loadingManager);
 
 GLTFLoaderr.load(
     '/models/round_wooden_table_01_4k.gltf/round_wooden_table_01_4k.gltf',
     function ( gltf ) {
-        gltf.scene.children[0].position.y = -1;
-        gui.add(gltf.scene.children[0].position, 'y', -50, 1).step(1);
+        gltf.scene.children[0].position.y = 0;
+        // gui.add(gltf.scene.children[0].position, 'y', -50, 1).step(1);
         scene.add( gltf.scene.children[0] );
     }
 );
@@ -126,22 +141,57 @@ GLTFLoaderr.load(
         //     x += 1;
         // }
         
-        gltf.scene.position.y = 0.004;
-        gui.add(gltf.scene.position, 'y', -50, 1).step(1);
+        gltf.scene.position.y = 1.004;
+        // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
         scene.add(gltf.scene)
     }
 );
 //
 
-//Enviroment Map
-const rgbeLoader = new RGBELoader();
-rgbeLoader.load('/models/envmap/photo_studio_loft_hall_8k.pic', (enviroment_map) => {
+// //Enviroment Map
+// const rgbeLoader = new RGBELoader();
+// rgbeLoader.load('/models/envmap/photo_studio_loft_hall_8k.pic', (enviroment_map) => {
+//     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
+//     scene.background  = enviroment_map;
+//     scene.environment = enviroment_map;
+// })
+
+// enviroment map
+const rgbeLoader = new RGBELoader(loadingManager);
+rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
     enviroment_map.mapping = THREE.EquirectangularReflectionMapping
     scene.background  = enviroment_map;
     scene.environment = enviroment_map;
+    
+    scene.backgroundBlurriness = 0.5; 
+    scene.environmentIntensity = 0.01; 
+    scene.backgroundIntensity  = 0.007;
 })
 
+let cinm = true;
+
+const handleKeyDown = (event) => {
+    const keyName = event.key;
+
+    // console.log(keyName)
+
+    if (keyName === " "){
+        camera.position.set(0.011, 1.3785, -0.4220)
+        cinm = false;
+    }
+};
+document.addEventListener("keydown", handleKeyDown)
+
+
 //  Animate
+//
+let cameraAngle = 0;
+let cameraHeight = 0.8;
+let cameraRadius = 2; // Adjust based on your scene scale
+let cinematicPhase = 0;
+const CINEMATIC_DURATION = 8; // Duration of each phase in seconds
+//
+
 const clock = new THREE.Clock()
 let previousTime = 0
 
@@ -150,6 +200,18 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
+
+    if (cinm){
+        cameraAngle += 0.007;
+        cameraHeight += 0.0007;
+        camera.position.x = Math.cos(cameraAngle) * (cameraRadius - cameraHeight);
+        camera.position.z = Math.sin(cameraAngle) * (cameraRadius - cameraHeight);
+        camera.position.y = cameraHeight;
+        
+        if (cameraHeight > 3) cameraHeight = 0.8;
+
+        camera.lookAt(0, 0, 0);
+    }
 
     // Update controls
     controls.update()
