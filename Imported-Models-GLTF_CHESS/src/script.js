@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 import GUI from 'lil-gui'
 import gsap from 'gsap'
 
@@ -7,7 +8,6 @@ import gsap from 'gsap'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
-
 
 
 const loadingScreen = document.getElementById('loading-screen');
@@ -86,6 +86,8 @@ const controls = new OrbitControls(camera, canvas)
 controls.target.set(0, 0.75, 0)
 controls.enableDamping = true
 
+let objects = []
+
 //  Renderer
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas
@@ -95,7 +97,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-
+//
 
 //GLTF Loading
 const GLTFLoaderr = new GLTFLoader(loadingManager);
@@ -109,6 +111,8 @@ GLTFLoaderr.load(
     }
 );
 
+
+
 GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
@@ -117,35 +121,46 @@ GLTFLoaderr.load(
         let z = -0.2;
 
         // Testing right apraoch
-        // let item;
-        // let posx = -0.36;
-		// while (gltf.scene.children.length){
-        //     item = gltf.scene.children[0];
-        //     if (x >= 16){
-        //         z = -0.25;
-        //         posx = -1.15;
-        //     }
-        //     if (item.name === "board"){
-        //         Board = item;
-        //         item.position.y = 1.004;
-        //         item.position.x = 0;
-        //         item.position.z = 0.179;
-        //         x -= 1;                    
-        //     }
-        //     else{
-        //         item.position.y = 1.004;
-        //         item.position.x = posx + (0.05 * x);
-        //         item.position.z = z;
-        //     }
-        //     scene.add(item)
-        //     x += 1;
-        // }
+        let item;
+        let posx = -0.36;
+		while (gltf.scene.children.length){
+            item = gltf.scene.children[0];
+            if (x >= 16){
+                z = -0.25;
+                posx = -1.15;
+            }
+            if (item.name === "board"){
+                Board = item;
+                item.position.y = 1.004;
+                item.position.x = 0;
+                item.position.z = 0.179;
+                x -= 1;                    
+            }
+            else{
+                objects.push(item)
+                item.position.y = 1.004;
+                item.position.x = posx + (0.05 * x);
+                item.position.z = z;
+            }
+            scene.add(item)
+            // item.position.max(new THREE.Vector3(5, 1.5, 5));
+
+
+            x += 1;
+        }
         
-        gltf.scene.position.y = 1.004;
-        // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
-        scene.add(gltf.scene)
+        // gltf.scene.position.y = 1.004;
+        // // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
+        // scene.add(gltf.scene)
     }
 );
+
+let dragg = false
+let controls2; 
+
+
+
+
 //
 
 // //Enviroment Map
@@ -181,12 +196,31 @@ const handleKeyDown = (event) => {
     }
 };
 document.addEventListener("keydown", handleKeyDown)
+controls2 = new DragControls( objects, camera, canvas );
+    
+// add event listener to highlight dragged objects
+
+controls2.addEventListener( 'dragstart', function ( event ) {
+
+    controls.enabled = false
+    event.object.material.emissive.set( 0xaaaaaa );
+    
+} );
+
+controls2.addEventListener( 'dragend', function ( event ) {
+    
+    controls.enabled = true
+    event.object.material.emissive.set( 0x000000 );
+    event.object.position.y = 1.0215;
+    // 1.004 
+
+} );
 
 
 //  Animate
 //
 let cameraAngle = 0;
-let cameraHeight = 0.8;
+let cameraHeight = 0.9;
 let cameraRadius = 2; // Adjust based on your scene scale
 let cinematicPhase = 0;
 const CINEMATIC_DURATION = 8; // Duration of each phase in seconds
@@ -197,6 +231,11 @@ let previousTime = 0
 
 const tick = () =>
 {
+    if (objects.length && dragg === false){
+        dragg = true;
+        console.log('Drag activated !');
+    }
+
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
@@ -208,7 +247,7 @@ const tick = () =>
         camera.position.z = Math.sin(cameraAngle) * (cameraRadius - cameraHeight);
         camera.position.y = cameraHeight;
         
-        if (cameraHeight > 3) cameraHeight = 0.8;
+        if (cameraHeight > 3) cameraHeight = 0.9;
 
         camera.lookAt(0, 0, 0);
     }
