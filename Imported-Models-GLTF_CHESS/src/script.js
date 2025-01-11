@@ -107,7 +107,7 @@ GLTFLoaderr.load(
     function ( gltf ) {
         gltf.scene.children[0].position.y = 0;
         // gui.add(gltf.scene.children[0].position, 'y', -50, 1).step(1);
-        scene.add( gltf.scene.children[0] );
+        // scene.add( gltf.scene.children[0] ); , Jilali Table
     }
 );
 
@@ -119,39 +119,47 @@ GLTFLoaderr.load(
         let x = 0;
         let Board;
         let z = -0.2;
-
-        // Testing right apraoch
         let item;
-        let posx = -0.36;
-		while (gltf.scene.children.length){
+
+        // 1st Method 
+        // Testing right apraoch
+        // let posx = -0.36;
+		// while (gltf.scene.children.length){
+        //     item = gltf.scene.children[0];
+        //     if (x >= 16){
+            //         z = -0.25;
+        //         posx = -1.15;
+        //     }
+        //     if (item.name === "board"){
+        //         Board = item;
+        //         item.position.y = 1.004;
+        //         item.position.x = 0;
+        //         item.position.z = 0.179;
+        //         x -= 1;                    
+        //     }
+        //     else{
+            //         objects.push(item)
+        //         item.position.y = 1.004;
+        //         item.position.x = posx + (0.05 * x);
+        //         item.position.z = z;
+        //     }
+        //     scene.add(item)
+        
+        //     x += 1;
+        // }
+        
+        // 2nd Method 
+        while (gltf.scene.children.length){
             item = gltf.scene.children[0];
-            if (x >= 16){
-                z = -0.25;
-                posx = -1.15;
-            }
             if (item.name === "board"){
-                Board = item;
                 item.position.y = 1.004;
-                item.position.x = 0;
-                item.position.z = 0.179;
-                x -= 1;                    
             }
             else{
                 objects.push(item)
-                item.position.y = 1.004;
-                item.position.x = posx + (0.05 * x);
-                item.position.z = z;
+                item.position.y = 1.0215;
             }
             scene.add(item)
-            // item.position.max(new THREE.Vector3(5, 1.5, 5));
-
-
-            x += 1;
         }
-        
-        // gltf.scene.position.y = 1.004;
-        // // gui.add(gltf.scene.position, 'y', -50, 1).step(1);
-        // scene.add(gltf.scene)
     }
 );
 
@@ -160,9 +168,7 @@ let controls2;
 
 
 
-
 //
-
 // //Enviroment Map
 // const rgbeLoader = new RGBELoader();
 // rgbeLoader.load('/models/envmap/photo_studio_loft_hall_8k.pic', (enviroment_map) => {
