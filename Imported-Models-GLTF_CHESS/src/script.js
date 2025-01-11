@@ -14,7 +14,12 @@ const loadingScreen = document.getElementById('loading-screen');
 
 const loadingManager = new THREE.LoadingManager();
 
+///Music
+const hit_sound = new Audio('/models/passion.mp3');
+///
+
 loadingManager.onLoad = function () {
+    hit_sound.play();
     gsap.to(loadingScreen, { opacity: 0, duration: 1, onComplete: () => {
         loadingScreen.style.display = 'none';
     }});
@@ -107,7 +112,7 @@ GLTFLoaderr.load(
     function ( gltf ) {
         gltf.scene.children[0].position.y = 0;
         // gui.add(gltf.scene.children[0].position, 'y', -50, 1).step(1);
-        // scene.add( gltf.scene.children[0] ); , Jilali Table
+        scene.add( gltf.scene.children[0] ); //Jilali Table
     }
 );
 
