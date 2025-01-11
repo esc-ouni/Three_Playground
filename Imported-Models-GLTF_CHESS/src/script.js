@@ -199,10 +199,8 @@ let cinm = true;
 const handleKeyDown = (event) => {
     const keyName = event.key;
 
-    // console.log(keyName)
-
     if (keyName === " "){
-        camera.position.set(0.011, 1.3785, -0.4220)
+        camera.position.set(0.011, 1.3785, camera.position.z > 0 ? -0.4220:0.4220)
         cinm = false;
     }
 };
@@ -211,6 +209,18 @@ controls2 = new DragControls( objects, camera, canvas );
     
 // add event listener to highlight dragged objects
 
+const MAX_HEIGHT = 1.03; // Set your desired maximum height
+
+controls2.addEventListener('drag', function (event) {
+    console.log( event.object.name , ' : hello, I\'m being draged');
+    // Clamp the y position to not exceed MAX_HEIGHT
+    if (event.object.position.y > MAX_HEIGHT) {
+        event.object.position.y = MAX_HEIGHT;
+    }
+    if (event.object.position.y <= 1.021) {
+        event.object.position.y = 1.021;
+    }
+});
 controls2.addEventListener( 'dragstart', function ( event ) {
 
     controls.enabled = false
