@@ -221,10 +221,15 @@ controls2.addEventListener('drag', function (event) {
         event.object.position.y = 1.021;
     }
 });
+
+///l
+let init_pos_x, init_pos_y;
 controls2.addEventListener( 'dragstart', function ( event ) {
 
     controls.enabled = false
     event.object.material.emissive.set( 0xaaaaaa );
+    init_pos_x = event.object.position.x;
+    init_pos_y = event.object.position.z;
     
 } );
 
@@ -234,11 +239,27 @@ function isNegativeZero(value) {
 }
 ///
 
+
+
 ///Get The position World to matrix
-const RATIO_FACTOR   = 19.74;
-const R_RATIO_FACTOR = 0.03;
-const SQUARE_DIAMETER = 0.06; // 0.03
-const SQUARE_RADIUS   = 0.03; // 0.03
+const RATIO_FACTOR    = 19.74;
+const SQUARE_DIAMETER = 0.058;
+const SQUARE_RADIUS   = 0.029;
+
+///Validator
+function Validator(pos) {
+    let cords = WorldToMatrix(pos.x, pos.z);
+
+    if ((cords[0] > 4 || cords[0] < -4) || (cords[1] > 4 || cords[1] < -4)){
+        pos.x = init_pos_x;
+        pos.z = init_pos_y;
+        return ;
+    }
+    
+    pos.x =  -((cords[0] > 0 ? cords[0] - 1: cords[0]) * SQUARE_DIAMETER) - SQUARE_RADIUS;
+    pos.z =   ((cords[1] > 0 ? cords[1] - 1: cords[1]) * SQUARE_DIAMETER) + SQUARE_RADIUS;
+}
+///
 
 function WorldToMatrix(world_x, world_y){
     let x = -Math.round(world_x * RATIO_FACTOR);
@@ -266,53 +287,36 @@ controls2.addEventListener( 'dragend', function ( event ) {
     controls.enabled = true
     event.object.material.emissive.set( 0x000000 );
     event.object.position.y = 1.0215;
-    // console.log(event.object.position.x , event.object.position.z);
-    // WorldToMatrix(event.object.position.x, event.object.position.z)
-    console.log("before ;x : ", -event.object.position.x ,", y : ", event.object.position.z);
-    let cords = WorldToMatrix(event.object.position.x, event.object.position.z);
-    
-    // event.object.position.x = -((cords[0] * (R_RATIO_FACTOR * 2)) + R_RATIO_FACTOR);
-    // event.object.position.z =  (cords[1] * (R_RATIO_FACTOR * 2)) + R_RATIO_FACTOR;
-    
-    // event.object.position.x = Math.round(-(cords[0] / RATIO_FACTOR) * 1000) / 1000;
-    // event.object.position.z = Math.round((cords[1] / RATIO_FACTOR) * 1000) / 1000;
-    
-    // event.object.position.x = -(cords[0] / RATIO_FACTOR) - SQUARE_RADIUS;
-    event.object.position.z =  ((cords[1] - 1) * SQUARE_DIAMETER) + SQUARE_RADIUS;
-    
-    // event.object.position.x = -(Math.round(cords[0] / RATIO_FACTOR * 1000) / 1000) + SQUARE_RADIUS;
-    // event.object.position.z = ((Math.round(cords[1] / RATIO_FACTOR * 1000) / 1000) * SQUARE_RADIUS) - SQUARE_RADIUS;
-    
-    // console.log(cords[0], cords[1]);
-    // console.log("after  ;x : ", - event.object.position.x ,", y : ", event.object.position.z);
-    // WorldToMatrix(event.object.position.x, event.object.position.z);
-    // event.object.position.x = 0;
-    // event.object.position.z = 0;
-    // gui.add(event.object.position, 'x', -10, 10).step(0.001)
-    // gui.add(event.object.position, 'z', -10, 10).step(0.001)
+
+    Validator(event.object.position);
 
 } );
 
 //
+
+
+////BUttona
+let button = document.getElementById('myButton');
+
+// Set button properties
+// button.textContent = 'Pass N Play';
+
+// Add event listener
+button.addEventListener('click', function() {
+    alert('Button was clicked!');
+});
+///
+
+
+
+
+
+
 //  Animate
 let cameraAngle  = 0;
 let cameraHeight = 0.9;
 let cameraRadius = 2; // Adjust based on your scene scale
 //
-
-
-
-
-
-
-
-
-
-// before ;x :  0.020658561296859175 , y :  0.020658561296859175
-// x :  1 , y :  1
-// after  ;x :  0.020658561296859175 , y :  0.020658561296859175
-// x :  1 , y :  1
-
 
 let ah = new THREE.AxesHelper(15);
 // ah.position.y = 1.022;
