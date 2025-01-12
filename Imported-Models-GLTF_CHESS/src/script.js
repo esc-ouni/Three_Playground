@@ -16,6 +16,7 @@ const loadingManager = new THREE.LoadingManager();
 
 ///Music
 const hit_sound = new Audio('/models/passion.mp3');
+const move_sound = new Audio('/sounds/move.mp3');
 ///
 
 loadingManager.onLoad = function () {
@@ -196,12 +197,16 @@ rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
 
 let cinm = true;
 
+function setPlayerPov(){
+    camera.position.set(0.011, 1.3785, camera.position.z > 0 ? -0.4220:0.4220)
+    cinm = false;
+}
+
 const handleKeyDown = (event) => {
     const keyName = event.key;
 
     if (keyName === " "){
-        camera.position.set(0.011, 1.3785, camera.position.z > 0 ? -0.4220:0.4220)
-        cinm = false;
+        setPlayerPov();
     }
 };
 document.addEventListener("keydown", handleKeyDown)
@@ -212,7 +217,7 @@ controls2 = new DragControls( objects, camera, canvas );
 const MAX_HEIGHT = 1.03; // Set your desired maximum height
 
 controls2.addEventListener('drag', function (event) {
-    console.log( event.object.name , ' : hello, I\'m being draged !');
+    // console.log( event.object.name , ' : hello, I\'m being draged !');
     // Clamp the y position to not exceed MAX_HEIGHT
     if (event.object.position.y > MAX_HEIGHT) {
         event.object.position.y = MAX_HEIGHT;
@@ -255,7 +260,7 @@ function Validator(pos) {
         pos.z = init_pos_y;
         return ;
     }
-    
+    move_sound.play();
     pos.x =  -((cords[0] > 0 ? cords[0] - 1: cords[0]) * SQUARE_DIAMETER) - SQUARE_RADIUS;
     pos.z =   ((cords[1] > 0 ? cords[1] - 1: cords[1]) * SQUARE_DIAMETER) + SQUARE_RADIUS;
 }
@@ -277,11 +282,10 @@ function WorldToMatrix(world_x, world_y){
     else if (y === 0){
         y = 1
     }
-    console.log("x : ",  x,", y : ", y);
+    // console.log("x : ",  x,", y : ", y);
     return [x, y];
 }
 ///
-
 
 controls2.addEventListener( 'dragend', function ( event ) {
     controls.enabled = true
@@ -291,26 +295,12 @@ controls2.addEventListener( 'dragend', function ( event ) {
     Validator(event.object.position);
 
 } );
-
 //
 
-
 ////BUttona
-let button = document.getElementById('myButton');
-
-// Set button properties
-// button.textContent = 'Pass N Play';
-
-// Add event listener
-button.addEventListener('click', function() {
-    alert('Button was clicked!');
-});
+let button = document.getElementById ('mybutton');
+button.addEventListener('click', setPlayerPov);
 ///
-
-
-
-
-
 
 //  Animate
 let cameraAngle  = 0;
@@ -328,7 +318,7 @@ const tick = () =>
 {
     if (objects.length && dragg === false){
         dragg = true;
-        console.log('Drag activated !');
+        // console.log('Drag activated !');
     }
 
     const elapsedTime = clock.getElapsedTime()
