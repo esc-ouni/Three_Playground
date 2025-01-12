@@ -11,10 +11,6 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
 
-///Using lib
-const engine_validator = new Chess();
-///
-
 const loadingScreen = document.getElementById('loading-screen');
 
 const loadingManager = new THREE.LoadingManager();
@@ -249,43 +245,85 @@ function isNegativeZero(value) {
 }
 ///
 
-
-
 ///Get The position World to matrix
 const RATIO_FACTOR    = 19.74;
 const SQUARE_DIAMETER = 0.058;
 const SQUARE_RADIUS   = 0.029;
 
+
+
+
+///Using lib
+const engine_validator = new Chess();
+///
+
+///cordinnatesToNotation
+function convertCoordinatesToNotation(x, y) {
+    const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    
+    // Adjust for coordinate system without 0 (-4 to 4, skipping 0)
+    const columnIndex = x < 0 ? x + 4 : x > 0 ? x + 3 : null;
+    
+    // Reverse row numbering (if -4 is top, 4 is bottom)
+    const rowNumber = y > 0 ? y + 4 : y + 5;
+    
+    // Validate the conversion
+    if (columnIndex === null || columnIndex < 0 || columnIndex > 7 || rowNumber < 1 || rowNumber > 8) {
+        // console.error('Invalid coordinates');
+        return null;
+    }
+    
+    return columns[columnIndex] + rowNumber;
+}
+///
+
 ///Validator
 function Validator(pos) {
+    let words = WorldToMatrix(init_pos_x, init_pos_y);
     let cords = WorldToMatrix(pos.x, pos.z);
 
-    if ((cords[0] > 4 || cords[0] < -4) || (cords[1] > 4 || cords[1] < -4)){
+
+    const fromNotation = convertCoordinatesToNotation(words[0], words[1]);
+    const toNotation   = convertCoordinatesToNotation(cords[0], cords[1]);
+
+    console.log('before cordinnates : ', words[0], words[1]);
+    console.log('from : ', fromNotation);
+    console.log('after  cordinnates : ', cords[0], cords[1]);
+    console.log('to   : ', toNotation);
+    console.log('\n\n');
+
+    if ((cords[0] > 4 || cords[0] < -4) || (cords[1] > 4 || cords[1] < -4) || !fromNotation || !toNotation){
         pos.x = init_pos_x;
         pos.z = init_pos_y;
         return ;
     }
 
-    // try {
-    //     if (engine_validator.move({from : 'e2', to: 'e4'})){
-    //         console.log('Valid Move !')
-    //     }
-    //     else {
-    //         console.log('InValid Move !')
-    //         return ;
-    //     }   
-    // } catch (error) {
-    //     console.log('InValid Move !')
-    //     pos.x = init_pos_x;
-    //     pos.z = init_pos_y;
-    //     return ;
-    // }
-
-    
-
-    move_sound.play();
-    pos.x =  -((cords[0] > 0 ? cords[0] - 1: cords[0]) * SQUARE_DIAMETER) - SQUARE_RADIUS;
-    pos.z =   ((cords[1] > 0 ? cords[1] - 1: cords[1]) * SQUARE_DIAMETER) + SQUARE_RADIUS;
+    try {
+        let result = engine_validator.move({from : fromNotation, to: toNotation});
+        console.log('==> Game judgemet : ', result);
+        if (result){
+            console.log('Valid Move !')
+            move_sound.play();
+            pos.x =  -((cords[0] > 0 ? cords[0] - 1: cords[0]) * SQUARE_DIAMETER) - SQUARE_RADIUS;
+            pos.z =   ((cords[1] > 0 ? cords[1] - 1: cords[1]) * SQUARE_DIAMETER) + SQUARE_RADIUS;
+            gsap.to(camera.position, {
+                z: camera.position.z > 0 ? -0.4220:0.4220,
+                duration: 1.5,
+                ease: "power3.inOut",
+            });
+        }
+        else {
+            console.log('InValid Move !')
+            pos.x = init_pos_x;
+            pos.z = init_pos_y;
+            return ;
+        }   
+    } catch (error) {
+        console.log('InValid Move !')
+        pos.x = init_pos_x;
+        pos.z = init_pos_y;
+        return ;
+    }
 }
 ///
 
