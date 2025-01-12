@@ -235,7 +235,10 @@ function isNegativeZero(value) {
 ///
 
 ///Get The position World to matrix
-const RATIO_FACTOR = 19.74;
+const RATIO_FACTOR   = 19.74;
+const R_RATIO_FACTOR = 0.03;
+const SQUARE_DIAMETER = 0.06; // 0.03
+const SQUARE_RADIUS   = 0.03; // 0.03
 
 function WorldToMatrix(world_x, world_y){
     let x = -Math.round(world_x * RATIO_FACTOR);
@@ -254,6 +257,7 @@ function WorldToMatrix(world_x, world_y){
         y = 1
     }
     console.log("x : ",  x,", y : ", y);
+    return [x, y];
 }
 ///
 
@@ -263,7 +267,30 @@ controls2.addEventListener( 'dragend', function ( event ) {
     event.object.material.emissive.set( 0x000000 );
     event.object.position.y = 1.0215;
     // console.log(event.object.position.x , event.object.position.z);
-    WorldToMatrix(event.object.position.x, event.object.position.z)
+    // WorldToMatrix(event.object.position.x, event.object.position.z)
+    console.log("before ;x : ", -event.object.position.x ,", y : ", event.object.position.z);
+    let cords = WorldToMatrix(event.object.position.x, event.object.position.z);
+    
+    // event.object.position.x = -((cords[0] * (R_RATIO_FACTOR * 2)) + R_RATIO_FACTOR);
+    // event.object.position.z =  (cords[1] * (R_RATIO_FACTOR * 2)) + R_RATIO_FACTOR;
+    
+    // event.object.position.x = Math.round(-(cords[0] / RATIO_FACTOR) * 1000) / 1000;
+    // event.object.position.z = Math.round((cords[1] / RATIO_FACTOR) * 1000) / 1000;
+    
+    // event.object.position.x = -(cords[0] / RATIO_FACTOR) - SQUARE_RADIUS;
+    event.object.position.z =  ((cords[1] - 1) * SQUARE_DIAMETER) + SQUARE_RADIUS;
+    
+    // event.object.position.x = -(Math.round(cords[0] / RATIO_FACTOR * 1000) / 1000) + SQUARE_RADIUS;
+    // event.object.position.z = ((Math.round(cords[1] / RATIO_FACTOR * 1000) / 1000) * SQUARE_RADIUS) - SQUARE_RADIUS;
+    
+    // console.log(cords[0], cords[1]);
+    // console.log("after  ;x : ", - event.object.position.x ,", y : ", event.object.position.z);
+    // WorldToMatrix(event.object.position.x, event.object.position.z);
+    // event.object.position.x = 0;
+    // event.object.position.z = 0;
+    // gui.add(event.object.position, 'x', -10, 10).step(0.001)
+    // gui.add(event.object.position, 'z', -10, 10).step(0.001)
+
 } );
 
 //
@@ -275,9 +302,21 @@ let cameraRadius = 2; // Adjust based on your scene scale
 
 
 
+
+
+
+
+
+
+// before ;x :  0.020658561296859175 , y :  0.020658561296859175
+// x :  1 , y :  1
+// after  ;x :  0.020658561296859175 , y :  0.020658561296859175
+// x :  1 , y :  1
+
+
 let ah = new THREE.AxesHelper(15);
-ah.position.y = 1.022;
-scene.add(ah)
+// ah.position.y = 1.022;
+// scene.add(ah)
 const clock = new THREE.Clock()
 let previousTime = 0
 
