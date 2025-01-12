@@ -18,6 +18,7 @@ const loadingManager = new THREE.LoadingManager();
 ///Music
 const hit_sound = new Audio('/models/passion.mp3');
 const move_sound = new Audio('/sounds/move.mp3');
+const illegal_sound = new Audio('/sounds/illegal.mp3');
 ///
 
 loadingManager.onLoad = function () {
@@ -199,7 +200,8 @@ rgbeLoader.load('/models/neon_photostudio_2k.hdr', (enviroment_map) => {
 let cinm = true;
 
 function setPlayerPov(){
-    camera.position.set(0.011, 1.3785, camera.position.z > 0 ? -0.4220:0.4220)
+    // camera.position.set(0.011, 1.3785, camera.position.z > 0 ? -0.4220:0.4220)
+    camera.position.set(0.011, 1.3785, -0.4220)
     cinm = false;
 }
 
@@ -293,6 +295,7 @@ function Validator(pos) {
     console.log('\n\n');
 
     if ((cords[0] > 4 || cords[0] < -4) || (cords[1] > 4 || cords[1] < -4) || !fromNotation || !toNotation){
+        // illegal_sound.play();
         pos.x = init_pos_x;
         pos.z = init_pos_y;
         return ;
@@ -314,12 +317,14 @@ function Validator(pos) {
         }
         else {
             console.log('InValid Move !')
+            illegal_sound.play();
             pos.x = init_pos_x;
             pos.z = init_pos_y;
             return ;
         }   
     } catch (error) {
         console.log('InValid Move !')
+        illegal_sound.play();
         pos.x = init_pos_x;
         pos.z = init_pos_y;
         return ;
