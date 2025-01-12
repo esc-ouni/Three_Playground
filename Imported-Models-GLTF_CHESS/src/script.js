@@ -228,21 +228,52 @@ controls2.addEventListener( 'dragstart', function ( event ) {
     
 } );
 
+///Edge Case
+function isNegativeZero(value) {
+    return value === 0 && (1 / value) === -Infinity;
+}
+///
+
+///Get The position World to matrix
+const RATIO_FACTOR = 19.74;
+
+function WorldToMatrix(world_x, world_y){
+    let x = -Math.round(world_x * RATIO_FACTOR);
+    let y =  Math.round(world_y * RATIO_FACTOR);
+    
+    if (x === 0 && isNegativeZero(x)){
+        x = -1
+    }
+    else if (x === 0 ){
+        x = 1
+    }
+    if (y === 0 && isNegativeZero(y)){
+        y = -1
+    }
+    else if (y === 0){
+        y = 1
+    }
+    console.log("x : ",  x,", y : ", y);
+}
+///
+
+
 controls2.addEventListener( 'dragend', function ( event ) {
     controls.enabled = true
     event.object.material.emissive.set( 0x000000 );
     event.object.position.y = 1.0215;
-    console.log(Math.round(event.object.position.x * 19.74) , Math.round(event.object.position.z * 19.74));
     // console.log(event.object.position.x , event.object.position.z);
+    WorldToMatrix(event.object.position.x, event.object.position.z)
 } );
 
-
-//  Animate
 //
-let cameraAngle = 0;
+//  Animate
+let cameraAngle  = 0;
 let cameraHeight = 0.9;
 let cameraRadius = 2; // Adjust based on your scene scale
 //
+
+
 
 let ah = new THREE.AxesHelper(15);
 ah.position.y = 1.022;
