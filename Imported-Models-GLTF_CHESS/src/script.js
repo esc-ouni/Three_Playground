@@ -3,12 +3,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 import GUI from 'lil-gui'
 import gsap from 'gsap'
+import { Chess } from 'chess.js'
 
 
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
 
+
+///Using lib
+const engine_validator = new Chess();
+///
 
 const loadingScreen = document.getElementById('loading-screen');
 
@@ -260,6 +265,24 @@ function Validator(pos) {
         pos.z = init_pos_y;
         return ;
     }
+
+    // try {
+    //     if (engine_validator.move({from : 'e2', to: 'e4'})){
+    //         console.log('Valid Move !')
+    //     }
+    //     else {
+    //         console.log('InValid Move !')
+    //         return ;
+    //     }   
+    // } catch (error) {
+    //     console.log('InValid Move !')
+    //     pos.x = init_pos_x;
+    //     pos.z = init_pos_y;
+    //     return ;
+    // }
+
+    
+
     move_sound.play();
     pos.x =  -((cords[0] > 0 ? cords[0] - 1: cords[0]) * SQUARE_DIAMETER) - SQUARE_RADIUS;
     pos.z =   ((cords[1] > 0 ? cords[1] - 1: cords[1]) * SQUARE_DIAMETER) + SQUARE_RADIUS;
