@@ -3,12 +3,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js'
 import GUI from 'lil-gui'
 import gsap from 'gsap'
-import { Chess } from 'chess.js'
-
-
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js'
+import { Chess } from 'chess.js'
 
 
 const loadingScreen = document.getElementById('loading-screen');
@@ -19,6 +16,7 @@ const loadingManager = new THREE.LoadingManager();
 const hit_sound = new Audio('/models/passion.mp3');
 const move_sound = new Audio('/sounds/move.mp3');
 const illegal_sound = new Audio('/sounds/illegal.mp3');
+const capture_sound = new Audio('/sounds/capture.mp3');
 ///
 
 loadingManager.onLoad = function () {
@@ -135,7 +133,7 @@ GLTFLoaderr.load(
 		// while (gltf.scene.children.length){
         //     item = gltf.scene.children[0];
         //     if (x >= 16){
-            //         z = -0.25;
+        //             z = -0.25;
         //         posx = -1.15;
         //     }
         //     if (item.name === "board"){
@@ -146,7 +144,7 @@ GLTFLoaderr.load(
         //         x -= 1;                    
         //     }
         //     else{
-            //         objects.push(item)
+        //             objects.push(item)
         //         item.position.y = 1.004;
         //         item.position.x = posx + (0.05 * x);
         //         item.position.z = z;
@@ -159,6 +157,7 @@ GLTFLoaderr.load(
         // 2nd Method 
         while (gltf.scene.children.length){
             item = gltf.scene.children[0];
+            // console.log("=> ", item.name);
             if (item.name === "board"){
                 item.position.y = 1.004;
             }
@@ -202,6 +201,7 @@ let cinm = true;
 function setPlayerPov(){
     // camera.position.set(0.011, 1.3785, camera.position.z > 0 ? -0.4220:0.4220)
     camera.position.set(0.011, 1.3785, -0.4220)
+    controls.enabled = false
     cinm = false;
 }
 
@@ -234,7 +234,7 @@ controls2.addEventListener('drag', function (event) {
 let init_pos_x, init_pos_y;
 controls2.addEventListener( 'dragstart', function ( event ) {
 
-    controls.enabled = false
+    // controls.enabled = false
     event.object.material.emissive.set( 0xaaaaaa );
     init_pos_x = event.object.position.x;
     init_pos_y = event.object.position.z;
@@ -262,16 +262,10 @@ const engine_validator = new Chess();
 ///cordinnatesToNotation
 function convertCoordinatesToNotation(x, y) {
     const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    
-    // Adjust for coordinate system without 0 (-4 to 4, skipping 0)
     const columnIndex = x < 0 ? x + 4 : x > 0 ? x + 3 : null;
-    
-    // Reverse row numbering (if -4 is top, 4 is bottom)
     const rowNumber = y > 0 ? y + 4 : y + 5;
     
-    // Validate the conversion
     if (columnIndex === null || columnIndex < 0 || columnIndex > 7 || rowNumber < 1 || rowNumber > 8) {
-        // console.error('Invalid coordinates');
         return null;
     }
     
@@ -279,8 +273,21 @@ function convertCoordinatesToNotation(x, y) {
 }
 ///
 
+///Capturing
+function findCapturedPiece(name, squareNotation) {
+    for (const piece of objects) {
+        const [x, y] = WorldToMatrix(piece.position.x, piece.position.z);
+        if (convertCoordinatesToNotation(x, y) === squareNotation && name !== piece.name){
+            console.log(piece.name, " being Captured !");
+            return piece;
+        }
+    }
+    return null;
+}
+///
+
 ///Validator
-function Validator(pos) {
+function Validator(name, pos) {
     let words = WorldToMatrix(init_pos_x, init_pos_y);
     let cords = WorldToMatrix(pos.x, pos.z);
 
@@ -306,6 +313,17 @@ function Validator(pos) {
         console.log('==> Game judgemet : ', result);
         if (result){
             console.log('Valid Move !')
+
+            ///Capturing
+            if (result.captured){
+                const capturedPiece = findCapturedPiece(name, toNotation);
+                if (capturedPiece) {
+                    console.log("Cptured Piece Found : ", capturedPiece.name);
+                    scene.remove(capturedPiece);
+                    objects = objects.filter(obj => obj !== capturedPiece); // tbu
+                    capture_sound.play(); // Sound for capture
+                }
+            }
             move_sound.play();
             pos.x =  -((cords[0] > 0 ? cords[0] - 1: cords[0]) * SQUARE_DIAMETER) - SQUARE_RADIUS;
             pos.z =   ((cords[1] > 0 ? cords[1] - 1: cords[1]) * SQUARE_DIAMETER) + SQUARE_RADIUS;
@@ -332,6 +350,7 @@ function Validator(pos) {
 }
 ///
 
+
 function WorldToMatrix(world_x, world_y){
     let x = -Math.round(world_x * RATIO_FACTOR);
     let y =  Math.round(world_y * RATIO_FACTOR);
@@ -354,11 +373,11 @@ function WorldToMatrix(world_x, world_y){
 ///
 
 controls2.addEventListener( 'dragend', function ( event ) {
-    controls.enabled = true
+    // controls.enabled = true
     event.object.material.emissive.set( 0x000000 );
     event.object.position.y = 1.0215;
 
-    Validator(event.object.position);
+    Validator(event.object.name, event.object.position);
 
 } );
 //
@@ -375,8 +394,6 @@ let cameraRadius = 2; // Adjust based on your scene scale
 //
 
 let ah = new THREE.AxesHelper(15);
-// ah.position.y = 1.022;
-// scene.add(ah)
 const clock = new THREE.Clock()
 let previousTime = 0
 
