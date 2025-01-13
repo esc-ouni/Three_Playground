@@ -13,8 +13,8 @@ const loadingScreen = document.getElementById('loading-screen');
 const loadingManager = new THREE.LoadingManager();
 
 ///Music
-const hit_sound = new Audio('/models/passion.mp3');
-const move_sound = new Audio('/sounds/move.mp3');
+const hit_sound     = new Audio('/sounds/passion.mp3');
+const move_sound    = new Audio('/sounds/move.mp3');
 const illegal_sound = new Audio('/sounds/illegal.mp3');
 const capture_sound = new Audio('/sounds/capture.mp3');
 ///
@@ -122,39 +122,8 @@ GLTFLoaderr.load(
 GLTFLoaderr.load(
     '/models/chess_set_4k.gltf/chess_set_4k.gltf',
 	function ( gltf ) {
-        let x = 0;
-        let Board;
-        let z = -0.2;
         let item;
 
-        // 1st Method 
-        // Testing right apraoch
-        // let posx = -0.36;
-		// while (gltf.scene.children.length){
-        //     item = gltf.scene.children[0];
-        //     if (x >= 16){
-        //             z = -0.25;
-        //         posx = -1.15;
-        //     }
-        //     if (item.name === "board"){
-        //         Board = item;
-        //         item.position.y = 1.004;
-        //         item.position.x = 0;
-        //         item.position.z = 0.179;
-        //         x -= 1;                    
-        //     }
-        //     else{
-        //             objects.push(item)
-        //         item.position.y = 1.004;
-        //         item.position.x = posx + (0.05 * x);
-        //         item.position.z = z;
-        //     }
-        //     scene.add(item)
-        
-        //     x += 1;
-        // }
-        
-        // 2nd Method 
         while (gltf.scene.children.length){
             item = gltf.scene.children[0];
             // console.log("=> ", item.name);
