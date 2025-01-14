@@ -20,12 +20,13 @@ const capture_sound = new Audio('/sounds/capture.mp3');
 ///
 
 loadingManager.onLoad = function () {
-    hit_sound.play();
+    // hit_sound.play();
     gsap.to(loadingScreen, { opacity: 0, duration: 1, onComplete: () => {
         loadingScreen.style.display = 'none';
     }});
 };
-
+    
+window.addEventListener('click', () => {hit_sound.play();})
 
 const gui = new GUI()
 
